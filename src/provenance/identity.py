@@ -26,6 +26,20 @@ def _implied(s: IndicatorSeries, i: int) -> float | None:
     return None
 
 
+def _tolerance(s: IndicatorSeries, i: int) -> float:
+    """Flat 10%, widened for a product whose integer unit cost carries rounding error.
+
+    An integer unit cost c is c +- 0.5, a relative error of 0.5 / c (50% at c = 1).
+    Sum identities keep the flat band: their parts are large and rounding is negligible.
+    """
+    if s.identity == "product":
+        unit = s.components.get("unit_cost")
+        c = unit[i] if unit else None
+        if c is not None and c > 0 and float(c).is_integer():
+            return max(TOLERANCE, 0.5 / c)
+    return TOLERANCE
+
+
 def identity_score(s: IndicatorSeries) -> TestResult:
     if s.identity not in ("product", "sum") or not s.components:
         return TestResult(None, False, {"identity": {}, "incomplete": []})
@@ -49,6 +63,7 @@ def identity_score(s: IndicatorSeries) -> TestResult:
     if not testable:
         return TestResult(None, False, detail)
     bad = set(incomplete)
+    index = {y: i for i, y in enumerate(s.years)}
     clean = [y for y in testable
-             if y not in bad and abs(ratios[y] - 1.0) <= TOLERANCE + _EPS]
+             if y not in bad and abs(ratios[y] - 1.0) <= _tolerance(s, index[y]) + _EPS]
     return TestResult(len(clean) / len(testable), True, detail)

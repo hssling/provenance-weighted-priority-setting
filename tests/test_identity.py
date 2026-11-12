@@ -91,3 +91,29 @@ def test_no_identity_is_untestable():
     s = IndicatorSeries("n", "n", [2000], [1.0], "x")
     r = identity_score(s)
     assert r.testable is False and r.score is None
+
+
+def test_tpt_2023_clean_because_unit_cost_of_one_carries_50pct_rounding():
+    # budget_cpp_tpt is an integer; 1 means [0.5, 1.5], so ratio 0.896 is rounding, not a discrepancy.
+    r = identity_score(load_who_budget(BUDGET_CSV, "IND")["budget_tpt"])
+    assert abs(r.detail["identity"][2023] - 0.896) < 0.001
+    assert r.score is not None and abs(r.score - 4 / 6) < 1e-9
+
+
+def test_tpt_2024_2025_still_fail_after_rounding_allowance():
+    s = load_who_budget(BUDGET_CSV, "IND")["budget_tpt"]
+    r = identity_score(s)
+    assert r.detail["identity"][2024] > 3.0 and r.detail["identity"][2025] > 9.0
+    # Only 2024 and 2025 fail: drop them and the rest is fully clean.
+    keep = [i for i, y in enumerate(s.years) if y < 2024]
+    s2 = IndicatorSeries(s.key, s.label, [s.years[i] for i in keep], [s.values[i] for i in keep],
+                         s.source, {}, {k: [v[i] for i in keep] for k, v in s.components.items()}, "product")
+    assert identity_score(s2).score == 1.0
+
+
+def test_large_unit_cost_does_not_get_widened_band():
+    s = IndicatorSeries("p", "p", [2000], [1000.0 * 10 / 1.12], "x", {},
+                        {"unit_cost": [1000.0], "volume": [10.0]}, "product")
+    r = identity_score(s)
+    assert abs(r.detail["identity"][2000] - 1.12) < 1e-9
+    assert r.score == 0.0
