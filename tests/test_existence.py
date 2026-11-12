@@ -3,27 +3,40 @@ import pytest
 from provenance.existence import (
     NODE_LABELS,
     TB_BUDGET_MAPPING,
+    TB_BUDGET_PARTIAL,
     ExistenceReport,
     existence_report,
     check_mapping_targets,
 )
 from provenance.series import TestResult
 
-FIVE_INVISIBLE = {
+SIX_INVISIBLE = {
     "Airborne infection prevention and control",
     "Whole-genome sequencing for drug-susceptibility prediction",
+    "Active case finding",
     "Bovine tuberculosis control",
     "Private-sector engagement",
     "Milk pasteurisation / dairy food chain",
 }
 
 
-def test_five_of_eleven_tb_nodes_are_fiscally_invisible():
+def test_six_of_eleven_tb_nodes_are_fiscally_invisible():
     r = existence_report(NODE_LABELS, TB_BUDGET_MAPPING)
     assert len(NODE_LABELS) == 11
-    assert len(r.invisible) == 5
-    assert set(r.invisible) == FIVE_INVISIBLE
+    assert len(r.invisible) == 6
+    assert set(r.invisible) == SIX_INVISIBLE
     assert "Airborne infection prevention and control" in r.invisible
+    assert "Active case finding" in r.invisible
+
+
+def test_active_case_finding_has_no_budget_line():
+    # WHO data dictionary: budget_prog is "Budget required for programme costs to treat
+    # drug-susceptible TB". Active case FINDING is not treatment, so ACF is invisible.
+    # Name-matching budget_prog to ACF was the error; the definition is the evidence.
+    assert TB_BUDGET_MAPPING["acf"] is None
+    r = existence_report(NODE_LABELS, TB_BUDGET_MAPPING)
+    assert r.score["acf"] == 0.0
+    assert "acf" not in r.mapped
 
 
 def test_rank_two_intervention_has_no_budget_line():
@@ -32,14 +45,15 @@ def test_rank_two_intervention_has_no_budget_line():
     assert "airborne_ipc" not in r.mapped
 
 
-def test_high_ranked_interventions_without_budget_line_are_ranks_two_and_four():
-    # The finding that matters: the second- and fourth-best-evidenced interventions
-    # cannot be tracked, defended at budget time, or evaluated for value.
+def test_top_five_evidence_ranked_interventions_include_three_invisible():
+    # The finding that matters: three of the five best-evidenced interventions (ranks 2, 4
+    # and 5) cannot be tracked, defended at budget time, or evaluated for value.
     keys = list(NODE_LABELS)  # insertion order is evidence rank 1..11
     invisible_ranks = sorted(
         i + 1 for i, k in enumerate(keys) if TB_BUDGET_MAPPING[k] is None)
-    assert invisible_ranks == [2, 4, 7, 8, 10]
-    assert TB_BUDGET_MAPPING[keys[1]] is None and TB_BUDGET_MAPPING[keys[3]] is None
+    assert invisible_ranks == [2, 4, 5, 7, 8, 10]
+    top_five_invisible = [i + 1 for i in range(5) if TB_BUDGET_MAPPING[keys[i]] is None]
+    assert top_five_invisible == [2, 4, 5]
 
 
 def test_mapped_nodes_point_at_their_budget_lines():
@@ -47,13 +61,21 @@ def test_mapped_nodes_point_at_their_budget_lines():
     assert r.mapped == {
         "molecular_dx": "budget_lab",
         "tpt": "budget_tpt",
-        "acf": "budget_prog",
         "short_regimen": "budget_sld",
         "nutrition": "budget_patsup",
         "tb_hiv_dm": "budget_tbhiv",
     }
     assert set(r.score.values()) == {0.0, 1.0}
-    assert sum(r.score.values()) == 6.0
+    assert sum(r.score.values()) == 5.0
+
+
+def test_tb_hiv_diabetes_is_mapped_but_recorded_as_partial():
+    # Mapped (a TB/HIV line exists) but not the whole node: diabetes has no line.
+    # Partial coverage is a recorded fact, not a reason to score the node invisible.
+    assert TB_BUDGET_MAPPING["tb_hiv_dm"] == "budget_tbhiv"
+    assert "diabetes" in TB_BUDGET_PARTIAL["tb_hiv_dm"]
+    r = existence_report(NODE_LABELS, TB_BUDGET_MAPPING)
+    assert r.score["tb_hiv_dm"] == 1.0
 
 
 def test_every_mapping_target_is_a_real_who_budget_column():
