@@ -162,3 +162,79 @@ in December 2022 and India rolled out from 2024.
   totals (23169.14, 18388.23, 15063.46).
 
 A project about data provenance cannot leave its own provenance undocumented.
+
+---
+
+## 4. D1: the instrument run end to end on India's TB data
+
+Reproduce with `python demos/d1_tb.py` (writes `outputs/d1_*.csv` and `d1_summary.txt`; `outputs/`
+is gitignored). Numbers below were checked against the published TB-BOPAS outputs
+(`ijtb_bopas_long.csv`, `ijtb_slopes.csv`), independently of the code that computes them.
+
+### 4.1 What is audited, and what is not
+
+The five tests were developed on **financing** data. TB-BOPAS consumes **epidemiological** series.
+The provenance of a budget line says nothing about the provenance of a notification rate, so
+propagating one into the other would be incoherent. D1 therefore audits the six series in
+`ntep_trajectories.csv` (five are BOPAS targets; `BDQ_res_pct`, two points, is audited but not in
+the 60-cell grid). The financing audit (sections 1.1 to 1.5, plus T5) is reported separately and is
+**not** propagated.
+
+### 4.2 T2 is untestable on every series the priority score uses
+
+No NTEP series has an independent second source in the repository; `who_dataset` names a WHO table,
+not an independent source. T2 returns untestable for all six. The test that produced the strongest
+financing finding (WHO's funding gap contradicting the India TB Report, agreeing in 0 of 6 years)
+therefore has **no power** on the series the priority score consumes. T1 here reconciles 42 of 42
+rows, but it checks `value = scale * numerator / denominator` within the file, not WHO's numbers.
+
+### 4.3 T3 and T4 double-counted; T4 now subsumes T3
+
+T4 is T3 on the same steps plus credit for a disclosed break, so it is identical to T3 where nothing
+is declared. Combining both penalised one implausible step twice. The composite now uses T1, T2 and
+T4 (T3 only if T4 is untestable); both scores are still reported. Effect: composites for
+`RRMDR_notif_100k` and `RR_new_pct` moved 0.902 to 0.926, and `n_testable` 3 to 2.
+The T3/T4 bound is derived leave-one-out from the other five series (p95), so no series sets its
+own yardstick; pooling all six gives the same composite.
+
+| series | composite | observations behind it |
+|---|---|---|
+| RRMDR_notif_100k | 0.926 | identity 8, declared 7 |
+| RR_new_pct | 0.926 | identity 8, declared 7 |
+| preXDR_fqr_pct | 1.0 | identity 6, declared 5 |
+| MDR_TSR_pct | 1.0 | identity 9, declared 8 |
+| XDR_TSR_pct | 1.0 | identity 9, declared 8 |
+
+No test scored exactly 0.0; no series is unassessable.
+
+### 4.4 The structural null
+
+Provenance could not reorder this ranking. **49 of 60 cells score exactly 0.0, and all 11 positive
+cells belong to one series, `RRMDR_notif_100k`.** Provenance scales a series' cells uniformly, so it
+cannot change the order within a series and cannot lift a zero cell.
+
+- **0 inversions** (no two cells with distinct scores trade places) at every provenance value from
+  0.0 to 1.0 in steps of 0.05.
+- **1 tie split**: Milk pasteurisation moves from rank 9 to 10. Nutritional support and Milk
+  pasteurisation both publish 0.033 and share rank 9; scaling then rounding gives 0.030 and 0.029.
+  Published scores are rounded to 3 decimals, rounding is monotone, so it can create or break ties
+  but never invert an order. `rank_changes` classifies each change as `inversion` or `tie_split`.
+- At provenance 0.0 the series is wiped out and the 11 cells tie at zero; that destroys the ranking
+  rather than reordering it.
+
+The ranking rests on a single axis, the `RRMDR_notif_100k` slope, whose published bootstrap CI is
+**[-0.11, +0.30]** and spans zero. The instrument could not discriminate on this instance because the
+priority score is degenerate. D1 does **not** support the claim that provenance reorders priorities;
+that is a question for D2 and D3, on instances where several series carry positive cells.
+
+### 4.5 EVPR
+
+Exactly **0.0 with standard error 0.0** for every series under all three priors (beta, uniform,
+floor). The decision cannot change, so no audit of any series is worth buying on this grid. Same
+cause as 4.4.
+
+### 4.6 Reproducibility note
+
+`fit_trajectories` bootstraps off the global RNG. D1 and the test fixture seed 20260908 (the
+published script's seed) and restore state, which reproduces all five published CIs exactly. An
+unseeded fit gives `RRMDR_notif_100k` [-0.1156, 0.2903], not the published [-0.1133, 0.2957].

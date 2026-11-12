@@ -338,9 +338,9 @@ def build_summary(c: dict) -> str:
       f"ranking, never ranked as clean; Ruling CC): {len(rr['unassessable_cells'])}.")
     P("")
     P("RESULT: DOES PROVENANCE REORDER THE RANKING?")
-    P(f"Interventions that changed rank: {len(rr['changes'])} (of {rr['n_cells']} cells, "
-      f"{rr['n_live']} with a positive score).")
-    P(f"Rank changes by kind: inversions: {len(rr['inversions'])}; tie splits: {len(rr['tie_splits'])}.")
+    P(f"Rank changes by kind: inversions: {len(rr['inversions'])}; tie splits: {len(rr['tie_splits'])} "
+      f"(of {rr['n_cells']} cells, {rr['n_live']} with a positive score).")
+    P(f"Interventions that changed published rank, of any kind: {len(rr['changes'])}.")
     for ch in rr["changes"]:
         P(f"  {ch.kind}: {ch.intervention} / {ch.target}: rank {ch.rank_before} -> {ch.rank_after}")
     if rr["tie_splits"]:
@@ -352,8 +352,8 @@ def build_summary(c: dict) -> str:
         live = rr["live_series"][0]
         lo, hi = c["live_ci"]
         P("")
-        P("Provenance cannot reorder this ranking, and that is not a weakness of the method. "
-          f"{rr['n_zero']} of {rr['n_cells']} cells score exactly 0.0, and all {rr['n_live']} positive "
+        P("Provenance cannot reorder this ranking. The instrument could not discriminate on this "
+          f"instance because the priority score is degenerate. {rr['n_zero']} of {rr['n_cells']} cells score exactly 0.0, and all {rr['n_live']} positive "
           f"cells belong to one series ({live}). Provenance scales a series' cells uniformly, so it "
           "cannot change the order among cells of one series, and it cannot lift a zero cell. "
           "Reordering is impossible by construction.")

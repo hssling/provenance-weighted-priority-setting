@@ -54,7 +54,7 @@ def test_d1_runs_end_to_end_and_writes_four_outputs():
 def test_demonstration_reports_whether_any_rank_changed():
     out = (OUTPUTS / "d1_rank_changes.csv").read_text()
     assert "rank_before" in out
-    n = int(re.search(r"changed rank: (\d+)", SUMMARY.read_text()).group(1))
+    n = int(re.search(r"of any kind: (\d+)", SUMMARY.read_text()).group(1))
     assert n == len(_csv("d1_rank_changes.csv"))     # the file and the stated count agree
 
 
@@ -228,9 +228,12 @@ def test_financing_audit_reproduces_the_recorded_findings():
     fin = d1_tb.audit_financing()
     assert fin["bound"] == pytest.approx(1.917, abs=5e-4) and fin["n_steps"] == 691
     assert fin["n_countries"] == 215
-    tpt = fin["t1"]["budget_tpt"].detail["identity"]
-    assert tpt[2024] == pytest.approx(3.3, abs=0.1) or 1 / tpt[2024] == pytest.approx(3.3, abs=0.1)
-    assert tpt[2025] == pytest.approx(9.1, abs=0.1) or 1 / tpt[2025] == pytest.approx(9.1, abs=0.1)
+    tpt = fin["t1"]["budget_tpt"]
+    # direction pinned: implied (unit cost x volume) over reported. >1 means the parts exceed the total
+    assert tpt.detail["identity"][2023] == pytest.approx(0.90, abs=0.005)
+    assert tpt.detail["identity"][2024] == pytest.approx(3.33, abs=0.01)
+    assert tpt.detail["identity"][2025] == pytest.approx(9.14, abs=0.01)
+    assert tpt.score == pytest.approx(2 / 3, abs=1e-4)
     assert fin["t1"]["exp_tot"].detail["incomplete"] == [2026]
     for k in ("budget_tot", "cf_tot"):
         assert fin["t1"][k].score == 1.0
