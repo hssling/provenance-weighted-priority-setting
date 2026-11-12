@@ -93,3 +93,73 @@ def test_sensitivity_custom_rules_and_unassessable_is_empty():
     assert set(composite_sensitivity([clean(0.5)], rules=("minimum",))) == {"minimum"}
     # Unassessable: no number exists under any rule, so report nothing rather than fake values.
     assert composite_sensitivity([untestable()]) == {}
+
+
+# ---- composite_report: makes evidential thinness visible -------------------------------
+from provenance.composite import CompositeReport, composite_report  # noqa: E402
+
+
+def t1(score, n):      # identity: ratios and incomplete years
+    return TestResult(score, True, {"identity": {2000 + i: 1.0 for i in range(n)}, "incomplete": []})
+
+
+def t2(score, n):      # triangulate
+    return TestResult(score, True, {"changes": {2000 + i: (0.0, 0.0) for i in range(n)}, "agree": []})
+
+
+def t3(score, n):      # implausibility
+    return TestResult(score, True, {"changes": {2000 + i: 0.1 for i in range(n)}, "exceed": [], "bound": 0.5})
+
+
+def t4(score, n):      # declared
+    return TestResult(score, True, {"changes": {2000 + i: 0.1 for i in range(n)},
+                                    "declared": [], "silent": [], "bound": 0.5})
+
+
+def test_report_zero_from_one_observation_is_named_and_thin():
+    r = composite_report([t1(1.0, 6), t2(1.0, 5), t3(1.0, 8), t4(0.0, 1)])
+    assert r.score == 0.0
+    assert r.min_observations == 1
+    assert r.collapsed_by == ["declared"]
+    assert r.n_testable == 4
+
+
+def test_report_zero_from_many_observations_has_larger_weight():
+    thin = composite_report([t1(1.0, 6), t4(0.0, 1)])
+    thick = composite_report([t1(1.0, 6), t4(0.0, 9)])
+    assert thin.score == thick.score == 0.0
+    assert thin.min_observations == 1 and thick.min_observations == 6
+    assert thick.collapsed_by == ["declared"]
+
+
+def test_report_collapsed_by_empty_without_exact_zero():
+    r = composite_report([t1(0.01, 3), t3(1.0, 4)])
+    assert r.collapsed_by == []
+
+
+def test_report_unassessable():
+    r = composite_report([untestable(), untestable()])
+    assert r == CompositeReport(score=None, n_testable=0, min_observations=None, collapsed_by=[])
+
+
+def test_report_score_matches_composite_and_ignores_untestable_observations():
+    rs = [t1(0.5, 4), untestable(), t3(0.8, 2)]
+    for rule in ("geometric", "arithmetic", "minimum"):
+        assert composite_report(rs, rule=rule).score == composite(rs, rule=rule)
+    assert composite_report(rs).min_observations == 2
+    assert composite_report(rs).n_testable == 2
+
+
+def test_report_names_all_four_tests():
+    r = composite_report([t1(0.0, 2), t2(0.0, 2), t3(0.0, 2), t4(0.0, 2)])
+    assert r.collapsed_by == ["identity", "triangulation", "implausibility", "declared"]
+
+
+def test_report_identity_counts_incomplete_years_too():
+    res = TestResult(0.0, True, {"identity": {2000: 1.0}, "incomplete": [2001, 2000]})
+    assert composite_report([res]).min_observations == 2   # union {2000, 2001}
+
+
+def test_report_unrecognised_detail_fails_loudly():
+    with pytest.raises(ValueError, match="detail"):
+        composite_report([clean(0.5)])

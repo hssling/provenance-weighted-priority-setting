@@ -9,6 +9,7 @@ The existence test (T5) is deliberately not an input: it scores interventions, n
 from __future__ import annotations
 
 import math
+from dataclasses import dataclass
 from statistics import fmean
 
 from provenance.series import TestResult
@@ -49,6 +50,58 @@ def composite(results: list[TestResult], *, rule: str = DEFAULT_RULE) -> float |
 
 def composite_sensitivity(results: list[TestResult],
                           rules: tuple[str, ...] = DEFAULT_SENSITIVITY_RULES) -> dict[str, float]:
-    """Composite under each rule. Empty dict when the series is unassessable (no number exists)."""
+    """Composite under each rule.
+
+    Returns an EMPTY dict when the series is unassessable (no testable result): no number exists
+    under any rule. An empty dict and a dict of zeros mean opposite things -- {} is "could not be
+    assessed", {"geometric": 0.0, ...} is "assessed and wholly failed". Check `if not d` first.
+    """
     out = {rule: composite(results, rule=rule) for rule in rules}
     return {k: v for k, v in out.items() if v is not None}
+
+
+def _identify(detail: dict) -> tuple[str, int]:
+    """(test name, observations evaluated) from a TestResult.detail.
+
+    The four test modules shape `detail` differently, so each gets its own accessor, recognised by
+    a key unique to that module. Derivation of the count:
+      identity       (identity.py):       years that were testable = |ratios keys U incomplete years|
+      triangulation  (triangulate.py):    len(detail["changes"]) = year-pairs compared (the score's denominator)
+      implausibility (implausibility.py): len(detail["changes"]) = adjacent-period steps (denominator)
+      declared       (declared.py):       len(detail["changes"]) = adjacent-period steps (denominator)
+    An unrecognised shape raises rather than guessing.
+    """
+    if "identity" in detail:
+        return "identity", len(set(detail["identity"]) | set(detail.get("incomplete", ())))
+    if "agree" in detail:
+        return "triangulation", len(detail["changes"])
+    if "exceed" in detail:
+        return "implausibility", len(detail["changes"])
+    if "declared" in detail and "silent" in detail:
+        return "declared", len(detail["changes"])
+    raise ValueError(f"unrecognised TestResult.detail shape (keys: {sorted(detail)})")
+
+
+@dataclass(frozen=True)
+class CompositeReport:
+    score: float | None           # same value composite() returns
+    n_testable: int               # how many tests could run
+    min_observations: int | None  # fewest observations behind any contributing test; None if none
+    collapsed_by: list[str]       # names of tests scoring exactly 0.0, in input order
+
+
+def composite_report(results: list[TestResult], *, rule: str = DEFAULT_RULE) -> CompositeReport:
+    """composite() plus the evidential weight behind it.
+
+    Exposes thinness without correcting for it: no minimum-evidence cutoff, no shrinkage. A 0.0
+    resting on one observation and a 0.0 resting on twenty have the same score but are reported
+    with different min_observations.
+    """
+    score = composite(results, rule=rule)  # validates `rule`
+    testable = [_identify(r.detail) + (r.score,) for r in results if r.testable]
+    return CompositeReport(
+        score=score,
+        n_testable=len(testable),
+        min_observations=min((n for _, n, _ in testable), default=None),
+        collapsed_by=[name for name, _, sc in testable if sc == 0.0],
+    )
