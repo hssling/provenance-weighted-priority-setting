@@ -13,7 +13,12 @@ from pathlib import Path
 import pytest
 
 from provenance import propagate as prop
-from provenance.evpr import evpr
+from provenance.evpr import evpr, evpr_prior_sensitivity, PRIORS
+
+
+def evpr_floor(*a, **k):
+    """the original (Uniform[P, 1]) prior, which the closed-form tests were written for"""
+    return evpr(*a, prior="floor", **k)
 from provenance.propagate import propagate
 
 SERIES = ["RR_new_pct", "RRMDR_notif_100k", "preXDR_fqr_pct", "MDR_TSR_pct", "XDR_TSR_pct"]
@@ -60,13 +65,13 @@ def _tops(counts, traj):
 # ---- the three requirements from the brief ------------------------------------------------
 
 def test_a_perfectly_clean_series_is_worth_nothing_to_audit(counts, contested):
-    v = evpr(counts, contested, CLEAN, draws=2000)
+    v = evpr_floor(counts, contested, CLEAN, draws=2000)
     assert set(v) == set(SERIES)            # non-vacuous: an empty dict must not pass
     assert all(x == 0.0 for x in v.values())
 
 
 def test_the_most_doubtful_series_has_the_highest_audit_value(counts, contested):
-    v = evpr(counts, contested, {**CLEAN, "RR_new_pct": 0.2}, draws=2000)
+    v = evpr_floor(counts, contested, {**CLEAN, "RR_new_pct": 0.2}, draws=2000)
     assert set(v) == set(SERIES)
     assert max(v, key=v.get) == "RR_new_pct"
     assert v["RR_new_pct"] > 0.0
@@ -75,10 +80,10 @@ def test_the_most_doubtful_series_has_the_highest_audit_value(counts, contested)
 
 def test_evpr_is_deterministic_under_a_fixed_seed(counts, contested):
     P = {**CLEAN, "RR_new_pct": 0.2, "MDR_TSR_pct": 0.6}
-    a = evpr(counts, contested, P, draws=2000, seed=7)
-    assert a == evpr(counts, contested, P, draws=2000, seed=7)
+    a = evpr_floor(counts, contested, P, draws=2000, seed=7)
+    assert a == evpr_floor(counts, contested, P, draws=2000, seed=7)
     assert a["RR_new_pct"] > 0.0
-    assert a != evpr(counts, contested, P, draws=2000, seed=8)   # the seed is actually used
+    assert a != evpr_floor(counts, contested, P, draws=2000, seed=8)   # the seed is actually used
 
 
 # ---- correctness against a closed form ----------------------------------------------------
@@ -91,7 +96,7 @@ def test_matches_the_closed_form_for_a_two_contender_decision(counts, contested)
     a, t = 0.2, m / B
     assert a < t < 1 and ((1 + a) / 2) * B < m   # the rival is the baseline choice, and can be overtaken
     exact = B * (1 - t) ** 2 / (2 * (1 - a))
-    got = evpr(counts, contested, {**CLEAN, "RR_new_pct": a}, draws=20000)["RR_new_pct"]
+    got = evpr_floor(counts, contested, {**CLEAN, "RR_new_pct": a}, draws=20000)["RR_new_pct"]
     assert got == pytest.approx(exact, rel=0.02)
 
 
@@ -102,7 +107,7 @@ def test_unassessable_series_gets_the_widest_prior_not_a_free_pass(counts, conte
     t = m / B
     assert 0.5 * B < m                          # baseline = rival, so the closed form applies
     exact = B * (1 - t) ** 2 / 2
-    got = evpr(counts, contested, {**CLEAN, "RR_new_pct": None}, draws=20000)["RR_new_pct"]
+    got = evpr_floor(counts, contested, {**CLEAN, "RR_new_pct": None}, draws=20000)["RR_new_pct"]
     assert got == pytest.approx(exact, rel=0.02)
 
 
@@ -111,14 +116,14 @@ def test_doubt_alone_is_not_value_a_dominated_series_is_worth_nothing(counts, co
     # even at provenance 1.0, so resolving it can never change the decision.
     top = _tops(counts, contested)
     assert top["MDR_TSR_pct"] < top["XDR_TSR_pct"]
-    v = evpr(counts, contested, {**CLEAN, "MDR_TSR_pct": 0.05}, draws=2000)
+    v = evpr_floor(counts, contested, {**CLEAN, "MDR_TSR_pct": 0.05}, draws=2000)
     assert set(v) == set(SERIES) and v["MDR_TSR_pct"] == 0.0
 
 
 def test_evpr_is_never_negative(counts, contested):
     P = {"RR_new_pct": 0.1, "RRMDR_notif_100k": 0.3, "preXDR_fqr_pct": 0.5, "MDR_TSR_pct": 0.7,
          "XDR_TSR_pct": 0.4}
-    v = evpr(counts, contested, P, draws=2000)
+    v = evpr_floor(counts, contested, P, draws=2000)
     assert set(v) == set(SERIES) and all(x >= 0.0 for x in v.values())
 
 
@@ -132,7 +137,7 @@ def test_real_data_evpr_is_exactly_zero_because_one_series_holds_every_live_cell
     rows = propagate(counts, real_traj, CLEAN)
     live = {r["series"] for r in rows if r["BOPAS"] > 0}
     assert live == {"RRMDR_notif_100k"}         # the premise; if data change, this fails loudly
-    v = evpr(counts, real_traj, P, draws=2000)
+    v = evpr(counts, real_traj, P, prior="floor", draws=2000)
     assert set(v) == set(SERIES)
     assert all(x == 0.0 for x in v.values())
 
@@ -154,13 +159,13 @@ def test_scaling_published_scores_by_q_agrees_with_a_full_propagate(counts, cont
 
 def test_missing_series_raises_rather_than_defaulting(counts, contested):
     with pytest.raises(ValueError, match="RR_new_pct"):
-        evpr(counts, contested, {s: 1.0 for s in SERIES if s != "RR_new_pct"}, draws=10)
+        evpr_floor(counts, contested, {s: 1.0 for s in SERIES if s != "RR_new_pct"}, draws=10)
 
 
 @pytest.mark.parametrize("draws", [0, -5, 2.5, True])
 def test_bad_draw_counts_raise(counts, contested, draws):
     with pytest.raises(ValueError, match="draws"):
-        evpr(counts, contested, CLEAN, draws=draws)
+        evpr_floor(counts, contested, CLEAN, draws=draws)
 
 
 def test_does_not_disturb_the_global_rng(counts, contested):
@@ -168,5 +173,81 @@ def test_does_not_disturb_the_global_rng(counts, contested):
     random.seed(123)
     expected = random.random()
     random.seed(123)
-    evpr(counts, contested, {**CLEAN, "RR_new_pct": 0.2}, draws=200)
+    evpr_floor(counts, contested, {**CLEAN, "RR_new_pct": 0.2}, draws=200)
     assert random.random() == expected
+
+
+# ---- Ruling FF: Beta prior (default) and prior sensitivity --------------------------------
+
+OBS = {s: 4 for s in SERIES}
+
+
+def test_beta_prior_prices_the_clean_looking_series_that_is_really_bad(counts, contested):
+    # a clean composite resting on only 4 observations is NOT certain under Beta; the floor prior
+    # (which never lets an audit find a problem) gives this series zero, the Beta gives it value.
+    floor = evpr(counts, contested, CLEAN, prior="floor", draws=4000)["RR_new_pct"]
+    beta = evpr(counts, contested, CLEAN, observations=OBS, draws=4000)["RR_new_pct"]
+    assert floor == 0.0 and beta > 0.0
+
+
+def test_beta_uncertainty_shrinks_with_the_evidence_count(counts, contested):
+    P = {**CLEAN, "RR_new_pct": 0.9}
+    few = evpr(counts, contested, P, observations={**OBS, "RR_new_pct": 2}, draws=20000)["RR_new_pct"]
+    many = evpr(counts, contested, P, observations={**OBS, "RR_new_pct": 60}, draws=20000)["RR_new_pct"]
+    assert few > many
+
+
+def test_beta_matches_a_direct_numeric_integral(counts, contested):
+    # regret of planning from the rival = E[(qB - m)+], q ~ Beta(P n + 1, (1-P) n + 1)
+    top = _tops(counts, contested)
+    # the clean rivals rest on OBS=4 observations, so under Beta they are themselves uncertain:
+    # their expected utility is top * Beta(5, 1) mean = top * 5/6
+    B, m = top["RR_new_pct"], max(v for s, v in top.items() if s != "RR_new_pct") * 5 / 6
+    a, b = 0.6 * 5 + 1, 0.4 * 5 + 1
+    n, exact = 100000, 0.0
+    const = math.gamma(a + b) / (math.gamma(a) * math.gamma(b))
+    for i in range(n):
+        x = (i + 0.5) / n
+        exact += max(x * B - m, 0.0) * const * x ** (a - 1) * (1 - x) ** (b - 1) / n
+    assert a / (a + b) * B < m          # baseline is the rival, so the formula applies
+    got = evpr(counts, contested, {**CLEAN, "RR_new_pct": 0.6}, observations={**OBS, "RR_new_pct": 5},
+               draws=40000)["RR_new_pct"]
+    assert exact > 0 and got == pytest.approx(exact, rel=0.05)
+
+
+def test_none_under_beta_is_uniform_without_needing_an_observation_count(counts, contested):
+    P = {s: None for s in SERIES}      # every series unassessable: Beta(1,1) everywhere
+    a = evpr(counts, contested, P, observations=OBS, draws=3000, seed=1)
+    b = evpr(counts, contested, P, prior="uniform", draws=3000, seed=1)
+    assert a == b and a["RR_new_pct"] > 0.0
+
+
+def test_beta_requires_an_observation_count(counts, contested):
+    with pytest.raises(ValueError, match="observation"):
+        evpr(counts, contested, CLEAN, draws=10)
+
+
+def test_unknown_prior_raises(counts, contested):
+    with pytest.raises(ValueError, match="prior"):
+        evpr(counts, contested, CLEAN, prior="flat", draws=10)
+
+
+def test_beta_is_deterministic_and_seeded(counts, contested):
+    P = {**CLEAN, "RR_new_pct": 0.5}
+    a = evpr(counts, contested, P, observations=OBS, draws=1000, seed=3)
+    assert a == evpr(counts, contested, P, observations=OBS, draws=1000, seed=3)
+    assert a != evpr(counts, contested, P, observations=OBS, draws=1000, seed=4)
+
+
+@pytest.mark.parametrize("P", [CLEAN, {s: 0.3 for s in SERIES}, {s: None for s in SERIES}])
+def test_real_data_is_exactly_zero_under_all_three_priors(counts, real_traj, P):
+    sens = evpr_prior_sensitivity(counts, real_traj, P, observations=OBS, draws=1000)
+    assert set(sens) == set(PRIORS)
+    for pr, v in sens.items():
+        assert set(v) == set(SERIES) and all(x == 0.0 for x in v.values()), pr
+
+
+def test_sensitivity_shows_the_priors_disagreeing_on_a_contested_grid(counts, contested):
+    sens = evpr_prior_sensitivity(counts, contested, {**CLEAN, "RR_new_pct": 0.5}, observations=OBS, draws=4000)
+    vals = {pr: sens[pr]["RR_new_pct"] for pr in PRIORS}
+    assert len(set(vals.values())) == 3 and all(v > 0 for v in vals.values())
