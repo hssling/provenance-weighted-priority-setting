@@ -147,7 +147,7 @@ def test_scaling_published_scores_by_q_agrees_with_a_full_propagate(counts, cont
     top = _tops(counts, contested)
     rows = propagate(counts, contested, {**CLEAN, series: q})
     full = max(r["BOPAS_adj"] for r in rows if r["series"] == series)
-    assert abs(full - q * top[series]) <= 0.0006
+    assert abs(full - q * top[series]) <= 0.001   # two roundings at 3 dp: the q=1 score (scaled by q) and the adjusted one
 
 
 # ---- input handling -----------------------------------------------------------------------
