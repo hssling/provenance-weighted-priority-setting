@@ -293,3 +293,15 @@ def test_an_assessable_series_with_zero_observations_gets_the_uniform_prior(coun
     beta0 = evpr(counts, contested, P, observations={s: 0 for s in SERIES}, draws=3000, seed=5)
     uniform = evpr(counts, contested, P, prior="uniform", draws=3000, seed=5)
     assert beta0 == uniform and beta0["RR_new_pct"] > 0.0
+
+
+def test_a_single_draw_reports_an_unknown_standard_error_not_a_perfect_one(counts, contested):
+    d = evpr_detail(counts, contested, {**CLEAN, "RR_new_pct": 0.5}, observations=OBS, draws=1)
+    assert set(d) == set(SERIES)
+    assert all(math.isnan(se) for _, se in d.values())
+    assert round_to_se(0.1234, float("nan")) == 0.1234      # no precision invented from an unknown se
+
+
+def test_floor_prior_at_p_one_is_a_point_mass_with_zero_value_and_zero_se(counts, contested):
+    d = evpr_detail(counts, contested, CLEAN, prior="floor", draws=50)
+    assert set(d) == set(SERIES) and all(x == (0.0, 0.0) for x in d.values())

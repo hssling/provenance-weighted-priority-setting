@@ -42,11 +42,15 @@ is a prior-mean quantity: each series' best cell is scored at (P_s*m_s+1)/(m_s+2
 m=4 that is 0.833, and series with different m shrink by different amounts, so the cell EVPR treats as
 today's best can differ from the one the published BOPAS_adj ranking (scored at P_s) puts first. That is
 correct EVPI (the value of information is measured against the best decision under current beliefs,
-which are the prior), not an inconsistency, but a reader comparing EVPR with the rank_changes report
+which are the prior), not an inconsistency (under the "floor" prior the prior mean is (1+P)/2 instead), but a reader comparing EVPR with the rank_changes report
 must not assume they share a baseline.
 
 PRECISION. Values are Monte Carlo estimates. evpr_detail returns each value with its standard error
 (sample sd of the per-draw regret / sqrt(draws); conservative for the stratified floor prior).
+The standard error is exactly 0 wherever the per-draw regret has zero variance: that includes series
+whose decision never changes, and also any point-mass prior (floor at P=1: q is known, the
+baseline decision is already optimal, so the regret is exactly 0 in every draw). With a single draw there is no variance estimate and the standard
+error is NaN, never 0.0 (a single sample does not establish perfect precision).
 
 HOW IT IS COMPUTED. propagate() recomputes the grid in ~25 ms, so 10,000 draws x 5 series through
 it would take ~20 minutes. Instead propagate() is called ONCE (validating the inputs and returning
@@ -85,16 +89,21 @@ def observations_from_results(results_by_series) -> dict[str, int]:
 
 def round_to_se(value: float, se: float) -> float:
     """Round `value` to the decimal place of the leading digit of its standard error (the precision
-    the draws support). se == 0 (the decision never changed) leaves the exact value untouched."""
-    if se <= 0.0:
+    the draws support). se == 0 (zero-variance regret) leaves the exact value untouched, and an
+    unknown (NaN) se also leaves it untouched rather than inventing a precision."""
+    if not se > 0.0:
         return value
     return round(value, max(0, -math.floor(math.log10(se))))
 
 
-def evpr(node_counts, traj_rows, provenance, **kw) -> dict[str, float]:
+def evpr(node_counts, traj_rows, provenance: dict[str, float | None], *, observations=None,
+         prior: str = "beta", draws: int = DEFAULT_DRAWS, seed: int = 0, **bopas_kwargs) -> dict[str, float]:
     """series key -> expected gain (BOPAS points) from resolving that series' provenance.
-    A Monte Carlo estimate: use evpr_detail for the standard errors. Arguments as evpr_detail."""
-    return {k: v for k, (v, _) in evpr_detail(node_counts, traj_rows, provenance, **kw).items()}
+    A Monte Carlo estimate: use evpr_detail for the standard errors. Arguments as evpr_detail
+    (`prior` is "beta" by default, "uniform" or "floor"; see the module docstring)."""
+    d = evpr_detail(node_counts, traj_rows, provenance, observations=observations, prior=prior,
+                    draws=draws, seed=seed, **bopas_kwargs)
+    return {k: v for k, (v, _) in d.items()}
 
 
 def evpr_detail(node_counts, traj_rows, provenance: dict[str, float | None], *, observations=None,
@@ -156,14 +165,18 @@ def evpr_detail(node_counts, traj_rows, provenance: dict[str, float | None], *, 
             best = u_s if u_s > rival else rival
             reg.append(best - (u_s if plan_from_s else rival))
         gain = math.fsum(reg) / draws
-        var = math.fsum((r - gain) ** 2 for r in reg) / (draws - 1) if draws > 1 else 0.0
-        out[s] = (gain, math.sqrt(var / draws))
+        se = (math.sqrt(math.fsum((r - gain) ** 2 for r in reg) / (draws - 1) / draws)
+              if draws > 1 else float("nan"))   # one draw: no variance estimate, NOT 0.0
+        out[s] = (gain, se)
     return out
 
 
 def evpr_prior_sensitivity(node_counts, traj_rows, provenance, *, observations=None,
                            **kw) -> dict[str, dict[str, tuple[float, float]]]:
-    """EVPR under every prior, side by side: {prior: {series: (evpr, se)}}. The prior is the most
+    """EVPR under every prior, side by side: {prior: {series: (evpr, se)}}.
+
+    NOTE: the inner values are (value, standard error) PAIRS. Earlier versions returned bare floats;
+    this is a breaking change (there are no callers outside the tests). The prior is the most
     contestable assumption in the method; report all three, not one."""
     return {pr: evpr_detail(node_counts, traj_rows, provenance, observations=observations, prior=pr, **kw)
             for pr in PRIORS}
