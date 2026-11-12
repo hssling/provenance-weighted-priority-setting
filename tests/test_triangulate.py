@@ -60,3 +60,48 @@ def test_real_data_who_vs_itr_approved_2022_disagrees():
     wa, ia = r.detail["changes"][2022]
     assert wa > 0 and ia < -0.4          # WHO up, ITR approved halves
     assert 2022 not in r.detail["agree"]
+
+
+def test_ratio_series():
+    from provenance.triangulate import ratio_series
+    n, d = _s([100.0, None, 0.0, 50.0], "A"), _s([75.0, 1.0, 1.0, None], "A")
+    assert ratio_series(n, d, key="g", label="g").values == [0.25, None, None, None]
+
+
+def test_level_mode_detects_constant_shortfall_that_change_mode_misses():
+    a = _s([0.0, 0.0, 0.0], "A")
+    b = _s([0.2, 0.2, 0.2], "B")
+    assert triangulate_score(b, _s([0.2, 0.2, 0.2], "A")).testable is False  # same source
+    assert triangulate_score(a, b, mode="level").score == 0.0
+    assert triangulate_score(a, b, mode="level", tolerance=0.25).score == 1.0
+    import pytest
+    with pytest.raises(ValueError):
+        triangulate_score(a, b, mode="bogus")
+
+
+def _real_gaps():
+    from provenance.triangulate import ratio_series
+    w = load_who_budget(BUDGET_CSV, "IND")
+    i = load_india_tb_report(ITR_CSV)
+    return (ratio_series(w["budget_tot"], w["cf_tot"], key="who_gap", label="WHO gap"),
+            ratio_series(i["itr_requested"], i["itr_approved"], key="itr_gap", label="ITR gap"))
+
+
+def test_real_gap_values():
+    who, itr = _real_gaps()
+    assert who.values == [0.0] * 8
+    assert [round(v, 3) for v in itr.values[1:]] == [0.237, 0.054, 0.125, 0.060, 0.461, 0.382]
+
+
+def test_level_sensitivity_sweep_who_zero_gap_vs_itr_shortfall():
+    """Honest sweep; crossover is a finding, not a knob. Overlap 2018-2023 (6 years)."""
+    who, itr = _real_gaps()
+    sweep = {t: triangulate_score(who, itr, mode="level", tolerance=t).score
+             for t in (0.01, 0.02, 0.05, 0.10, 0.15)}
+    print(sweep)
+    # tight tolerances: disagree in every year
+    assert sweep[0.01] == sweep[0.02] == sweep[0.05] == 0.0
+    # disagreement dissolves monotonically as tolerance widens
+    vals = list(sweep.values())
+    assert vals == sorted(vals) and vals[-1] > vals[0]
+    assert sweep[0.10] == 2 / 6 and sweep[0.15] == 3 / 6
