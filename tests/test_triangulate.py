@@ -71,7 +71,9 @@ def test_ratio_series():
 def test_level_mode_detects_constant_shortfall_that_change_mode_misses():
     a = _s([0.0, 0.0, 0.0], "A")
     b = _s([0.2, 0.2, 0.2], "B")
-    assert triangulate_score(b, _s([0.2, 0.2, 0.2], "A")).testable is False  # same source
+    assert triangulate_score(a, b, mode="change").testable is False  # zero base: change undefined
+    c = _s([1.0, 1.0, 1.0], "A")
+    assert triangulate_score(c, _s([2.0, 2.0, 2.0], "B"), mode="change").score == 1.0  # blind
     assert triangulate_score(a, b, mode="level").score == 0.0
     assert triangulate_score(a, b, mode="level", tolerance=0.25).score == 1.0
     import pytest
