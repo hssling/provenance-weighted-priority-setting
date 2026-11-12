@@ -100,7 +100,6 @@ def test_level_sensitivity_sweep_who_zero_gap_vs_itr_shortfall():
     who, itr = _real_gaps()
     sweep = {t: triangulate_score(who, itr, mode="level", tolerance=t).score
              for t in (0.01, 0.02, 0.05, 0.10, 0.15)}
-    print(sweep)
     # tight tolerances: disagree in every year
     assert sweep[0.01] == sweep[0.02] == sweep[0.05] == 0.0
     # disagreement dissolves monotonically as tolerance widens

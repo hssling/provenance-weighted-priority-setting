@@ -34,7 +34,7 @@ def test_declared_break_is_still_worse_than_no_break():
     assert declared < 1.0
 
 
-def test_declared_never_scores_below_silent_over_credit_range():
+def test_declared_credit_constant_lies_strictly_between_zero_and_one():
     assert 0.0 < DECLARED_CREDIT < 1.0
 
 
@@ -70,3 +70,14 @@ def test_trajectory_notes_without_a_break_year_are_not_pinned():
     t = load_trajectories(NTEP_CSV)
     assert t["RR_new_pct"].notes == {}
     assert t["RR_new_pct"].values and t["RR_new_pct"].years
+
+
+def test_empty_note_does_not_declare_the_break():
+    assert declared_score(_s({2022: ""}), bound=0.5).score == declared_score(_s({}), bound=0.5).score
+
+
+def test_real_rrmdr_series_scores_above_its_silent_equivalent():
+    real = load_trajectories(NTEP_CSV)["RRMDR_notif_100k"]
+    silent = IndicatorSeries(real.key, real.label, list(real.years), list(real.values),
+                             real.source, {}, {})
+    assert declared_score(real, bound=0.2).score > declared_score(silent, bound=0.2).score

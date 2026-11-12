@@ -18,7 +18,10 @@ from __future__ import annotations
 from .series import IndicatorSeries, TestResult
 
 TOLERANCE = 0.15          # change mode: proportional-change gap
-LEVEL_TOLERANCE = 0.05    # level mode: 5 percentage points, set a priori (see sweep test)
+# level mode: 5 percentage points. A judgment call, not a derived value. The evidence is
+# the sweep across 0.01-0.15 in the tests, not this number; the finding holds from 0.01
+# to 0.05 and dissolves only as the tolerance widens beyond that.
+LEVEL_TOLERANCE = 0.05
 
 
 def _changes(s: IndicatorSeries) -> dict[int, float]:
@@ -50,6 +53,15 @@ def ratio_series(numerator: IndicatorSeries, denominator: IndicatorSeries, *,
 
 def triangulate_score(a: IndicatorSeries, b: IndicatorSeries | None, *,
                       mode: str = "change", tolerance: float | None = None) -> TestResult:
+    """Score agreement between series `a` and an independent counterpart `b`.
+
+    mode="change" compares year-on-year proportional changes (unit-free; works across
+    currencies). mode="level" compares the values directly and is only meaningful for
+    dimensionless inputs (e.g. from ratio_series). `tolerance` is the maximum absolute
+    gap for a year to count as agreeing; None selects the per-mode default (TOLERANCE for
+    change, LEVEL_TOLERANCE for level). Returns testable=False, score=None when b is
+    None, shares a's source, or no year-pair is comparable.
+    """
     if mode not in ("change", "level"):
         raise ValueError(f"mode must be 'change' or 'level', not {mode!r}")
     if tolerance is None:

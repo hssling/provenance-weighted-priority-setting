@@ -1,7 +1,7 @@
 """T4: declared-break alignment. Standard library only.
 
 A step that exceeds `bound` (same rule as T3) is a BREAK. A break is DECLARED when
-s.notes has an entry for the year the step arrives in, else SILENT.
+s.notes has a non-empty entry for the year the step arrives in, else SILENT.
 
 Anti-goal: the instrument must reward disclosure. A declared break scores strictly
 higher than an identical silent one, so a programme that footnotes a definitional or
@@ -30,8 +30,8 @@ def declared_score(s: IndicatorSeries, *, bound: float) -> TestResult:
                                         "changes": {}, "declared": [], "silent": [],
                                         "bound": bound})
     breaks = [y for y, c in sorted(changes.items()) if abs(c) > bound]
-    declared = [y for y in breaks if y in s.notes]
-    silent = [y for y in breaks if y not in s.notes]
+    declared = [y for y in breaks if s.notes.get(y)]
+    silent = [y for y in breaks if not s.notes.get(y)]
     total = (len(changes) - len(breaks)) + DECLARED_CREDIT * len(declared)
     detail = {"changes": dict(sorted(changes.items())), "declared": declared,
               "silent": silent, "bound": bound}
