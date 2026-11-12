@@ -32,38 +32,50 @@ NODE_LABELS: dict[str, str] = {
     "tb_hiv_dm": "Integrated TB-HIV-diabetes care",                                    # rank 11
 }
 
-# Node key -> WHO TB budget column, or None for no line item.
-#
-# Each mapping must be checked against the WHO data dictionary DEFINITION of the column,
-# not against its name. A plausible name is not evidence: budget_prog reads like
-# "programme" and was once mapped to active case finding, but WHO defines it as
-# "Budget required for programme costs to treat drug-susceptible TB", so ACF is invisible.
-# check_mapping_targets() guards against typos in the other direction (a real intervention
-# mistyped into a false "invisible"); it cannot catch a wrong-but-real column.
-#
-# Definitions quoted from the WHO data dictionary are marked "WHO:". Entries marked
-# "UNVERIFIED" still need their definition pulled from the dictionary before publication.
-#
-# Partial coverage (mapped, but not the whole node): recorded here in a comment rather than
-# as a field on ExistenceReport, so the report keeps the fields the spec defines and T5
-# stays a plain existence score. Partial entries are listed in TB_BUDGET_PARTIAL below.
-TB_BUDGET_MAPPING: dict[str, str | None] = {
-    "molecular_dx": "budget_lab",        # lab line; UNVERIFIED definition
-    "airborne_ipc": None,                # no WHO line; UNVERIFIED that no column under another name covers it
-    "tpt": "budget_tpt",                 # TPT line; UNVERIFIED definition
-    "wgs_dst": None,                     # no WHO line for sequencing; UNVERIFIED
-    "acf": None,                         # WHO: budget_prog is "Budget required for programme costs to treat drug-susceptible TB". Active case finding is not treatment, so no line.
-    "short_regimen": "budget_sld",       # second-line drugs line; UNVERIFIED definition
-    "bovine_tb": None,                   # no WHO line; UNVERIFIED
-    "private_sector": None,              # no WHO line; UNVERIFIED
-    "nutrition": "budget_patsup",        # patient support line; UNVERIFIED definition
-    "milk_pasteurisation": None,         # no WHO line; UNVERIFIED
-    "tb_hiv_dm": "budget_tbhiv",         # WHO: "collaborative TB/HIV activities". Mapped but partial: covers the TB and HIV arms, not diabetes.
+# WHO data dictionary definition of each budget column the mapping uses. Verbatim, transcribed
+# from TB_dictionary_2026-08-25.csv (not in this repo's data/, which is immutable). A mapping
+# is judged against this definition, never against the column name: budget_prog reads like
+# "programme" but is defined as programme costs to TREAT drug-susceptible TB.
+BUDGET_DEFINITIONS: dict[str, str] = {
+    "budget_lab": "Budget required for laboratory infrastructure, equipment and supplies (US Dollars)",
+    "budget_tpt": "Budget required for TB preventive treatment: drugs (US Dollars)",
+    "budget_sld": "Budget required for drugs to treat drug-resistant TB (US Dollars)",
+    "budget_patsup": "Budget required for patient support (US Dollars)",
+    "budget_prog": "Budget required for programme costs to treat drug-susceptible TB (US Dollars)",
+    "budget_tbhiv": "Budget required for collaborative TB/HIV activities (US Dollars)",
 }
 
-# Node keys whose mapping is mapped but only partly covers the node, with what is not covered.
+# Node key -> WHO TB budget column, or None for no line item. Each mapped column's definition
+# is in BUDGET_DEFINITIONS above. check_mapping_targets() guards typos (a real intervention
+# mistyped into a false "invisible"); it cannot catch a wrong-but-real column, so the
+# definitions are the check against that.
+TB_BUDGET_MAPPING: dict[str, str | None] = {
+    "molecular_dx": "budget_lab",        # full match: Xpert is laboratory equipment and supplies
+    "airborne_ipc": None,                # no WHO line
+    "tpt": "budget_tpt",                 # partial: drugs only (see TB_BUDGET_PARTIAL)
+    "wgs_dst": None,                     # no WHO line
+    "acf": None,                         # no line. budget_prog is treatment, not finding (ruling S)
+    "short_regimen": "budget_sld",       # partial: drugs only (see TB_BUDGET_PARTIAL)
+    "bovine_tb": None,                   # no WHO line
+    "private_sector": None,              # no WHO line
+    "nutrition": "budget_patsup",        # full match: patient support is broader than nutrition but contains it
+    "milk_pasteurisation": None,         # no WHO line
+    "tb_hiv_dm": "budget_tbhiv",         # partial: TB/HIV arms only (see TB_BUDGET_PARTIAL)
+}
+
+# Node keys mapped to a budget line that covers only part of the node. Mapped, so not invisible
+# (score 1.0), but the score does not mean the whole intervention is costed. Each note says what
+# is and is not covered.
+#
+# CAVEAT FOR ANY BUDGET-SHARE COMPARISON: for these three nodes the comparison is against a
+# DRUGS-ONLY line (or TB/HIV-only). A node can look underfunded simply because its non-drug cost
+# (delivery, contact tracing, adherence, programme work) is pooled in a line that cannot be
+# attributed to it. Read a low budget share for these nodes as a floor on tracked spending,
+# not as a measure of spending on the intervention.
 TB_BUDGET_PARTIAL: dict[str, str] = {
-    "tb_hiv_dm": "diabetes arm has no budget line; the TB/HIV arms are covered by budget_tbhiv",
+    "tpt": "budget_tpt covers TB preventive treatment drugs only. Delivery, contact tracing and adherence support are not covered.",
+    "short_regimen": "budget_sld covers drugs to treat drug-resistant TB only. Rollout programme work is not covered; DR-TB programme costs sit in budget_mdrmgt, which no node maps to.",
+    "tb_hiv_dm": "budget_tbhiv covers collaborative TB/HIV activities. The diabetes arm is not covered.",
 }
 
 

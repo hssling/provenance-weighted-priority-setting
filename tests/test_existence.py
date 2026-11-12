@@ -1,6 +1,7 @@
 import pytest
 
 from provenance.existence import (
+    BUDGET_DEFINITIONS,
     NODE_LABELS,
     TB_BUDGET_MAPPING,
     TB_BUDGET_PARTIAL,
@@ -109,3 +110,41 @@ def test_mapping_key_without_node_is_an_error():
 def test_empty_budget_line_is_an_error_not_a_mapping():
     with pytest.raises(ValueError):
         existence_report(NODE_LABELS, {**TB_BUDGET_MAPPING, "tpt": ""})
+
+
+# Verbatim from the WHO data dictionary (TB_dictionary_2026-08-25.csv), as given by the coordinator.
+WHO_DEFINITIONS = {
+    "budget_lab": "Budget required for laboratory infrastructure, equipment and supplies (US Dollars)",
+    "budget_tpt": "Budget required for TB preventive treatment: drugs (US Dollars)",
+    "budget_sld": "Budget required for drugs to treat drug-resistant TB (US Dollars)",
+    "budget_patsup": "Budget required for patient support (US Dollars)",
+    "budget_prog": "Budget required for programme costs to treat drug-susceptible TB (US Dollars)",
+    "budget_tbhiv": "Budget required for collaborative TB/HIV activities (US Dollars)",
+}
+
+
+def test_partial_mappings_are_exactly_tpt_sld_and_tb_hiv_diabetes():
+    # Keys are node keys: "short_regimen" is the BPaL/BPaL-M node, mapped to budget_sld.
+    assert set(TB_BUDGET_PARTIAL) == {"tpt", "short_regimen", "tb_hiv_dm"}
+    for node, note in TB_BUDGET_PARTIAL.items():
+        assert note.strip(), f"partial note for {node!r} is empty"
+
+
+def test_partial_nodes_are_mapped_not_invisible():
+    # Partial coverage is a fact about the mapping, not an invisibility: the count stays 6.
+    r = existence_report(NODE_LABELS, TB_BUDGET_MAPPING)
+    assert len(r.invisible) == 6
+    for node in TB_BUDGET_PARTIAL:
+        assert node in r.mapped and r.score[node] == 1.0
+        assert NODE_LABELS[node] not in r.invisible
+
+
+def test_budget_definitions_match_who_dictionary_verbatim():
+    assert BUDGET_DEFINITIONS == WHO_DEFINITIONS
+
+
+def test_every_mapped_budget_line_has_a_nonempty_who_definition():
+    targets = {t for t in TB_BUDGET_MAPPING.values() if t is not None}
+    assert targets <= set(WHO_DEFINITIONS)  # budget_prog is defined but deliberately unmapped (ruling S)
+    for col in targets:
+        assert BUDGET_DEFINITIONS[col].strip(), f"{col} has no definition"
