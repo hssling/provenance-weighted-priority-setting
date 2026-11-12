@@ -56,10 +56,28 @@ WHO's own data dictionary settles it: `budget_prog` is *"Budget required for
 programme costs to **treat** drug-susceptible TB"*. Case **finding** is not
 treatment. The mapping was corrected after the implementer challenged it.
 
-One mapping is **partial rather than absent**: node 11, integrated
-TB-HIV-diabetes care, maps to `budget_tbhiv` = *"collaborative TB/HIV
-activities"*. Two of its three arms are traceable; diabetes is not. It is
-counted as mapped, with the partiality recorded.
+**Three mappings are partial rather than absent**, and this materially limits
+any "evidence rank versus budget share" comparison:
+
+| node | line | what the definition actually covers |
+|---|---|---|
+| TB preventive therapy (3) | `budget_tpt` | *"TB preventive treatment: **drugs**"* — not delivery, contact tracing or adherence support |
+| Shorter all-oral regimen rollout (6) | `budget_sld` | *"**drugs** to treat drug-resistant TB"* — a rollout is programme work; DR-TB programme costs sit in `budget_mdrmgt`, which maps to no node |
+| Integrated TB-HIV-diabetes care (11) | `budget_tbhiv` | *"collaborative **TB/HIV** activities"* — two of three arms; diabetes absent |
+
+Only two mappings are full matches: molecular diagnostics → `budget_lab`
+(laboratory equipment and supplies) and nutritional support → `budget_patsup`
+(patient support, which is broader than nutrition but contains it).
+
+**Caveat on the concordance comparison.** For the three partial nodes, budget
+share is computed against a **drugs-only** line. An intervention can therefore
+appear underfunded merely because the non-drug part of its cost is pooled
+somewhere unattributable. The earlier observation that TB preventive therapy
+receives ~0.3% of the TB budget is the share of its **drug** cost, not of its
+total programme cost, and must be stated that way.
+
+That pooling is itself a form of fiscal invisibility — not of the intervention,
+but of the part of it that is not a commodity.
 
 Every mapping is now checked against the dictionary definition, not against the
 column name. A plausible-looking name is not evidence that a line item covers
