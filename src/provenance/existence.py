@@ -33,7 +33,7 @@ NODE_LABELS: dict[str, str] = {
 }
 
 # WHO data dictionary definition of each budget column the mapping uses. Verbatim, transcribed
-# from TB_dictionary_2026-08-25.csv (not in this repo's data/, which is immutable). A mapping
+# from data/TB_dictionary_2026-08-25.csv (checked against that file in the tests). A mapping
 # is judged against this definition, never against the column name: budget_prog reads like
 # "programme" but is defined as programme costs to TREAT drug-susceptible TB.
 BUDGET_DEFINITIONS: dict[str, str] = {

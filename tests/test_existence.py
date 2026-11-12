@@ -1,3 +1,6 @@
+import csv
+from pathlib import Path
+
 import pytest
 
 from provenance.existence import (
@@ -112,15 +115,17 @@ def test_empty_budget_line_is_an_error_not_a_mapping():
         existence_report(NODE_LABELS, {**TB_BUDGET_MAPPING, "tpt": ""})
 
 
-# Verbatim from the WHO data dictionary (TB_dictionary_2026-08-25.csv), as given by the coordinator.
-WHO_DEFINITIONS = {
-    "budget_lab": "Budget required for laboratory infrastructure, equipment and supplies (US Dollars)",
-    "budget_tpt": "Budget required for TB preventive treatment: drugs (US Dollars)",
-    "budget_sld": "Budget required for drugs to treat drug-resistant TB (US Dollars)",
-    "budget_patsup": "Budget required for patient support (US Dollars)",
-    "budget_prog": "Budget required for programme costs to treat drug-susceptible TB (US Dollars)",
-    "budget_tbhiv": "Budget required for collaborative TB/HIV activities (US Dollars)",
-}
+DICTIONARY_CSV = Path(__file__).resolve().parents[1] / "data" / "TB_dictionary_2026-08-25.csv"
+
+
+def _who_definitions() -> dict[str, str]:
+    # The file has a non-UTF-8 byte (near position 5333); errors="replace" keeps it readable.
+    with open(DICTIONARY_CSV, encoding="utf-8", errors="replace", newline="") as fh:
+        return {r["variable_name"]: r["definition"]
+                for r in csv.DictReader(fh) if r["dataset"] == "Budget"}
+
+
+WHO_DEFINITIONS = _who_definitions()
 
 
 def test_partial_mappings_are_exactly_tpt_sld_and_tb_hiv_diabetes():
@@ -128,6 +133,7 @@ def test_partial_mappings_are_exactly_tpt_sld_and_tb_hiv_diabetes():
     assert set(TB_BUDGET_PARTIAL) == {"tpt", "short_regimen", "tb_hiv_dm"}
     for node, note in TB_BUDGET_PARTIAL.items():
         assert note.strip(), f"partial note for {node!r} is empty"
+        assert TB_BUDGET_MAPPING[node] in note, f"partial note for {node!r} omits its column"
 
 
 def test_partial_nodes_are_mapped_not_invisible():
@@ -140,7 +146,10 @@ def test_partial_nodes_are_mapped_not_invisible():
 
 
 def test_budget_definitions_match_who_dictionary_verbatim():
-    assert BUDGET_DEFINITIONS == WHO_DEFINITIONS
+    # Compared against the dictionary file in data/, not a second hand-typed copy.
+    assert set(BUDGET_DEFINITIONS) <= set(WHO_DEFINITIONS)
+    for col, text in BUDGET_DEFINITIONS.items():
+        assert text == WHO_DEFINITIONS[col], col
 
 
 def test_every_mapped_budget_line_has_a_nonempty_who_definition():
