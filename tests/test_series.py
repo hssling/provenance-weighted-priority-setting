@@ -37,9 +37,25 @@ def test_blank_becomes_none_and_reported_zero_stays_zero():
     assert e["exp_lab"].values[-1] is None
 
 
-def test_NA_token_is_none(tmp_path):
+def _write_budget(tmp_path, rows, drop=()):
+    """Synthetic budget CSV holding every column the loader maps (minus `drop`)."""
+    from provenance.series import BUDGET_IDENTITIES
+    cols = {"budget_tpt", "budget_lab"}
+    for _, parts in BUDGET_IDENTITIES.values():
+        cols.update(parts.values())
+    cols = sorted(cols - set(drop))
     p = tmp_path / "b.csv"
-    p.write_text("iso3,year,budget_tpt,budget_lab\nIND,2020,NA,0\nIND,2021,5,\n")
+    lines = ["iso3,year," + ",".join(cols)]
+    for r in rows:
+        iso, yr, tpt, lab = r.split(",")
+        vals = {"budget_tpt": tpt, "budget_lab": lab}
+        lines.append(f"{iso},{yr}," + ",".join(vals.get(c, "") for c in cols))
+    p.write_text(chr(10).join(lines) + chr(10))
+    return p
+
+
+def test_NA_token_is_none(tmp_path):
+    p = _write_budget(tmp_path, ["IND,2020,NA,0", "IND,2021,5,"])
     s = load_who_budget(p, "IND")
     assert s["budget_tpt"].values == [None, 5.0]
     assert s["budget_lab"].values == [0.0, None]
@@ -85,3 +101,48 @@ def test_testresult_rejects_inconsistent_combinations():
         TestResult(0.5, False, {})
     with pytest.raises(ValueError):
         TestResult(None, True, {})
+
+
+def test_exp_tot_2026_pathology_is_visible_as_sum_identity():
+    e = load_who_expenditure(EXP_CSV, "IND")
+    t = e["exp_tot"]
+    assert t.identity == "sum"
+    assert t.values[-1] == 0.0
+    assert len(t.components) == 11
+    assert all(part[-1] is None for part in t.components.values())
+
+
+def test_sum_identity_reconciles_in_a_good_year():
+    e = load_who_expenditure(EXP_CSV, "IND")
+    t = e["exp_tot"]
+    i = t.years.index(2022)
+    assert sum(p[i] for p in t.components.values()) == t.values[i]
+
+
+def test_budget_sum_and_product_identities_mapped():
+    b = load_who_budget(BUDGET_CSV, "IND")
+    assert b["budget_tpt"].identity == "product"
+    assert b["budget_tot"].identity == "sum" and len(b["budget_tot"].components) == 11
+    assert b["cf_tot"].identity == "sum"
+    assert b["budget_lab"].identity is None
+
+
+def test_rcvd_tot_has_both_identities():
+    e = load_who_expenditure(EXP_CSV, "IND")
+    assert e["rcvd_tot"].identity == "sum" and len(e["rcvd_tot"].components) == 11
+    s = e["rcvd_tot_by_source"]
+    assert s.identity == "sum" and len(s.components) == 4
+    assert s.values == e["rcvd_tot"].values
+    i = s.years.index(2022)
+    assert sum(p[i] for p in s.components.values()) == s.values[i]
+
+
+def test_mapped_but_absent_column_raises_naming_it(tmp_path):
+    p = _write_budget(tmp_path, ["IND,2020,1,1"], drop=["tx_tpt"])
+    with pytest.raises(ValueError, match="tx_tpt"):
+        load_who_budget(p, "IND")
+
+
+def test_default_identity_is_last_positional_field():
+    s = IndicatorSeries("k", "l", [], [], "s", {}, {})
+    assert s.identity is None
