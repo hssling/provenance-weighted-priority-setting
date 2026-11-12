@@ -5,6 +5,8 @@ used where a test needs several series with positive worsening slopes at once: o
 only RRMDR_notif_100k has any positive BOPAS cell, so reordering cannot be exercised there.
 """
 import copy
+import random
+import sys
 from pathlib import Path
 
 import pytest
@@ -235,10 +237,116 @@ def test_series_with_no_testable_result_gets_none_not_one():
 # ---- the published repository stays untouched -----------------------------------------------
 
 def test_importing_the_published_module_leaves_no_files_in_the_repository(mod):
-    code = REPO / "code"
-    assert not list(code.rglob("__pycache__"))
-    assert not list(code.rglob("*.pyc"))
+    for sub in ("code", "outputs"):
+        assert not list((REPO / sub).rglob("__pycache__"))
+        assert not list((REPO / sub).rglob("*.pyc"))
 
 
 def test_loader_returns_the_published_function(mod):
     assert load_compute_bopas() is mod.compute_bopas
+
+
+# ---- the read-only mitigation itself (regressions here would write into a DOI-published repo) --
+
+@pytest.fixture
+def fresh_loader(monkeypatch):
+    saved = prop._module
+    monkeypatch.setattr(prop, "_module", None)
+    yield monkeypatch
+    prop._module = saved
+
+
+def _fake_repo(tmp_path, body, outputs=True):
+    code = tmp_path / "code"
+    code.mkdir()
+    (tmp_path / "outputs").mkdir() if outputs else None
+    src = code / "fake.py"
+    src.write_text(body, encoding="utf-8")
+    return src
+
+
+def test_loading_the_published_module_does_not_disturb_the_global_rng(fresh_loader):
+    random.seed(12345)
+    state = random.getstate()
+    prop._bopas_module()           # the real script calls random.seed(20260908) at import
+    assert random.getstate() == state
+
+
+def test_failed_import_restores_flags_rng_and_caches_nothing(fresh_loader, tmp_path):
+    src = _fake_repo(tmp_path, "import random\nrandom.seed(1)\nraise RuntimeError('boom')\n")
+    fresh_loader.setattr(prop, "BOPAS_SOURCE", src)
+    fresh_loader.setattr(sys, "dont_write_bytecode", False)   # make restoration observable
+    random.seed(999)
+    state, flag = random.getstate(), sys.dont_write_bytecode
+    with pytest.raises(RuntimeError, match="boom"):
+        prop._bopas_module()
+    assert sys.dont_write_bytecode == flag
+    assert random.getstate() == state
+    assert prop._module is None
+    assert not list(tmp_path.rglob("__pycache__"))
+
+
+def test_missing_outputs_dir_is_a_loud_failure_not_a_quiet_mkdir(fresh_loader, tmp_path):
+    src = _fake_repo(tmp_path, "x = 1\n", outputs=False)
+    fresh_loader.setattr(prop, "BOPAS_SOURCE", src)
+    with pytest.raises(RuntimeError, match="outputs"):
+        prop._bopas_module()
+    assert not (tmp_path / "outputs").exists()
+    assert prop._module is None
+
+
+# ---- rank_changes must not be able to emit meaningless movement -----------------------------
+
+def test_cells_zero_before_and_after_are_never_reported():
+    row = lambda i, v: dict(intervention=i, target="t", BOPAS=v, BOPAS_adj=v)
+    before = [dict(intervention="A", target="t", BOPAS=2.0), dict(intervention="D", target="t", BOPAS=1.0),
+              dict(intervention="B", target="t", BOPAS=0.0), dict(intervention="C", target="t", BOPAS=0.0)]
+    after = [dict(intervention="A", target="t", BOPAS_adj=0.0), dict(intervention="D", target="t", BOPAS_adj=1.0),
+             dict(intervention="B", target="t", BOPAS_adj=0.0), dict(intervention="C", target="t", BOPAS_adj=0.0)]
+    # A (2.0 -> 0.0) and D move; B and C were never in contention though A now ties them at rank 2
+    assert rank_changes(before, after) == [RankChange("A", "t", 1, 2), RankChange("D", "t", 2, 1)]
+
+
+def test_zeroing_the_only_live_series_reports_no_rank_movement_for_dead_cells(counts, real_traj):
+    after = propagate(counts, real_traj, {**CLEAN, "RRMDR_notif_100k": 0.0})
+    before = [{k: v for k, v in r.items()} for r in after]
+    ch = rank_changes(before, after)
+    assert len(ch) <= 11            # only the 11 live cells can move; never 59
+    live = {(r["intervention"], r["target"]) for r in before if r["BOPAS"] > 0}
+    assert {(c.intervention, c.target) for c in ch} <= live
+
+
+def test_unassessable_cells_are_excluded_from_the_ranking_not_ranked_as_clean(counts, synth, mod):
+    before, _ = mod.compute_bopas(counts, synth)
+    p = {**CLEAN, "XDR_TSR_pct": None, "RR_new_pct": 0.1, "MDR_TSR_pct": 0.1}
+    after = propagate(counts, synth, p)
+    ch = rank_changes(before, after)
+    assert not any(c.target.startswith("XDR_TSR_pct") for c in ch)
+    # ranks are computed among assessable cells only: unassessable cells hold no rank slot
+    assessable = [r for r in after if not r["unassessable"]]
+    top = max(assessable, key=lambda r: r["BOPAS_adj"])
+    top_rank_after = [c.rank_after for c in ch if (c.intervention, c.target) == (top["intervention"], top["target"])]
+    assert top_rank_after in ([], [1])
+
+
+def test_unassessable_series_cells_are_listed_apart_from_the_ranking(counts, synth):
+    after = propagate(counts, synth, {**CLEAN, "XDR_TSR_pct": None})
+    cells = after.unassessable_cells
+    assert {c["series"] for c in cells} == {"XDR_TSR_pct"}
+    assert len(cells) == sum(1 for r in after if r["series"] == "XDR_TSR_pct")
+    assert all({"intervention", "target", "series"} <= set(c) for c in cells)
+    assert propagate(counts, synth, CLEAN).unassessable_cells == []
+
+
+def test_unassessable_cells_never_appear_in_rank_changes_even_when_they_lead(counts, synth, mod):
+    before, _ = mod.compute_bopas(counts, synth)
+    after = propagate(counts, synth, {**CLEAN, "XDR_TSR_pct": None, "RRMDR_notif_100k": 0.01})
+    xdr_label = "XDR_TSR_pct label"
+    assert all(c.target != xdr_label for c in rank_changes(before, after))
+
+
+# ---- duplicate series ------------------------------------------------------------------------
+
+def test_duplicate_series_in_traj_rows_raises(counts, synth):
+    with pytest.raises(ValueError, match="RR_new_pct"):
+        propagate(counts, synth + [synth[0]], CLEAN)

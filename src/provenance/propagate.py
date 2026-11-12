@@ -38,11 +38,15 @@ def _bopas_module():
     Importing it has two side effects this guards against: Python would write __pycache__ next to
     the source (bytecode writing is switched off for the duration), and the script calls
     random.seed() at import, which would silently reseed the caller's global generator (state is
-    saved and restored). It also runs OUT.mkdir(exist_ok=True) on the repository's existing
-    outputs/ directory, which is a no-op while that directory exists.
+    saved and restored). It also runs OUT.mkdir(exist_ok=True) at import, which would CREATE
+    outputs/ inside the published repository if it were missing; that is refused up front.
     """
     global _module
     if _module is None:
+        outputs = BOPAS_SOURCE.parent.parent / "outputs"   # the script's OUT = HERE.parent / "outputs"
+        if not outputs.is_dir():
+            raise RuntimeError(f"{outputs} does not exist; importing {BOPAS_SOURCE.name} would create it "
+                               f"inside the published repository, which is read-only")
         spec = importlib.util.spec_from_file_location("build_tb_bopas_ijtb", BOPAS_SOURCE)
         mod = importlib.util.module_from_spec(spec)
         old_flag, state = sys.dont_write_bytecode, random.getstate()
@@ -68,6 +72,9 @@ class PropagationResult(list):
     so a report can say how much of the grid rests on unaudited series.
     """
     unassessable: list[str]
+    # cells of those series ({"intervention","target","series"}). They are excluded from
+    # rank_changes and must be reported apart from the ranking, never inside it.
+    unassessable_cells: list[dict]
 
 
 def _check(series: str, p) -> float | None:
@@ -89,6 +96,9 @@ def propagate(node_counts, traj_rows, provenance: dict[str, float | None], *,
     """
     compute_bopas = load_compute_bopas()
     series_keys = [t["series"] for t in traj_rows]
+    dup = sorted({s for s in series_keys if series_keys.count(s) > 1})
+    if dup:
+        raise ValueError(f"duplicate series in traj_rows: {dup}")
     missing = [s for s in dict.fromkeys(series_keys) if s not in provenance]
     if missing:
         raise ValueError(f"no provenance given for series {missing}; pass None for 'unassessable', "
@@ -109,6 +119,8 @@ def propagate(node_counts, traj_rows, provenance: dict[str, float | None], *,
         out.append(dict(r, provenance=p[r["series"]], unassessable=p[r["series"]] is None,
                         T_adj=a["T"] + 0.0, BOPAS_adj=a["BOPAS"] + 0.0))
     out.unassessable = [s for s in dict.fromkeys(series_keys) if p[s] is None]
+    out.unassessable_cells = [dict(intervention=r["intervention"], target=r["target"], series=r["series"])
+                              for r in out if r["unassessable"]]
     return out
 
 
@@ -149,8 +161,15 @@ def rank_changes(before: list[dict], after: list[dict]) -> list[RankChange]:
     """Cells whose rank differs between `before` (by BOPAS) and `after` (by BOPAS_adj).
 
     Cells are paired by (intervention, target), not by position. Ranks are on the published
-    (rounded) scores, so cells tied at 0.0 share a rank; a rank change can therefore also arise
-    when rounding creates or breaks a tie. Empty list means the ranking is unchanged.
+    (rounded) scores, so a rank change can also arise when rounding creates or breaks a tie.
+    Empty list means the ranking is unchanged. Two classes of cell are structurally excluded:
+
+    - cells scoring zero BOTH before and after: they were never in contention, so there is no
+      movement to report (without this, zeroing the only live series would "move" every dead cell
+      to a shared rank 1). They still sit below every live cell and do not disturb its rank.
+    - cells flagged `unassessable` in `after` (see propagate): a series that could not be audited
+      is neither ranked as clean nor as zero, so it takes no rank slot in either ranking. Report
+      them from PropagationResult.unassessable_cells.
     """
     b = {(r["intervention"], r["target"]): r["BOPAS"] for r in before}
     a = {(r["intervention"], r["target"]): r["BOPAS_adj"] for r in after}
@@ -161,6 +180,10 @@ def rank_changes(before: list[dict], after: list[dict]) -> list[RankChange]:
     for v in (*b.values(), *a.values()):
         if isinstance(v, float) and math.isnan(v):
             raise ValueError("NaN score cannot be ranked")
+    out_of_ranking = {(r["intervention"], r["target"]) for r in after if r.get("unassessable")}
+    b = {k: v for k, v in b.items() if k not in out_of_ranking}
+    a = {k: v for k, v in a.items() if k not in out_of_ranking}
     rb, ra = _ranks(b), _ranks(a)
-    return sorted((RankChange(i, t, rb[(i, t)], ra[(i, t)]) for (i, t) in b if rb[(i, t)] != ra[(i, t)]),
+    return sorted((RankChange(i, t, rb[(i, t)], ra[(i, t)]) for (i, t) in b
+                   if rb[(i, t)] != ra[(i, t)] and (b[(i, t)] != 0 or a[(i, t)] != 0)),
                   key=lambda c: (c.rank_before, c.intervention, c.target))
