@@ -117,3 +117,19 @@ def test_large_unit_cost_does_not_get_widened_band():
     r = identity_score(s)
     assert abs(r.detail["identity"][2000] - 1.12) < 1e-9
     assert r.score == 0.0
+
+
+def _unit_one(ratio):
+    # unit cost 1, volume 10, so implied = 10 and reported = 10 / ratio
+    return IndicatorSeries("p", "p", [2000], [10.0 / ratio], "x", {},
+                           {"unit_cost": [1.0], "volume": [10.0]}, "product")
+
+
+def test_unit_cost_one_ratio_1_8_is_clean_under_asymmetric_band():
+    # c_true in [0.5, 1.5) => ratio = 1/c_true in (0.667, 2.0]. A symmetric +-0.5 band
+    # (max 1.5) would have wrongly failed 1.8.
+    assert identity_score(_unit_one(1.8)).score == 1.0
+
+
+def test_unit_cost_one_ratio_0_6_fails_lower_bound():
+    assert identity_score(_unit_one(0.6)).score == 0.0

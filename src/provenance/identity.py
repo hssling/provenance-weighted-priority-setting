@@ -26,18 +26,21 @@ def _implied(s: IndicatorSeries, i: int) -> float | None:
     return None
 
 
-def _tolerance(s: IndicatorSeries, i: int) -> float:
-    """Flat 10%, widened for a product whose integer unit cost carries rounding error.
+def _bounds(s: IndicatorSeries, i: int) -> tuple[float, float]:
+    """Admissible implied/reported ratio for year index i: flat [0.90, 1.10], widened for
+    a product whose integer unit cost c carries rounding error.
 
-    An integer unit cost c is c +- 0.5, a relative error of 0.5 / c (50% at c = 1).
-    Sum identities keep the flat band: their parts are large and rounding is negligible.
+    c_true is in [c - 0.5, c + 0.5) and ratio = c / c_true, so the ratio lies in
+    (c / (c + 0.5), c / (c - 0.5)]: asymmetric (c = 1 gives (0.667, 2.0]).
+    Sum identities keep the flat band; their parts are large and rounding is negligible.
     """
+    lo, hi = 1.0 - TOLERANCE, 1.0 + TOLERANCE
     if s.identity == "product":
         unit = s.components.get("unit_cost")
         c = unit[i] if unit else None
         if c is not None and c > 0 and float(c).is_integer():
-            return max(TOLERANCE, 0.5 / c)
-    return TOLERANCE
+            lo, hi = min(lo, c / (c + 0.5)), max(hi, c / (c - 0.5))
+    return lo, hi
 
 
 def identity_score(s: IndicatorSeries) -> TestResult:
@@ -65,5 +68,6 @@ def identity_score(s: IndicatorSeries) -> TestResult:
     bad = set(incomplete)
     index = {y: i for i, y in enumerate(s.years)}
     clean = [y for y in testable
-             if y not in bad and abs(ratios[y] - 1.0) <= _tolerance(s, index[y]) + _EPS]
+             if y not in bad
+             and _bounds(s, index[y])[0] - _EPS <= ratios[y] <= _bounds(s, index[y])[1] + _EPS]
     return TestResult(len(clean) / len(testable), True, detail)
