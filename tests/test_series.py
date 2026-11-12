@@ -41,6 +41,7 @@ def _write_budget(tmp_path, rows, drop=()):
     """Synthetic budget CSV holding every column the loader maps (minus `drop`)."""
     from provenance.series import BUDGET_IDENTITIES
     cols = {"budget_tpt", "budget_lab"}
+    cols.update(BUDGET_IDENTITIES)
     for _, parts in BUDGET_IDENTITIES.values():
         cols.update(parts.values())
     cols = sorted(cols - set(drop))
