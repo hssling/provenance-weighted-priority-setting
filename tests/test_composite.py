@@ -139,7 +139,8 @@ def test_report_collapsed_by_empty_without_exact_zero():
 
 def test_report_unassessable():
     r = composite_report([untestable(), untestable()])
-    assert r == CompositeReport(score=None, n_testable=0, min_observations=None, collapsed_by=[])
+    assert r == CompositeReport(score=None, n_testable=0, observations={}, min_observations=None,
+                             collapsed_by=[])
 
 
 def test_report_score_matches_composite_and_ignores_untestable_observations():
@@ -163,3 +164,45 @@ def test_report_identity_counts_incomplete_years_too():
 def test_report_unrecognised_detail_fails_loudly():
     with pytest.raises(ValueError, match="detail"):
         composite_report([clean(0.5)])
+
+
+# ---- Ruling X: per-test observations ---------------------------------------------------
+def test_observations_show_well_evidenced_test_behind_the_zero():
+    # identity collapsed on 20 observations; a clean triangulation has only 1.
+    r = composite_report([t1(0.0, 20), t2(1.0, 1)])
+    assert r.collapsed_by == ["identity"]
+    assert r.observations["identity"] == 20
+    assert r.observations["triangulation"] == 1
+    assert r.min_observations == 1  # summary only; observations is the field to read
+
+
+def test_min_observations_is_derived_from_observations():
+    r = composite_report([t1(0.5, 4), untestable(), t3(0.8, 2), t4(1.0, 9)])
+    assert r.min_observations == min(r.observations.values()) == 2
+
+
+def test_observations_only_for_testable_tests():
+    r = composite_report([t1(0.5, 4), untestable(), t3(0.8, 2)])
+    assert r.observations == {"identity": 4, "implausibility": 2}
+    assert r.n_testable == len(r.observations)
+
+
+def test_collapsed_by_subset_of_observations():
+    r = composite_report([t1(0.0, 3), t2(0.0, 5), t4(0.7, 2)])
+    assert set(r.collapsed_by) <= set(r.observations)
+
+
+def test_unassessable_has_empty_observations():
+    assert composite_report([untestable()]).observations == {}
+
+
+def test_duplicate_test_in_results_fails_loudly():
+    with pytest.raises(ValueError, match="identity"):
+        composite_report([t1(0.5, 2), t1(0.9, 3)])
+
+
+def test_unrecognised_detail_error_names_result_and_shapes():
+    with pytest.raises(ValueError) as e:
+        composite_report([t1(0.5, 2), clean(0.5)])
+    msg = str(e.value)
+    assert "results[1]" in msg and "identity" in msg and "exceed" in msg and "silent" in msg

@@ -60,6 +60,10 @@ def composite_sensitivity(results: list[TestResult],
     return {k: v for k, v in out.items() if v is not None}
 
 
+_SHAPES = ("identity: keys 'identity'+'incomplete'; triangulation: keys 'changes'+'agree'; "
+           "implausibility: keys 'changes'+'exceed'; declared: keys 'changes'+'declared'+'silent'")
+
+
 def _identify(detail: dict) -> tuple[str, int]:
     """(test name, observations evaluated) from a TestResult.detail.
 
@@ -79,14 +83,16 @@ def _identify(detail: dict) -> tuple[str, int]:
         return "implausibility", len(detail["changes"])
     if "declared" in detail and "silent" in detail:
         return "declared", len(detail["changes"])
-    raise ValueError(f"unrecognised TestResult.detail shape (keys: {sorted(detail)})")
+    raise ValueError(f"unrecognised TestResult.detail shape (keys: {sorted(detail)}); "
+                     f"recognised shapes are {_SHAPES}")
 
 
 @dataclass(frozen=True)
 class CompositeReport:
     score: float | None           # same value composite() returns
     n_testable: int               # how many tests could run
-    min_observations: int | None  # fewest observations behind any contributing test; None if none
+    observations: dict[str, int]  # test name -> observations behind its score; testable tests only
+    min_observations: int | None  # min(observations.values()); None if none testable
     collapsed_by: list[str]       # names of tests scoring exactly 0.0, in input order
 
 
@@ -95,13 +101,26 @@ def composite_report(results: list[TestResult], *, rule: str = DEFAULT_RULE) -> 
 
     Exposes thinness without correcting for it: no minimum-evidence cutoff, no shrinkage. A 0.0
     resting on one observation and a 0.0 resting on twenty have the same score but are reported
-    with different min_observations.
+    differently.
+
+    Read `observations` beside `collapsed_by` to judge a 0.0. `min_observations` is only a
+    summary over ALL testable tests: it may belong to a clean test, not to the one that collapsed.
     """
     score = composite(results, rule=rule)  # validates `rule`
-    testable = [_identify(r.detail) + (r.score,) for r in results if r.testable]
-    return CompositeReport(
-        score=score,
-        n_testable=len(testable),
-        min_observations=min((n for _, n, _ in testable), default=None),
-        collapsed_by=[name for name, _, sc in testable if sc == 0.0],
-    )
+    observations: dict[str, int] = {}
+    collapsed: list[str] = []
+    for i, r in enumerate(results):
+        if not r.testable:
+            continue
+        try:
+            name, n = _identify(r.detail)
+        except ValueError as e:
+            raise ValueError(f"results[{i}]: {e}") from None
+        if name in observations:
+            raise ValueError(f"results[{i}]: more than one {name!r} result; observations is keyed by test")
+        observations[name] = n
+        if r.score == 0.0:
+            collapsed.append(name)
+    return CompositeReport(score=score, n_testable=len(observations), observations=observations,
+                           min_observations=min(observations.values(), default=None),
+                           collapsed_by=collapsed)
