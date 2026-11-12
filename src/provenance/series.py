@@ -5,6 +5,7 @@ Absent values (blank or "NA") load as None; a reported "0" loads as 0.0.
 from __future__ import annotations
 
 import csv
+import re
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -152,4 +153,35 @@ def load_india_tb_report(path: Path) -> dict[str, IndicatorSeries]:
             source=source,
             notes=dict(_ITR_NOTES.get(col, {})),
         )
+    return out
+
+
+NTEP_TRAJECTORIES_CSV = DATA_DIR.parents[1] / "tb_bopas_repo" / "data" / "ntep_trajectories.csv"
+
+# The source repeats one note on every row of a series. Copying it onto every year would
+# make every jump look "declared" and reward silent breaks, so a note is pinned only to a
+# year it names as a break ("changed at 2020"). Notes naming no break year are descriptive
+# of the whole series and are not turned into per-year declarations.
+_BREAK_YEAR = re.compile(r"changed at (\d{4})")
+
+
+def load_trajectories(path: Path) -> dict[str, IndicatorSeries]:
+    """NTEP trajectories CSV (read-only) -> one IndicatorSeries per `series` value."""
+    with open(Path(path), newline="", encoding="utf-8-sig") as fh:
+        rows = list(csv.DictReader(fh))
+    grouped: dict[str, list[dict]] = {}
+    for r in rows:
+        grouped.setdefault(r["series"], []).append(r)
+    out = {}
+    for key, rs in grouped.items():
+        rs.sort(key=lambda r: int(r["year"]))
+        notes = {}
+        for r in rs:
+            m = _BREAK_YEAR.search(r["note"] or "")
+            if m:
+                notes[int(m.group(1))] = r["note"].strip()
+        out[key] = IndicatorSeries(
+            key=key, label=rs[0]["label"], years=[int(r["year"]) for r in rs],
+            values=[_parse(r["value"]) for r in rs],
+            source=f"NTEP trajectories ({rs[0]['who_dataset']})", notes=notes)
     return out
