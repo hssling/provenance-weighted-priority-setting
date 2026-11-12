@@ -44,9 +44,27 @@ Domestic share 62% → 96%. Monotone and large.
 
 ### 1.4 Fiscal invisibility
 
-Five of eleven evidence-ranked TB interventions have **no budget line at all**:
+**Six** of eleven evidence-ranked TB interventions have **no budget line at all**:
 airborne infection prevention and control (rank 2), whole-genome sequencing (4),
-bovine TB control (7), private-sector engagement (8), milk pasteurisation (10).
+**active case finding (5)**, bovine TB control (7), private-sector engagement (8),
+milk pasteurisation (10).
+
+Three of the top five evidence-ranked interventions are fiscally untraceable.
+
+Active case finding was initially mapped to `budget_prog`. That is wrong, and
+WHO's own data dictionary settles it: `budget_prog` is *"Budget required for
+programme costs to **treat** drug-susceptible TB"*. Case **finding** is not
+treatment. The mapping was corrected after the implementer challenged it.
+
+One mapping is **partial rather than absent**: node 11, integrated
+TB-HIV-diabetes care, maps to `budget_tbhiv` = *"collaborative TB/HIV
+activities"*. Two of its three arms are traceable; diabetes is not. It is
+counted as mapped, with the partiality recorded.
+
+Every mapping is now checked against the dictionary definition, not against the
+column name. A plausible-looking name is not evidence that a line item covers
+the intervention — which is the same error, one level up, that this instrument
+exists to catch.
 
 This replicates the finding in the JSSTD NACP-V paper, where STI services, PrEP
 and surveillance likewise had no traceable line item. Two programmes, two
