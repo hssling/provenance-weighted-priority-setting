@@ -5,6 +5,15 @@ not run is not evidence of cleanliness. If nothing is testable the composite is 
 is *unassessable*), which is distinct from 0.0 (testable and wholly failed) and from 1.0 (clean).
 
 The existence test (T5) is deliberately not an input: it scores interventions, not series.
+
+COMPARABILITY WARNING. Composites are NOT comparable across series with different `n_testable`.
+Untestable tests are dropped, so a series is scored on whichever tests could run, and adding a
+testable CLEAN test raises the composite: geometric mean of (0.8) is 0.8, but of (0.8, 1.0) it is
+0.894; with an arithmetic rule 0.8 vs 0.9. A series that happens to be testable by more tests looks
+better for that reason alone. Rank or compare composites only across series with the same
+n_testable (and ideally the same set of tests); read `CompositeReport.n_testable` and
+`observations` beside every score. In D1 every series has the same n_testable (1), so the
+comparison there is clean; in any D2/D3 with mixed testability it will not be.
 """
 from __future__ import annotations
 

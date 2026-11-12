@@ -206,3 +206,13 @@ def test_unrecognised_detail_error_names_result_and_shapes():
         composite_report([t1(0.5, 2), clean(0.5)])
     msg = str(e.value)
     assert "results[1]" in msg and "identity" in msg and "exceed" in msg and "silent" in msg
+
+
+def test_adding_a_testable_clean_test_raises_the_composite_so_n_testable_must_match():
+    # I5: composites are not comparable across series with different n_testable.
+    from provenance.composite import composite
+    from provenance.series import TestResult
+    a = TestResult(0.9, True, {"changes": {2001: 0.1}, "exceed": [], "bound": 0.5})
+    clean = TestResult(1.0, True, {"identity": {2001: 1.0}, "incomplete": []})
+    assert composite([a]) == 0.9
+    assert composite([a, clean]) == pytest.approx(0.9 ** 0.5) and composite([a, clean]) > 0.9

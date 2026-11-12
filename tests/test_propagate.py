@@ -398,8 +398,13 @@ def test_creating_a_tie_is_a_tie_split():
 
 
 def test_real_data_change_is_a_tie_split(counts, real_traj):
-    rows = propagate(counts, real_traj, {**CLEAN, "RRMDR_notif_100k": 0.9023370853794828,
-                                         "RR_new_pct": 0.9023370853794828})
+    # An EXPLICIT provenance value (0.9), not the instrument's current composite. This used to pin
+    # 0.9023370853794828, the superseded pre-Ruling-GG composite, which made the test look like a
+    # statement about the instrument's output. It is a statement about the published rounding: the
+    # real grid has a tie at 0.033 (Nutritional support / Milk pasteurisation) that scaling by many
+    # values (0.71, 0.72, 0.75, 0.77, 0.78, 0.8, 0.9, ...) splits and by others (0.73, 0.76, 0.79,
+    # 0.82, 0.91, ...) does not. Whether a tie splits is an artefact of the value, never a finding.
+    rows = propagate(counts, real_traj, {**CLEAN, "RRMDR_notif_100k": 0.9, "RR_new_pct": 0.9})
     ch = rank_changes(rows, rows)
     assert [(c.intervention[:4], c.kind) for c in ch] == [("Milk", "tie_split")]
 

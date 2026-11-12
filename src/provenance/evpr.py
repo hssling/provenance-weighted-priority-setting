@@ -21,8 +21,18 @@ independent across series, where P_s is the composite and m_s the total testable
 it (sum of CompositeReport.observations). Mean (P_s*m_s+1)/(m_s+2), which shrinks P_s toward
 0.5 by an amount that depends on m_s; it is TWO-SIDED (a series that passes its tests
 may still be bad: the failure this project has found most often is a test that silently missed a
-problem) and its width is set by the evidence count, not a free parameter. It is the same
-Beta(k+1, n-k+1) construction the parent project uses for literature support (lower_beta_bound).
+problem) and its width is set by the evidence count, not a free parameter.
+
+WHAT THIS PRIOR IS NOT. It is a pragmatic, evidence-weighted prior, NOT a posterior from any
+likelihood the composite satisfies. A Beta(k+1, n-k+1) is the posterior of a binomial proportion
+after k successes in n independent trials; here P is a (geometric) mean of per-test pass fractions,
+not a count of successes in m trials, and m is a sum of per-test observation counts that can count
+the same year more than once across tests (T1 and T4 read the same years), so the "trials" are
+neither independent nor distinct. P*m is therefore not a success count and the Beta's width is not
+a posterior width. It borrows the shape of the Beta(k+1, n-k+1) idiom (two-sided, narrowing with
+evidence) and nothing else; it is NOT the construction the parent project uses for literature
+support (lower_beta_bound), whose inputs are genuine binomial counts. That is why EVPR is reported
+under three priors (see PRIORS): the choice of prior is the most contestable assumption here.
 A series with no testable result (None, m = 0) gets Beta(1, 1) = Uniform[0, 1]: the uninformative
 case falls out of the same formula. Consequence: a clean composite resting on few observations is
 NOT certain, so all-clean input does not give zero EVPR except where the decision cannot change.
