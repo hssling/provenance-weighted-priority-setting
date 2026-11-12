@@ -81,3 +81,28 @@ def test_real_rrmdr_series_scores_above_its_silent_equivalent():
     silent = IndicatorSeries(real.key, real.label, list(real.years), list(real.values),
                              real.source, {}, {})
     assert declared_score(real, bound=0.2).score > declared_score(silent, bound=0.2).score
+
+
+def test_a_declared_fall_is_flagged_and_credited_like_a_declared_rise():
+    # C2: the old statistic could not see falls beyond a bound of 1. 4 -> 1 is a 4-fold fall.
+    fall = _s({2021: "definition changed"}, [4.0, 4.0, 1.0, 1.0], [2019, 2020, 2021, 2022])
+    rise = _s({2021: "definition changed"}, [1.0, 1.0, 4.0, 4.0], [2019, 2020, 2021, 2022])
+    for s in (fall, rise):
+        r = declared_score(s, bound=0.5)
+        assert r.detail["declared"] == [2021] and r.score == pytest.approx((2 + 0.5) / 3)
+
+
+def test_declared_score_is_untestable_when_the_reference_is_unstable():
+    r = declared_score(_s({}), bound=1.0)
+    assert not r.testable and r.score is None and "not stable" in r.detail["reason"]
+
+
+def test_real_rrmdr_2020_step_is_flagged_and_declared_at_the_derived_bound():
+    # The one declared definitional break in the data. Its 2020 step is -25.7%: invisible to the
+    # old asymmetric statistic at the derived bound (0.3211), caught by the symmetric one
+    # (fold change - 1 = 0.347). The bound was NOT tuned: it is the leave-one-out p95 from the
+    # other five series, unchanged by the fix (see test_d1_tb).
+    s = load_trajectories(NTEP_CSV)["RRMDR_notif_100k"]
+    r = declared_score(s, bound=0.3211)
+    assert r.detail["declared"] == [2020] and r.detail["silent"] == [2018]
+    assert r.score > implausibility_score(s, bound=0.3211).score    # disclosure is rewarded

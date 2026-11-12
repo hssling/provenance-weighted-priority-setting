@@ -1,3 +1,5 @@
+import pytest
+
 from provenance.identity import identity_score
 from provenance.series import (
     BUDGET_CSV,
@@ -107,7 +109,8 @@ def test_tpt_2024_2025_still_fail_after_rounding_allowance():
     # Only 2024 and 2025 fail: drop them and the rest is fully clean.
     keep = [i for i, y in enumerate(s.years) if y < 2024]
     s2 = IndicatorSeries(s.key, s.label, [s.years[i] for i in keep], [s.values[i] for i in keep],
-                         s.source, {}, {k: [v[i] for i in keep] for k, v in s.components.items()}, "product")
+                         s.source, {}, {k: [v[i] for i in keep] for k, v in s.components.items()}, "product",
+                         s.unit_rounding)
     assert identity_score(s2).score == 1.0
 
 
@@ -122,7 +125,7 @@ def test_large_unit_cost_does_not_get_widened_band():
 def _unit_one(ratio):
     # unit cost 1, volume 10, so implied = 10 and reported = 10 / ratio
     return IndicatorSeries("p", "p", [2000], [10.0 / ratio], "x", {},
-                           {"unit_cost": [1.0], "volume": [10.0]}, "product")
+                           {"unit_cost": [1.0], "volume": [10.0]}, "product", 0.5)
 
 
 def test_unit_cost_one_ratio_1_8_is_clean_under_asymmetric_band():
@@ -133,3 +136,41 @@ def test_unit_cost_one_ratio_1_8_is_clean_under_asymmetric_band():
 
 def test_unit_cost_one_ratio_0_6_fails_lower_bound():
     assert identity_score(_unit_one(0.6)).score == 0.0
+
+
+def test_integral_unit_cost_without_a_declared_rounding_model_gets_the_flat_band():
+    # M4: an integral unit cost is not evidence of rounding (a derived scale/denominator can be
+    # integral by accident). Same numbers as _unit_one(1.8), no rounding declared: 1.8 fails.
+    s = IndicatorSeries("p", "p", [2000], [10.0 / 1.8], "x", {},
+                        {"unit_cost": [1.0], "volume": [10.0]}, "product")
+    assert s.unit_rounding is None and identity_score(s).score == 0.0
+
+
+def test_loader_declares_rounding_for_budget_tpt_only():
+    b = load_who_budget(BUDGET_CSV, "IND")
+    assert b["budget_tpt"].unit_rounding == 0.5 and b["budget_tot"].unit_rounding is None
+
+
+def test_tolerance_sweep_on_real_identities():
+    # M3: TOLERANCE has no derivation, so its effect is recorded. Sum identities are flat across
+    # 0.01-0.15; budget_tpt (the only product identity) is not: 2/6 up to 0.05, 4/6 from 0.08.
+    from provenance.series import EXP_CSV, load_who_expenditure
+    b, e = load_who_budget(BUDGET_CSV, "IND"), load_who_expenditure(EXP_CSV, "IND")
+    sums = {"budget_tot": (b["budget_tot"], 1.0), "cf_tot": (b["cf_tot"], 1.0),
+            "exp_tot": (e["exp_tot"], 0.9), "rcvd_tot": (e["rcvd_tot"], 0.9),
+            "rcvd_tot_by_source": (e["rcvd_tot_by_source"], 0.9)}
+    for tol in (0.01, 0.02, 0.05, 0.10, 0.15):
+        for name, (s, want) in sums.items():
+            assert identity_score(s, tolerance=tol).score == pytest.approx(want), (name, tol)
+    tpt = {tol: identity_score(b["budget_tpt"], tolerance=tol).score for tol in (0.01, 0.05, 0.08, 0.10, 0.15)}
+    assert tpt[0.01] == tpt[0.05] == pytest.approx(2 / 6)
+    assert tpt[0.10] == tpt[0.15] == pytest.approx(4 / 6)
+
+
+def test_self_derived_identity_is_untestable_but_still_reports_ratios():
+    # I1: components built from the same record as the total cannot discriminate.
+    s = _sum_series([100.0, 100.0], [60.0, 60.0], [40.0, 40.0])
+    assert identity_score(s).score == 1.0
+    r = identity_score(s, independent=False)
+    assert r.testable is False and r.score is None
+    assert r.detail["identity"] == {2000: 1.0, 2001: 1.0} and "reason" in r.detail

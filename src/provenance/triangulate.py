@@ -15,6 +15,8 @@ comparable year-pair all return testable=False, score=None. Never a clean score.
 """
 from __future__ import annotations
 
+import math
+
 from .series import IndicatorSeries, TestResult
 
 TOLERANCE = 0.15          # change mode: proportional-change gap
@@ -33,6 +35,30 @@ def _changes(s: IndicatorSeries) -> dict[int, float]:
         prev = by_year.get(y - 1)
         if v is not None and prev is not None and prev != 0:
             out[y] = v / prev - 1.0
+    return out
+
+
+def _steps(s: IndicatorSeries) -> dict[int, float]:
+    """Inversion-symmetric size of each year-on-year step, for T3/T4 (not T2).
+
+    With r = v[y] / v[y-1] the size is max(r, 1/r) - 1: the fold change minus one. For a rise
+    it equals the proportional change (+50% -> 0.5); a fall of the same fold gets the same size
+    (a halving, -50%, -> 1.0, exactly as a doubling). It is a monotone function of |log r|, so a
+    step exceeds a bound here iff |log r| exceeds log(1 + bound): the |log| statistic, in units
+    a reader can interpret.
+
+    The raw |v/prev - 1| is NOT symmetric: a fall is capped at 1 (r in [0, 1)), so no bound >= 1
+    could ever flag any fall, however large. A step to zero or through zero (r <= 0) has no
+    finite fold and is +inf: always beyond any finite bound. Comparable steps are the same as
+    `_changes` (consecutive years, both present, non-zero base).
+    """
+    by_year = dict(zip(s.years, s.values))
+    out = {}
+    for y, v in by_year.items():
+        prev = by_year.get(y - 1)
+        if v is not None and prev is not None and prev != 0:
+            r = v / prev
+            out[y] = max(r, 1.0 / r) - 1.0 if r > 0 else math.inf
     return out
 
 

@@ -39,6 +39,8 @@ EXP_IDENTITIES = {
     "rcvd_tot": _sum_of("rcvd"),
     "rcvd_tot_by_source": ("sum", {f"rcvd_tot_{x}": f"rcvd_tot_{x}" for x in _SOURCES}),
 }
+# WHO reports budget_cpp_tpt as a whole number, so the unit cost carries +-0.5 of rounding error.
+_UNIT_ROUNDING = {"budget_tpt": 0.5}
 _SYNTHETIC = {"rcvd_tot_by_source": "rcvd_tot"}
 
 
@@ -51,7 +53,11 @@ class IndicatorSeries:
     source: str
     notes: dict[int, str] = field(default_factory=dict)
     components: dict[str, list[float | None]] = field(default_factory=dict)
-    identity: str | None = None  # "product" | "sum" | None; appended last, keep it last
+    identity: str | None = None  # "product" | "sum" | None; keep it where it is (positional callers)
+    # Half-width of the rounding applied to the product identity's unit_cost, in the unit_cost's own
+    # units (0.5: reported to the nearest whole unit). None: no rounding model, flat tolerance only.
+    # Declared by whoever knows how the figure was reported (the loader), never inferred from the value.
+    unit_rounding: float | None = None
 
 
 @dataclass(frozen=True)
@@ -106,7 +112,9 @@ def _load(path: Path, iso3: str, identities: dict[str, tuple[str, dict[str, str]
         identity, parts = identities.get(key, (None, {}))
         comp = {name: list(cols[src]) for name, src in parts.items()}
         values = cols[_SYNTHETIC.get(key, key)]
-        out[key] = IndicatorSeries(key, key, list(years), list(values), source, {}, comp, identity)
+        rounding = _UNIT_ROUNDING.get(key)
+        out[key] = IndicatorSeries(key, key, list(years), list(values), source, {}, comp, identity,
+                                   rounding)
     return out
 
 

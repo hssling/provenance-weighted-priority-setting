@@ -86,15 +86,55 @@ def test_derive_bound_without_comparable_changes_raises():
 def test_recorded_real_data_result_reference_cpp_dstb_all_countries():
     # RECORDS an outcome; it is not a target. Reference set, fixed in advance of looking at
     # the result: budget_cpp_dstb (DS-TB cost per patient) for every country in the WHO
-    # budget file, i.e. the same kind of quantity as the known case (a unit cost) but a
-    # different regimen. The derived bound is ~1.92 (a 192% year-on-year change), and it
-    # catches NOTHING in India's budget_cpp_xdr. That null is reported, not tuned away:
-    # the reference is itself too volatile for T3 to discriminate unit-cost series.
+    # budget file, the same kind of quantity as the known case (a unit cost). Under the
+    # symmetric step size the derived bound is ~4.13 (a 5.1-fold swing at p95; the old
+    # asymmetric statistic gave 1.917, which could not flag any fall). A reference that swings
+    # five-fold at its 95th percentile is not stable, so the precondition fails and T3 is
+    # NOT TESTABLE on budget_cpp_xdr: not 1.0. That is reported, not tuned away.
     import csv
     with open(BUDGET_CSV, newline="", encoding="utf-8-sig") as fh:
         isos = sorted({r["iso3"] for r in csv.DictReader(fh)})
     ref = [load_who_budget(BUDGET_CSV, i)["budget_cpp_dstb"] for i in isos]
     b = derive_bound(ref)
-    assert len(ref) == 215 and b == pytest.approx(1.917, abs=0.001)
-    r = implausibility_score(load_who_budget(BUDGET_CSV, "IND")["budget_cpp_xdr"], bound=b)
-    assert r.score == 1.0 and r.detail["exceed"] == []
+    assert len(ref) == 215 and b == pytest.approx(4.132, abs=0.001)
+    cpp = load_who_budget(BUDGET_CSV, "IND")["budget_cpp_xdr"]
+    r = implausibility_score(cpp, bound=b)
+    assert r.testable is False and r.score is None and "not stable" in r.detail["reason"]
+    # With the precondition waived the symmetric statistic does see the falls the old one hid.
+    forced = implausibility_score(cpp, bound=b, max_bound=None)
+    assert forced.testable and forced.detail["exceed"] == []     # still within a 5-fold bound
+
+
+def test_a_fall_is_as_flaggable_as_the_equal_fold_rise():
+    # C2: |v/prev - 1| is capped at 1 for any fall, so no bound >= 1 could ever flag one.
+    fall, rise = _s([100.0, 25.0]), _s([100.0, 400.0])
+    for bound in (0.5, 2.9):
+        a = implausibility_score(fall, bound=bound, max_bound=None)
+        b = implausibility_score(rise, bound=bound, max_bound=None)
+        assert a.score == b.score == 0.0 and a.detail["exceed"] == b.detail["exceed"] == [2019]
+    assert implausibility_score(fall, bound=3.0, max_bound=None).score == 1.0   # exactly at 3-fold-1
+    # the failure that was verified: a 1000x collapse is beyond a bound of 1.917
+    assert implausibility_score(_s([1000.0, 0.001]), bound=1.917, max_bound=None).score == 0.0
+
+
+def test_step_size_is_inversion_symmetric():
+    from provenance.triangulate import _steps
+    up, down = _steps(_s([4.0, 10.0])), _steps(_s([10.0, 4.0]))
+    assert up[2019] == pytest.approx(down[2019]) == pytest.approx(1.5)
+
+
+def test_unstable_reference_is_untestable_not_clean():
+    # I3: a bound >= STABLE_BOUND_MAX means the reference is not stable; "no violations" would be
+    # an artefact of the reference.
+    s = _s([100.0, 101.0, 102.0])
+    assert implausibility_score(s, bound=0.5).score == 1.0
+    r = implausibility_score(s, bound=1.0)
+    assert r.testable is False and r.score is None
+
+
+def test_step_to_zero_is_infinite_and_derive_bound_survives_infinities():
+    from provenance.triangulate import _steps
+    assert _steps(_s([4.0, 0.0]))[2019] == float("inf")
+    ref = [_s([4.0, 0.0, 4.0, 4.0, 4.0, 4.0])]          # one +inf step among comparable steps
+    assert derive_bound(ref, percentile=0.5) == 0.0      # no nan from inf * 0
+    assert derive_bound(ref, percentile=0.99) == float("inf")

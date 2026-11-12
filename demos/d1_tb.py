@@ -29,13 +29,13 @@ from provenance.evpr import (PRIORS, evpr_prior_sensitivity, observations_from_r
                              round_to_se)
 from provenance.existence import (NODE_LABELS, TB_BUDGET_MAPPING, TB_BUDGET_PARTIAL,  # noqa: E402
                                   existence_report)
-from provenance.identity import TOLERANCE as IDENTITY_TOLERANCE, identity_score  # noqa: E402
+from provenance.identity import identity_score                                    # noqa: E402
 from provenance.implausibility import derive_bound, implausibility_score          # noqa: E402
 from provenance.propagate import provenance_from_results, rank_changes            # noqa: E402
 from provenance.series import (BUDGET_CSV, EXP_CSV, ITR_CSV, NTEP_TRAJECTORIES_CSV,  # noqa: E402
                                IndicatorSeries, load_india_tb_report, load_trajectories,
                                load_who_budget, load_who_expenditure)
-from provenance.triangulate import _changes, ratio_series, triangulate_score      # noqa: E402
+from provenance.triangulate import _changes, _steps, ratio_series, triangulate_score  # noqa: E402
 
 OUTPUTS = ROOT / "outputs"
 SUMMARY = OUTPUTS / "d1_summary.txt"
@@ -62,7 +62,9 @@ def _ntep_rows() -> list[dict]:
 
 def _identity_view(series: IndicatorSeries, rows: list[dict]) -> IndicatorSeries:
     """value = scale * numerator / denominator, as a 'product' identity: unit_cost = scale/den,
-    volume = numerator. Checks that the file's own value reconciles with its own counts."""
+    volume = numerator. Checks that the file's own value reconciles with its own counts. The unit
+    cost is DERIVED here, so it declares no rounding model (unit_rounding stays None): the flat
+    tolerance applies, whether or not scale/denominator happens to be a whole number."""
     scale = next((v for suf, v in _SCALE.items() if series.key.endswith(suf)), None)
     if scale is None:
         raise ValueError(f"no scale known for series {series.key!r}")
@@ -76,6 +78,11 @@ def _identity_view(series: IndicatorSeries, rows: list[dict]) -> IndicatorSeries
 
 def composite_inputs(results: list) -> list:
     """The results that enter a series' composite: T1, T2, and ONE of T4 / T3 (Ruling GG).
+
+    On the NTEP series T1 and T2 are both untestable (T1: self-derived components, see audit_ntep;
+    T2: no second source), and untestable results are dropped by composite(). So each NTEP composite
+    is, in practice, its T4 (or T3) score alone. T1 stays in the list so that it would count the day
+    a series carries an independent identity.
 
     T4 (declared-break alignment) is T3 (implausibility) on the SAME steps, with credit for a
     disclosed break: identical to T3 where nothing is declared, more generous where something is.
@@ -96,6 +103,15 @@ def audit_ntep(percentile: float = PERCENTILE, pooled_reference: bool = False):
     series sets its own yardstick. `pooled_reference=True` pools all six (sensitivity only).
     T2: no series has an independent second source anywhere in this repository, so it is run with
     no counterpart and returns untestable. One triangulation result per series (Ruling Z).
+    T1: the identity is value = scale * numerator / denominator with value, numerator and
+    denominator all read from the SAME file (ntep_trajectories.csv). It can fail only on a
+    transcription slip, so it is run with independent=False: untestable, not a clean 1.0 that would
+    inflate every composite and the Beta prior's observation count. Its ratios are still computed
+    and reported as a transcription check (main(): "reconciles in N of M rows").
+    LIMITATION (I4): leave-one-out removes a series from its OWN reference, but the reference
+    population is still the audited population. If other series carry undeclared shifts (RR_new_pct
+    does, in 2021) they inflate every other series' bound. A reference external to the audited
+    series would not have this problem; none exists in this repository.
     """
     series = load_trajectories(NTEP_TRAJECTORIES_CSV)
     rows = _ntep_rows()
@@ -104,7 +120,7 @@ def audit_ntep(percentile: float = PERCENTILE, pooled_reference: bool = False):
         ref = list(series.values()) if pooled_reference else [o for k, o in series.items() if k != key]
         bound = derive_bound(ref, percentile=percentile)
         bounds[key] = bound
-        results[key] = [identity_score(_identity_view(s, rows)),
+        results[key] = [identity_score(_identity_view(s, rows), independent=False),
                         triangulate_score(s, None, mode="level"),
                         implausibility_score(s, bound=bound),
                         declared_score(s, bound=bound)]
@@ -188,7 +204,13 @@ def _all_countries(key: str) -> list[IndicatorSeries]:
 
 
 def audit_financing() -> dict:
-    """T1, T3, T4 and level-mode T2 on India's financing data. Reported; never propagated."""
+    """T1, T3, T4 and level-mode T2 on India's financing data. Reported; never propagated.
+
+    T3/T4 on budget_cpp_xdr need a STABLE reference (implausibility.py's precondition). The
+    cross-country budget_cpp_dstb reference is not: its p95 step is a >5-fold swing and about 28%
+    of its steps are exactly zero (a carried-forward figure, not a measurement). The tests then
+    return testable=False; a reported 1.0 would be an artefact of the reference.
+    """
     bud, exp = load_who_budget(BUDGET_CSV, ISO3), load_who_expenditure(EXP_CSV, ISO3)
     itr = load_india_tb_report(ITR_CSV)
     rows = []
@@ -216,10 +238,15 @@ def audit_financing() -> dict:
     ref = _all_countries("budget_cpp_dstb")
     bound = derive_bound(ref, percentile=PERCENTILE)
     n_steps = sum(len(_changes(s)) for s in ref)
+    zero_share = sum(1 for s in ref for c in _changes(s).values() if c == 0.0) / n_steps
     cpp = bud["budget_cpp_xdr"]
-    add("budget_cpp_xdr", "T3 implausibility", implausibility_score(cpp, bound=bound),
-        f"bound {bound:.3f} = p{int(PERCENTILE * 100)} of {n_steps} steps, {len(ref)} countries (budget_cpp_dstb)")
-    add("budget_cpp_xdr", "T4 declared", declared_score(cpp, bound=bound), "WHO file carries no notes")
+    basis = (f"bound {bound:.3f} = p{int(PERCENTILE * 100)} of {n_steps} steps, {len(ref)} countries "
+             f"(budget_cpp_dstb); {zero_share:.0%} of those steps are exactly zero")
+    t3, t4 = implausibility_score(cpp, bound=bound), declared_score(cpp, bound=bound)
+    add("budget_cpp_xdr", "T3 implausibility", t3,
+        basis + ("; " + t3.detail["reason"] if not t3.testable else ""))
+    add("budget_cpp_xdr", "T4 declared", t4,
+        "WHO file carries no notes" + ("; " + t4.detail["reason"] if not t4.testable else ""))
 
     # T2, level mode, on dimensionless internal ratios (no exchange rate): two independent sources.
     years = [y for y in itr["itr_requested"].years if y in bud["budget_tot"].years]
@@ -237,8 +264,8 @@ def audit_financing() -> dict:
         add(name, "T2 triangulation (level)", r,
             f"WHO vs India TB Report, {years[0]}-{years[-1]}: agree in {len(r.detail.get('agree', []))} "
             f"of {len(r.detail.get('changes', {}))} years (tolerance 0.05)")
-    return {"rows": rows, "t1": t1, "t2": t2, "bound": bound, "n_steps": n_steps,
-            "n_countries": len(ref)}
+    return {"rows": rows, "t1": t1, "t2": t2, "t3": t3, "t4": t4, "bound": bound,
+            "n_steps": n_steps, "n_countries": len(ref), "zero_share": zero_share}
 
 
 def invisibility_rows() -> list[dict]:
@@ -302,6 +329,40 @@ def score_rows(results, bounds, bopas_series):
     return out, prov
 
 
+def flagged_steps(results: dict, series: dict[str, IndicatorSeries]) -> list[dict]:
+    """Every T3/T4 flagged step, with its values and whether a note declares it."""
+    out = []
+    for key, res in results.items():
+        t3, t4 = res[2], res[3]
+        if not t3.testable:
+            continue
+        s = series[key]
+        by = dict(zip(s.years, s.values))
+        for y in t3.detail["exceed"]:
+            out.append(dict(series=key, year=y, prev=by[y - 1], value=by[y], change=t3.detail["changes"][y],
+                            size=t3.detail["steps"][y], bound=t3.detail["bound"],
+                            declared=y in t4.detail.get("declared", []), note=s.notes.get(y, "")))
+    return out
+
+
+def known_cases(results: dict, series: dict[str, IndicatorSeries]) -> list[dict]:
+    """Each declared break in the data (a series note on a year) and whether T3 flagged that year's
+    step. A miss is REPORTED, not tuned away: the bound is derived, never adjusted to catch a case."""
+    out = []
+    for key, s in series.items():
+        t3 = results[key][2]
+        for y, note in sorted(s.notes.items()):
+            if not note:
+                continue
+            c = t3.detail["changes"].get(y) if t3.testable else None
+            out.append(dict(series=key, year=y, note=note, change=c,
+                            size=t3.detail["steps"].get(y) if t3.testable else None,
+                            bound=t3.detail["bound"] if t3.testable else None,
+                            flagged=t3.testable and y in t3.detail["exceed"],
+                            comparable=c is not None))
+    return out
+
+
 def build_summary(c: dict) -> str:
     rr = c["rank"]
     L = []
@@ -313,17 +374,23 @@ def build_summary(c: dict) -> str:
     P("Audited: the six epidemiological series in ntep_trajectories.csv. Five feed BOPAS;")
     P("BDQ_res_pct (2 points, descriptive only) is audited but is not in the grid.")
     P("")
-    P(f"T1 identity: value = scale * numerator / denominator reconciles in {c['t1_ok']} of "
-      f"{c['t1_n']} rows (within +-10%). This checks the file's own arithmetic, not WHO's numbers: "
-      "it would not catch a wrong numerator copied consistently.")
+    P(f"T1 identity: UNTESTABLE for all six series, by design. value = scale * numerator / denominator "
+      f"reconciles in {c['t1_ok']} of {c['t1_n']} rows, but value, numerator and denominator all come from "
+      "the same file, so the check can fail only on a transcription slip. It is reported as a "
+      "transcription check and kept out of every composite and out of the EVPR observation counts; "
+      "scoring it 1.0 would have inflated both. It would not catch a wrong numerator copied consistently.")
     P("T2 triangulation: UNTESTABLE for all six series. Every series comes from WHO global TB data and "
       "no independent second source for any of them exists in this repository; who_dataset names the "
       "WHO table, not an independent source. A legitimate outcome, not a pass.")
     P(f"T3/T4: bound derived leave-one-out from the other epidemiological series (p{int(PERCENTILE * 100)} "
-      "of |year-on-year change|), so no series sets its own yardstick. "
+      "of the symmetric year-on-year step size, fold change - 1, so a fall counts as much as an equal-fold "
+      "rise), so no series sets its own yardstick. The reference population is still the audited "
+      "population: leave-one-out removes a series from its own reference, not from the others'. "
       f"Pooled-reference sensitivity (not adopted): {c['pooled_note']}")
     P("")
-    P("Composite = geometric mean of T1 and T4 (T3 when T4 is untestable). T3 is reported but not combined: "
+    P("Composite = geometric mean of the testable tests among T1, T2 and T4 (T3 when T4 is untestable). "
+      "T1 and T2 are untestable here, so each composite is its T4 score alone (n_testable = 1). "
+      "T3 is reported but not combined: "
       "T4 is T3 on the same steps plus credit for disclosure, so using both would count one implausible "
       "step twice (Ruling GG). T2 is untestable for all six series, so no composite contains a "
       "triangulation: the test behind the strongest financing finding has no power on the series the "
@@ -333,6 +400,33 @@ def build_summary(c: dict) -> str:
         tot = sum(int(x.split("=")[1]) for x in r["observations"].split(";")) if r["observations"] else 0
         P(f"{r['series']:18} {_fmt(c['prov'][r['series']]):>9} {r['n_testable']:>5} {tot:>4} "
           f"{(r['collapsed_by'] or '-'):>12}  {r['observations']}")
+    P("")
+    P("")
+    P("FLAGGED STEPS (T3/T4: a year-on-year step larger than the derived bound)")
+    for f in c["flags"]:
+        P(f"  {f['series']} {f['year']}: {f['prev']:g} -> {f['value']:g} ({f['change']:+.1%}; size {f['size']:.3f} > "
+          f"bound {f['bound']:.3f}); {'DECLARED: ' + f['note'] if f['declared'] else 'SILENT (no note)'}")
+    if not c["flags"]:
+        P("  none")
+    silent = [f for f in c["flags"] if not f["declared"]]
+    if silent:
+        P(f"  {len(silent)} silent flagged step(s): candidate undeclared shift(s) (a flag is a candidate, not a proven definitional change) found by a bound derived without "
+          "reference to the flagged series.")
+    P("KNOWN CASES (every break the data itself declares; a miss is a reportable limitation, not a reason "
+      "to tune the bound)")
+    for k in c["known"]:
+        if k["flagged"]:
+            P(f"  {k['series']} {k['year']}: step {k['change']:+.1%} (size {k['size']:.3f}) EXCEEDS bound "
+              f"{k['bound']:.3f}: detected and declared; T4 credits the disclosure.")
+        elif k["comparable"]:
+            P(f"  {k['series']} {k['year']}: step {k['change']:+.1%} (size {k['size']:.3f}) does NOT exceed "
+              f"bound {k['bound']:.3f}: MISSED known case. Reported as a limitation, not tuned.")
+        else:
+            P(f"  {k['series']} {k['year']}: no comparable step into the declared year: MISSED (untestable).")
+    n_decl = sum(1 for f in c["flags"] if f["declared"])
+    P(f"  The disclosure mechanism (T4 credit) is exercised on real data in {n_decl} step(s); T4 differs from "
+      f"T3 on {sum(1 for r in c['score_rows'] if r['T3_implausibility'] != r['T4_declared'])} of "
+      f"{len(c['score_rows'])} series.")
     P("")
     P(f"Unassessable series: {rr['unassessable_series'] or 'none'}. Unassessable cells (excluded from the "
       f"ranking, never ranked as clean; Ruling CC): {len(rr['unassessable_cells'])}.")
@@ -348,38 +442,57 @@ def build_summary(c: dict) -> str:
           "3 decimals, so cells with different true scores can tie, and scaling then rounding can "
           "split or create ties. Rounding is monotone, so it can never make a higher-scoring cell "
           "fall below a lower one. An inversion is the only kind that reorders.")
+    live_one = len(rr["live_series"]) == 1
+    if rr["inversions"]:
+        P(f"{len(rr['inversions'])} pairs of cells traded places (see the grid).")
+    else:
+        P("No pair of cells traded places.")
+        if not live_one:
+            P(f"Positive cells span {len(rr['live_series'])} series ({', '.join(rr['live_series']) or 'none'}), so "
+              "reordering was possible in principle on this grid and did not occur.")
     if c["structural_null"]:
         live = rr["live_series"][0]
         lo, hi = c["live_ci"]
         P("")
-        P("Provenance cannot reorder this ranking. The instrument could not discriminate on this "
-          f"instance because the priority score is degenerate. {rr['n_zero']} of {rr['n_cells']} cells score exactly 0.0, and all {rr['n_live']} positive "
-          f"cells belong to one series ({live}). Provenance scales a series' cells uniformly, so it "
-          "cannot change the order among cells of one series, and it cannot lift a zero cell. "
-          "Reordering is impossible by construction.")
+        P("Provenance cannot reorder this ranking, and two things make that so, jointly. "
+          f"(1) The DATA: {rr['n_zero']} of {rr['n_cells']} cells score exactly 0.0, and all {rr['n_live']} positive "
+          f"cells belong to one series ({live}); the priority score is degenerate on this instance. "
+          "(2) The DESIGN: one provenance scalar per series scales that series' cells uniformly, so it "
+          "can only reorder cells ACROSS series; it cannot change the order among cells of one series "
+          "and cannot lift a zero cell. On any grid where the positive cells sit in one series, "
+          "reordering is impossible by construction, whatever the data. The null is therefore not "
+          "evidence about the instrument, and not wholly about BOPAS either.")
         P(f"Stress test: provenance of {live} swept from 0.0 to 1.0 in steps of 0.05. Inversions at "
           f"any value: {c['stress_max']}. Literal rank changes still occur at {len(c['stress_ties'])} of the "
-          "19 interior values (rounding ties, as above); at 0.0 the series is wiped out and all its "
+          f"{c['stress_interior']} interior values (rounding ties, as above); at 0.0 the series is wiped out and all its "
           "cells tie at zero, which destroys the ranking rather than reordering it.")
         P("")
-        P("This is a finding about the PRIORITY SCORE, not about provenance. The national ranking rests "
+        P("The national ranking rests "
           f"on a single axis: the slope of {live}, whose bootstrap CI is [{lo:+.2f}, {hi:+.2f}] and "
-          "spans zero. A ranking that depends on one trend that cannot be told from flat is degenerate "
-          "however clean the data behind it. Per the specification's anti-goal (a method that changes "
+          + ("spans zero. A ranking that depends on one trend that cannot be told from flat is degenerate "
+             "however clean the data behind it. " if lo < 0 < hi else
+             "excludes zero, so the single axis is a resolved trend; the ranking is still reorder-proof by design. ")
+          + "Per the specification's anti-goal (a method that changes "
           "no ranking anywhere has failed, and the paper should say so), D1 does NOT support the claim "
-          "that provenance reorders priorities. That claim needs a setting where several series carry "
-          "positive cells: D2/D3.")
-    elif not rr["inversions"]:
-        P("No pair of cells traded places, but the grid is not the single-axis degenerate case.")
-    else:
-        P(f"{len(rr['inversions'])} pairs of cells traded places (see the grid).")
+          "that provenance reorders priorities. At present the project contains ZERO instances of "
+          "reordering anywhere; D2 and D3 do not exist yet. That claim needs a setting where several "
+          "series carry positive cells: D2/D3.")
+    elif live_one and not rr["inversions"]:
+        live = rr["live_series"][0]
+        P(f"All {rr['n_live']} positive cells belong to one series ({live}), so reordering is impossible by "
+          "construction (provenance scales a series' cells uniformly); this is the single-series case "
+          f"even though {live}'s slope CI does not span zero, so the zero-spanning degeneracy argument "
+          "does not apply.")
     P("")
     P("EVPR (expected value of resolving a series' provenance, in BOPAS points; Ruling FF)")
     P("Reported as value (standard error), rounded to the precision the draws support, all three priors.")
-    for prior in PRIORS:
+    for prior in (p for p in PRIORS if p in c["evpr"]):
         P(f"  prior={prior:8} " + "  ".join(
             f"{s}={round_to_se(v, se):g} (se {se:g})" for s, (v, se) in c["evpr"][prior].items()))
-    if all(v == 0.0 and se == 0.0 for d in c["evpr"].values() for v, se in d.values()):
+    if not c["evpr"]:
+        P("  (no EVPR computed)")
+    evpr_cells = [x for d in c["evpr"].values() for x in d.values()]
+    if evpr_cells and all(v == 0.0 and se == 0.0 for v, se in evpr_cells):
         P("Every EVPR is exactly 0.0 with standard error 0.0: the decision cannot change, so no audit "
           "of any series is worth buying on this grid. Same cause as above.")
     P("")
@@ -406,12 +519,13 @@ def main() -> str:
     grid_prov = {s: prov[s] for s in bopas_series}
 
     rr = rank_report(counts, traj, grid_prov)
-    live_ci, stress_max, stress_tie_values = None, 0, []
+    live_ci, stress_max, stress_tie_values, stress_interior = None, 0, [], 0
     if len(rr["live_series"]) == 1:
         t = next(t for t in traj if t["series"] == rr["live_series"][0])
         live_ci = (t["primary_lo"], t["primary_hi"])
         sweep = stress_test(counts, traj, rr["live_series"][0])
         stress_max = max(inv for _, inv, _ in sweep)
+        stress_interior = sum(1 for p, _, _ in sweep if 0.0 < p < 1.0)
         stress_tie_values = [p for p, inv, lit in sweep if lit and 0.0 < p < 1.0]
 
     obs = observations_from_results({s: composite_inputs(results[s]) for s in bopas_series})
@@ -419,10 +533,12 @@ def main() -> str:
 
     rows = _ntep_rows()
     t1_n = t1_ok = 0
-    for s in load_trajectories(NTEP_TRAJECTORIES_CSV).values():
-        d = identity_score(_identity_view(s, rows)).detail["identity"]
-        t1_n += len(d)
-        t1_ok += sum(1 for v in d.values() if 1.0 - IDENTITY_TOLERANCE <= v <= 1.0 + IDENTITY_TOLERANCE)
+    ntep_series = load_trajectories(NTEP_TRAJECTORIES_CSV)
+    for s in ntep_series.values():
+        # the transcription check: asked of identity_score itself (its own band), not re-derived here
+        d = identity_score(_identity_view(s, rows)).detail
+        t1_n += len(set(d["identity"]) | set(d["incomplete"]))
+        t1_ok += len(d["clean"])
 
     pooled_results, pooled_bounds = audit_ntep(pooled_reference=True)
     pooled_prov = provenance_from_results({k: composite_inputs(v) for k, v in pooled_results.items()})
@@ -444,7 +560,9 @@ def main() -> str:
 
     text = build_summary(dict(rank=rr, score_rows=srows, prov=prov, t1_ok=t1_ok, t1_n=t1_n,
                               structural_null=is_structural_null(rr, live_ci), live_ci=live_ci,
-                              stress_max=stress_max, stress_ties=stress_tie_values, evpr=ev, fin=fin, invis=invis,
+                              stress_max=stress_max, stress_ties=stress_tie_values,
+                              stress_interior=stress_interior,
+                              flags=flagged_steps(results, ntep_series), known=known_cases(results, ntep_series), evpr=ev, fin=fin, invis=invis,
                               pooled_note=pooled_note))
     SUMMARY.write_text(text, encoding="utf-8")
     print(text)
