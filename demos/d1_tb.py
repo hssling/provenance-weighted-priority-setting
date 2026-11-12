@@ -74,6 +74,21 @@ def _identity_view(series: IndicatorSeries, rows: list[dict]) -> IndicatorSeries
                            "product")
 
 
+def composite_inputs(results: list) -> list:
+    """The results that enter a series' composite: T1, T2, and ONE of T4 / T3 (Ruling GG).
+
+    T4 (declared-break alignment) is T3 (implausibility) on the SAME steps, with credit for a
+    disclosed break: identical to T3 where nothing is declared, more generous where something is.
+    Combining both would penalise one implausible step twice and treat the two as independent
+    evidence when one strictly contains the other. So when T4 is testable only T4 enters; T3 enters
+    only when T4 is untestable. Both scores are still REPORTED (d1_provenance_scores.csv). Do not
+    re-add T3 to the composite: its absence is deliberate, not an oversight.
+    Order of `results` is (T1 identity, T2 triangulation, T3 implausibility, T4 declared).
+    """
+    t1, t2, t3, t4 = results
+    return [t1, t2, t4 if t4.testable else t3]
+
+
 def audit_ntep(percentile: float = PERCENTILE, pooled_reference: bool = False):
     """T1-T4 per NTEP series -> (results_by_series, bounds).
 
@@ -117,18 +132,14 @@ def rank_report(counts, traj, provenance: dict[str, float | None]) -> dict:
     rows = prop.propagate(counts, traj, provenance)
     changes = rank_changes(rows, rows)     # BOPAS (published) vs BOPAS_adj, both carried by each row
     live = [r for r in rows if r["BOPAS"] > 0]
-    ranked = [r for r in rows if not r["unassessable"]]
-    # A strict inversion: x outscored y before and y outscores x after. Provenance multiplies one
-    # series by p >= 0 and the published score is then rounded, a monotone map, so within a series
-    # an inversion is impossible; only ACROSS series can it happen. Rank changes WITHOUT an
-    # inversion are ties created or broken by the published 3-decimal rounding.
-    inversions = [(x["intervention"], x["series"], y["intervention"], y["series"])
-                  for x in ranked for y in ranked
-                  if x["BOPAS"] > y["BOPAS"] and x["BOPAS_adj"] < y["BOPAS_adj"]]
-    moved = {(c.intervention, c.target) for c in changes}
+    # rank_changes classifies each change (Ruling HH). An inversion is a real reordering: cells with
+    # distinct scores traded places. A tie_split is a tie created or broken by the published
+    # 3-decimal rounding, which is monotone and so can never invert an order.
+    inversions = [c for c in changes if c.kind == "inversion"]
+    tie_splits = [c for c in changes if c.kind == "tie_split"]
     return {
         "rows": rows, "changes": changes, "inversions": inversions,
-        "rounding_ties": sorted(moved), "n_cells": len(rows),
+        "tie_splits": tie_splits, "n_cells": len(rows),
         "n_live": len(live), "n_zero": len(rows) - len(live),
         "live_series": sorted({r["series"] for r in live}),
         "unassessable_series": list(rows.unassessable),
@@ -254,9 +265,9 @@ def _write(path: Path, fields: list[str], rows: list[dict]) -> None:
 def write_rank_changes(path: Path, changes) -> None:
     """One row per cell that changed rank. A header-only file means ZERO changes; the count is
     also stated in the summary so the file is never the only evidence of a null."""
-    _write(path, ["intervention", "target", "rank_before", "rank_after"],
+    _write(path, ["intervention", "target", "rank_before", "rank_after", "kind"],
            [dict(intervention=c.intervention, target=c.target, rank_before=c.rank_before,
-                 rank_after=c.rank_after) for c in changes])
+                 rank_after=c.rank_after, kind=c.kind) for c in changes])
 
 
 def _fmt(x, nd=3):
@@ -270,11 +281,11 @@ SCORE_FIELDS = ["series", "in_bopas_grid", "composite_geometric", "composite_ari
 
 
 def score_rows(results, bounds, bopas_series):
-    prov = provenance_from_results(results)
+    prov = provenance_from_results({k: composite_inputs(v) for k, v in results.items()})
     out = []
     for key, res in results.items():
-        rep = composite_report(res)
-        sens = composite_sensitivity(res)
+        rep = composite_report(composite_inputs(res))
+        sens = composite_sensitivity(composite_inputs(res))
         per = {n: ("untestable" if not r.testable else round(r.score, 4)) for n, r in zip(_TESTS, res)}
         out.append(dict(
             series=key, in_bopas_grid=key in bopas_series,
@@ -312,6 +323,11 @@ def build_summary(c: dict) -> str:
       "of |year-on-year change|), so no series sets its own yardstick. "
       f"Pooled-reference sensitivity (not adopted): {c['pooled_note']}")
     P("")
+    P("Composite = geometric mean of T1 and T4 (T3 when T4 is untestable). T3 is reported but not combined: "
+      "T4 is T3 on the same steps plus credit for disclosure, so using both would count one implausible "
+      "step twice (Ruling GG). T2 is untestable for all six series, so no composite contains a "
+      "triangulation: the test behind the strongest financing finding has no power on the series the "
+      "priority score consumes.")
     P(f"{'series':18} {'composite':>9} {'tests':>5} {'obs':>4} {'collapsed_by':>12}  observations")
     for r in c["score_rows"]:
         tot = sum(int(x.split("=")[1]) for x in r["observations"].split(";")) if r["observations"] else 0
@@ -324,14 +340,14 @@ def build_summary(c: dict) -> str:
     P("RESULT: DOES PROVENANCE REORDER THE RANKING?")
     P(f"Interventions that changed rank: {len(rr['changes'])} (of {rr['n_cells']} cells, "
       f"{rr['n_live']} with a positive score).")
-    P(f"Pairs of cells whose strict order inverted: {len(rr['inversions'])}.")
+    P(f"Rank changes by kind: inversions: {len(rr['inversions'])}; tie splits: {len(rr['tie_splits'])}.")
     for ch in rr["changes"]:
-        P(f"  moved: {ch.intervention} / {ch.target}: rank {ch.rank_before} -> {ch.rank_after}")
-    if rr["changes"] and not rr["inversions"]:
-        P("Every rank change above is a ROUNDING ARTEFACT, not a reordering: the published scores are "
-          "rounded to 3 decimals, so cells with different true scores can tie (here, before), and "
-          "scaling then rounding can split or create ties. Rounding is monotone, so it can never make "
-          "a higher-scoring cell fall below a lower one.")
+        P(f"  {ch.kind}: {ch.intervention} / {ch.target}: rank {ch.rank_before} -> {ch.rank_after}")
+    if rr["tie_splits"]:
+        P("A tie split is a ROUNDING ARTEFACT, not a reordering: the published scores are rounded to "
+          "3 decimals, so cells with different true scores can tie, and scaling then rounding can "
+          "split or create ties. Rounding is monotone, so it can never make a higher-scoring cell "
+          "fall below a lower one. An inversion is the only kind that reorders.")
     if c["structural_null"]:
         live = rr["live_series"][0]
         lo, hi = c["live_ci"]
@@ -341,7 +357,7 @@ def build_summary(c: dict) -> str:
           f"cells belong to one series ({live}). Provenance scales a series' cells uniformly, so it "
           "cannot change the order among cells of one series, and it cannot lift a zero cell. "
           "Reordering is impossible by construction.")
-        P(f"Stress test: provenance of {live} swept from 0.0 to 1.0 in steps of 0.05. Strict inversions at "
+        P(f"Stress test: provenance of {live} swept from 0.0 to 1.0 in steps of 0.05. Inversions at "
           f"any value: {c['stress_max']}. Literal rank changes still occur at {len(c['stress_ties'])} of the "
           "19 interior values (rounding ties, as above); at 0.0 the series is wiped out and all its "
           "cells tie at zero, which destroys the ranking rather than reordering it.")
@@ -398,7 +414,7 @@ def main() -> str:
         stress_max = max(inv for _, inv, _ in sweep)
         stress_tie_values = [p for p, inv, lit in sweep if lit and 0.0 < p < 1.0]
 
-    obs = observations_from_results({s: results[s] for s in bopas_series})
+    obs = observations_from_results({s: composite_inputs(results[s]) for s in bopas_series})
     ev = evpr_prior_sensitivity(counts, traj, grid_prov, observations=obs, draws=DRAWS)
 
     rows = _ntep_rows()
@@ -409,7 +425,7 @@ def main() -> str:
         t1_ok += sum(1 for v in d.values() if 0.9 <= v <= 1.1)
 
     pooled_results, pooled_bounds = audit_ntep(pooled_reference=True)
-    pooled_prov = provenance_from_results(pooled_results)
+    pooled_prov = provenance_from_results({k: composite_inputs(v) for k, v in pooled_results.items()})
     pooled_note = ("RRMDR_notif_100k composite "
                    f"{_fmt(pooled_prov['RRMDR_notif_100k'])} (bound {pooled_bounds['RRMDR_notif_100k']:.3f}) "
                    f"against {_fmt(prov['RRMDR_notif_100k'])} (bound {bounds['RRMDR_notif_100k']:.3f}).")

@@ -33,8 +33,16 @@ def counts(mod):
 
 @pytest.fixture(scope="module")
 def real_traj(mod):
+    # fit_trajectories bootstraps off the GLOBAL rng: seed as the published script does (and restore),
+    # or the CIs and the tests that read them vary from run to run (Ruling II).
+    import random
     by_series, _ = mod.load_series()
-    return mod.fit_trajectories(by_series)
+    state = random.getstate()
+    random.seed(20260908)
+    try:
+        return mod.fit_trajectories(by_series)
+    finally:
+        random.setstate(state)
 
 
 def _t(series, slope, half=1.0, sign=+1):
@@ -350,3 +358,51 @@ def test_unassessable_cells_never_appear_in_rank_changes_even_when_they_lead(cou
 def test_duplicate_series_in_traj_rows_raises(counts, synth):
     with pytest.raises(ValueError, match="RR_new_pct"):
         propagate(counts, synth + [synth[0]], CLEAN)
+
+
+# ---- Ruling II: the real-data fixture is deterministic and reproduces the published CIs ---------
+
+def test_real_traj_fixture_reproduces_the_published_slope_cis(real_traj):
+    import csv
+    with open(REPO / "outputs" / "ijtb_slopes.csv", newline="", encoding="utf-8") as fh:
+        pub = {r["series"]: r for r in csv.DictReader(fh)}
+    for t in real_traj:
+        assert (t["primary_lo"], t["primary_hi"]) == (float(pub[t["series"]]["primary_lo"]),
+                                                      float(pub[t["series"]]["primary_hi"]))
+
+
+# ---- Ruling HH: each rank change is classified as an inversion or a tie_split --------------------
+
+def _cells(b, a):
+    return ([dict(intervention=k, target="t", BOPAS=v) for k, v in b.items()],
+            [dict(intervention=k, target="t", BOPAS_adj=v) for k, v in a.items()])
+
+
+def test_a_swap_of_distinct_scores_is_an_inversion():
+    before, after = _cells({"A": 3.0, "B": 2.0}, {"A": 1.0, "B": 2.0})
+    assert [c.kind for c in rank_changes(before, after)] == ["inversion", "inversion"]
+
+
+def test_splitting_a_tie_is_a_tie_split_not_an_inversion():
+    # published scores tie at 0.033; scaling then rounding gives 0.030 vs 0.029 (the real case)
+    before, after = _cells({"A": 0.040, "N": 0.033, "M": 0.033}, {"A": 0.036, "N": 0.030, "M": 0.029})
+    ch = rank_changes(before, after)
+    assert [(c.intervention, c.kind) for c in ch] == [("M", "tie_split")]
+
+
+def test_creating_a_tie_is_a_tie_split():
+    before, after = _cells({"A": 0.034, "B": 0.033}, {"A": 0.030, "B": 0.030})
+    ch = rank_changes(before, after)
+    assert [(c.intervention, c.kind) for c in ch] == [("B", "tie_split")] or all(c.kind == "tie_split" for c in ch)
+    assert ch and all(c.kind == "tie_split" for c in ch)
+
+
+def test_real_data_change_is_a_tie_split(counts, real_traj):
+    rows = propagate(counts, real_traj, {**CLEAN, "RRMDR_notif_100k": 0.9023370853794828,
+                                         "RR_new_pct": 0.9023370853794828})
+    ch = rank_changes(rows, rows)
+    assert [(c.intervention[:4], c.kind) for c in ch] == [("Milk", "tie_split")]
+
+
+def test_kind_does_not_affect_equality_of_the_rank_fields():
+    assert RankChange("A", "t", 1, 2, "inversion") == RankChange("A", "t", 1, 2, "tie_split")

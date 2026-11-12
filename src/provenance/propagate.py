@@ -19,7 +19,7 @@ import importlib.util
 import math
 import random
 import sys
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 
 from provenance.composite import composite, composite_report
@@ -150,6 +150,11 @@ class RankChange:
     target: str
     rank_before: int
     rank_after: int
+    # "inversion": this cell traded places with a cell of strictly different score (a real
+    # reordering). "tie_split": every move involves a tie, created or broken by the published
+    # 3-decimal rounding (rounding is monotone, so it can never invert an order). Not part of
+    # equality, so comparisons of the rank fields are unaffected.
+    kind: str = field(default="", compare=False)
 
 
 def _ranks(scores: dict[tuple[str, str], float]) -> dict[tuple[str, str], int]:
@@ -184,6 +189,9 @@ def rank_changes(before: list[dict], after: list[dict]) -> list[RankChange]:
     b = {k: v for k, v in b.items() if k not in out_of_ranking}
     a = {k: v for k, v in a.items() if k not in out_of_ranking}
     rb, ra = _ranks(b), _ranks(a)
-    return sorted((RankChange(i, t, rb[(i, t)], ra[(i, t)]) for (i, t) in b
+    def kind(k):
+        return "inversion" if any((b[k] - b[o]) * (a[k] - a[o]) < 0 for o in b if o != k) else "tie_split"
+
+    return sorted((RankChange(i, t, rb[(i, t)], ra[(i, t)], kind((i, t))) for (i, t) in b
                    if rb[(i, t)] != ra[(i, t)] and (b[(i, t)] != 0 or a[(i, t)] != 0)),
                   key=lambda c: (c.rank_before, c.intervention, c.target))

@@ -71,7 +71,8 @@ def test_null_reordering_is_stated_not_hidden():
     assert "cannot reorder" in text
     assert "by construction" in text and "degenerate" in text and "d2/d3" in text
     assert "[-0.11, +0.30]" in SUMMARY.read_text()          # the published slope CI, in the words
-    assert "rounding artefact" in text and "strict order inverted: 0" in text
+    assert "inversions: 0" in text and "tie splits: 1" in text
+    assert "t2 is untestable for all six" in text
 
 
 # ---- the null is checked against independent reads, so an empty result cannot pass ------------
@@ -101,6 +102,7 @@ def test_zero_rank_changes_and_no_unassessable_cells_on_real_data(inputs):
     assert (rr["n_cells"], rr["n_live"], rr["n_zero"]) == (60, 11, 49)
     assert rr["live_series"] == ["RRMDR_notif_100k"]
     assert rr["inversions"] == []                    # no pair of cells traded places
+    assert [c.kind for c in rr["changes"]] == ["tie_split"] and len(rr["tie_splits"]) == 1
     # the one literal rank change is a rounding tie being split: two cells share a published score
     assert [(c.intervention[:4], c.rank_before, c.rank_after) for c in rr["changes"]] == [("Milk", 9, 10)]
     pub = {r["intervention"][:4]: r["BOPAS"] for r in rr["rows"] if r["series"] == "RRMDR_notif_100k"}
@@ -138,6 +140,7 @@ def test_rank_report_reports_changes_when_series_can_trade_places(inputs, synth)
     prov["XDR_TSR_pct"] = 0.05
     rr = d1_tb.rank_report(counts, synth, prov)
     assert len(rr["changes"]) > 0 and len(rr["inversions"]) > 0 and len(rr["live_series"]) > 1
+    assert all(c.kind == "inversion" for c in rr["inversions"])
     assert d1_tb.is_structural_null(rr, None) is False
 
 
@@ -149,7 +152,7 @@ def test_rank_changes_writer_writes_every_change(tmp_path, inputs, synth):
     with open(p, newline="", encoding="utf-8") as fh:
         rows = list(csv.DictReader(fh))
     assert len(rows) == len(rr["changes"]) > 0
-    assert set(rows[0]) == {"intervention", "target", "rank_before", "rank_after"}
+    assert set(rows[0]) == {"intervention", "target", "rank_before", "rank_after", "kind"}
 
 
 def test_unassessable_series_cells_are_reported_apart_and_not_ranked(inputs, synth):
@@ -191,8 +194,8 @@ def test_t3_bound_is_leave_one_out_not_self_referential():
 def test_scores_csv_carries_the_evidence_weight_beside_each_composite():
     rows = {r["series"]: r for r in _csv("d1_provenance_scores.csv")}
     r = rows["RRMDR_notif_100k"]
-    assert r["n_testable"] == "3" and r["min_observations"] == "7"
-    assert "identity=8" in r["observations"] and "implausibility=7" in r["observations"]
+    assert r["n_testable"] == "2" and r["min_observations"] == "7"
+    assert "identity=8" in r["observations"] and "declared=7" in r["observations"]
     assert r["collapsed_by"] == "" and 0.0 < float(r["composite_geometric"]) < 1.0
     assert rows["BDQ_res_pct"]["in_bopas_grid"] == "False"
     for row in rows.values():
@@ -247,3 +250,39 @@ def test_invisibility_csv_matches_findings():
     none = {int(r["evidence_rank"]) for r in rows if r["coverage"] == "none"}
     assert none == {2, 4, 5, 7, 8, 10}
     assert {int(r["evidence_rank"]) for r in rows if r["coverage"] == "partial"} == {3, 6, 11}
+
+
+# ---- Ruling GG: T4 subsumes T3 in the composite; both are still reported --------------------------
+
+def test_t3_does_not_enter_the_composite_when_t4_is_testable():
+    results, _ = d1_tb.audit_ntep()
+    for key in NTEP:
+        used = d1_tb.composite_inputs(results[key])
+        names = [d1_tb.composite_report([r]).observations for r in used]
+        flat = {n for o in names for n in o}
+        assert "implausibility" not in flat and "declared" in flat
+    rep = {r["series"]: r for r in _csv("d1_provenance_scores.csv")}
+    assert "implausibility" not in rep["RRMDR_notif_100k"]["observations"]
+    assert rep["RRMDR_notif_100k"]["n_testable"] == "2"
+
+
+def test_composite_is_geometric_mean_of_t1_and_t4_only():
+    results, _ = d1_tb.audit_ntep()
+    prov = d1_tb.provenance_from_results({k: d1_tb.composite_inputs(v) for k, v in results.items()})
+    t1, t4 = results["RRMDR_notif_100k"][0].score, results["RRMDR_notif_100k"][3].score
+    assert prov["RRMDR_notif_100k"] == pytest.approx((t1 * t4) ** 0.5)
+    assert prov["RRMDR_notif_100k"] > 0.857 ** 1.5     # strictly above the old double-counted value
+
+
+def test_t3_is_used_when_t4_is_untestable():
+    from provenance.series import TestResult
+    t3 = TestResult(0.5, True, {"changes": {2001: 1.0}, "exceed": [2001]})
+    t4 = TestResult(None, False, {})
+    t1 = TestResult(1.0, True, {"identity": {2001: 1.0}, "incomplete": []})
+    used = d1_tb.composite_inputs([t1, TestResult(None, False, {}), t3, t4])
+    assert [r for r in used if r.testable] == [t1, t3]
+
+
+def test_both_t3_and_t4_scores_are_still_reported_side_by_side():
+    r = {x["series"]: x for x in _csv("d1_provenance_scores.csv")}["RRMDR_notif_100k"]
+    assert r["T3_implausibility"] != "" and r["T4_declared"] != ""
