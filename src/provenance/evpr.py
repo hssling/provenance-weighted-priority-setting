@@ -18,7 +18,7 @@ almost nothing, a change among distant ones a great deal. Units here are BOPAS p
 
 THE PRIOR (an assumption, not a finding; Ruling FF). Default: q_s ~ Beta(P_s*m_s + 1, (1-P_s)*m_s + 1),
 independent across series, where P_s is the composite and m_s the total testable observations behind
-it (sum of CompositeReport.observations). Mean ~ P_s; it is TWO-SIDED (a series that passes its tests
+it (sum of CompositeReport.observations). Mean (P_s*m_s+1)/(m_s+2), which shrinks P_s toward 0.5 by an amount that depends on m_s; it is TWO-SIDED (a series that passes its tests
 may still be bad: the failure this project has found most often is a test that silently missed a
 problem) and its width is set by the evidence count, not a free parameter. It is the same
 Beta(k+1, n-k+1) construction the parent project uses for literature support (lower_beta_bound).
@@ -36,6 +36,17 @@ crossing a rival, so doubt alone is not value. That is a property of the constru
 ZEROS ARE EXPECTED ON THE REAL DATA. Provenance scales a series' cells uniformly, so it can only
 reorder cells ACROSS series. On the real TB data all 11 positive cells belong to one series, so the
 decision can never change and every EVPR is exactly 0.0. That is the correct answer, not a bug.
+
+THE BASELINE IS THE PRIOR-MEAN RANKING, NOT THE PUBLISHED ONE. The "decision today" term max_a E[u]
+is a prior-mean quantity: each series' best cell is scored at (P_s*m_s+1)/(m_s+2), not at P_s. At P=1,
+m=4 that is 0.833, and series with different m shrink by different amounts, so the cell EVPR treats as
+today's best can differ from the one the published BOPAS_adj ranking (scored at P_s) puts first. That is
+correct EVPI (the value of information is measured against the best decision under current beliefs,
+which are the prior), not an inconsistency, but a reader comparing EVPR with the rank_changes report
+must not assume they share a baseline.
+
+PRECISION. Values are Monte Carlo estimates. evpr_detail returns each value with its standard error
+(sample sd of the per-draw regret / sqrt(draws); conservative for the stratified floor prior).
 
 HOW IT IS COMPUTED. propagate() recomputes the grid in ~25 ms, so 10,000 draws x 5 series through
 it would take ~20 minutes. Instead propagate() is called ONCE (validating the inputs and returning
@@ -59,9 +70,11 @@ from provenance.propagate import propagate
 # The three priors reported side by side by evpr_prior_sensitivity (Ruling FF + two bounds).
 PRIORS = ("beta", "uniform", "floor")
 
-# Default number of draws per series. Not a tuned value: with stratified sampling the error of a
-# mean is ~1/draws^1.5 of the spread, so 10,000 gives ~4 significant digits for any series whose
-# decision can change, and the whole call takes about a second.
+# Default number of draws per series. Not a tuned value: a round number whose achieved precision is
+# MEASURED, not assumed. The Beta path is plain Monte Carlo, so the error falls as 1/sqrt(draws):
+# at 10,000 draws a value whose decision can change is good to roughly 3% relative (about two
+# significant figures) and a small one (e.g. 0.0007) can be off by ~20% relative. Always read a value
+# with its standard error (evpr_detail) and round with round_to_se. The call takes ~0.05-0.2 s.
 DEFAULT_DRAWS = 10_000
 
 
@@ -70,9 +83,25 @@ def observations_from_results(results_by_series) -> dict[str, int]:
     return {k: sum(composite_report(r).observations.values()) for k, r in results_by_series.items()}
 
 
-def evpr(node_counts, traj_rows, provenance: dict[str, float | None], *, observations=None,
-         prior: str = "beta", draws: int = DEFAULT_DRAWS, seed: int = 0, **bopas_kwargs) -> dict[str, float]:
+def round_to_se(value: float, se: float) -> float:
+    """Round `value` to the decimal place of the leading digit of its standard error (the precision
+    the draws support). se == 0 (the decision never changed) leaves the exact value untouched."""
+    if se <= 0.0:
+        return value
+    return round(value, max(0, -math.floor(math.log10(se))))
+
+
+def evpr(node_counts, traj_rows, provenance, **kw) -> dict[str, float]:
     """series key -> expected gain (BOPAS points) from resolving that series' provenance.
+    A Monte Carlo estimate: use evpr_detail for the standard errors. Arguments as evpr_detail."""
+    return {k: v for k, (v, _) in evpr_detail(node_counts, traj_rows, provenance, **kw).items()}
+
+
+def evpr_detail(node_counts, traj_rows, provenance: dict[str, float | None], *, observations=None,
+         prior: str = "beta", draws: int = DEFAULT_DRAWS, seed: int = 0,
+                **bopas_kwargs) -> dict[str, tuple[float, float]]:
+    """series key -> (expected gain in BOPAS points from resolving that series' provenance,
+    Monte Carlo standard error of that gain).
 
     `provenance` is series -> composite in [0, 1], or None if unassessable; every series in
     `traj_rows` must appear (propagate raises otherwise). `observations` (series -> testable
@@ -118,20 +147,23 @@ def evpr(node_counts, traj_rows, provenance: dict[str, float | None], *, observa
         else:
             a, b = shape[s]
             q = [rng.betavariate(a, b) for _ in range(draws)]
-        own = top[s] * (math.fsum(q) / draws)           # mean utility of planning from s
-        plan_from_s = own >= rival                      # the best decision available today
-        regret = 0.0
+        # best decision today, from the ANALYTIC prior means on both sides (not the draws' sample
+        # mean), so a near-tie cannot flip on draw noise
+        plan_from_s = expected[s] >= rival
+        reg = []
         for qi in q:
             u_s = top[s] * qi
             best = u_s if u_s > rival else rival
-            regret += best - (u_s if plan_from_s else rival)
-        out[s] = regret / draws
+            reg.append(best - (u_s if plan_from_s else rival))
+        gain = math.fsum(reg) / draws
+        var = math.fsum((r - gain) ** 2 for r in reg) / (draws - 1) if draws > 1 else 0.0
+        out[s] = (gain, math.sqrt(var / draws))
     return out
 
 
 def evpr_prior_sensitivity(node_counts, traj_rows, provenance, *, observations=None,
-                           **kw) -> dict[str, dict[str, float]]:
-    """EVPR under every prior, side by side: {prior: {series: evpr}}. The prior is the most
+                           **kw) -> dict[str, dict[str, tuple[float, float]]]:
+    """EVPR under every prior, side by side: {prior: {series: (evpr, se)}}. The prior is the most
     contestable assumption in the method; report all three, not one."""
-    return {pr: evpr(node_counts, traj_rows, provenance, observations=observations, prior=pr, **kw)
+    return {pr: evpr_detail(node_counts, traj_rows, provenance, observations=observations, prior=pr, **kw)
             for pr in PRIORS}

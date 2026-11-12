@@ -13,7 +13,7 @@ from pathlib import Path
 import pytest
 
 from provenance import propagate as prop
-from provenance.evpr import evpr, evpr_prior_sensitivity, PRIORS
+from provenance.evpr import evpr, evpr_detail, evpr_prior_sensitivity, round_to_se, PRIORS
 
 
 def evpr_floor(*a, **k):
@@ -244,10 +244,52 @@ def test_real_data_is_exactly_zero_under_all_three_priors(counts, real_traj, P):
     sens = evpr_prior_sensitivity(counts, real_traj, P, observations=OBS, draws=1000)
     assert set(sens) == set(PRIORS)
     for pr, v in sens.items():
-        assert set(v) == set(SERIES) and all(x == 0.0 for x in v.values()), pr
+        assert set(v) == set(SERIES) and all(x == (0.0, 0.0) for x in v.values()), pr
 
 
 def test_sensitivity_shows_the_priors_disagreeing_on_a_contested_grid(counts, contested):
     sens = evpr_prior_sensitivity(counts, contested, {**CLEAN, "RR_new_pct": 0.5}, observations=OBS, draws=4000)
-    vals = {pr: sens[pr]["RR_new_pct"] for pr in PRIORS}
+    vals = {pr: sens[pr]["RR_new_pct"][0] for pr in PRIORS}
     assert len(set(vals.values())) == 3 and all(v > 0 for v in vals.values())
+
+
+# ---- review fixes: standard errors, rounding, m = 0 ----------------------------------------
+
+def test_standard_error_is_zero_when_the_decision_never_changes_and_positive_otherwise(counts, contested, real_traj):
+    z = evpr_detail(counts, real_traj, {s: 0.3 for s in SERIES}, observations=OBS, draws=500)
+    assert set(z) == set(SERIES) and all(v == (0.0, 0.0) for v in z.values())
+    d = evpr_detail(counts, contested, {**CLEAN, "RR_new_pct": 0.5}, observations=OBS, draws=2000)
+    v, se = d["RR_new_pct"]
+    assert v > 0 and 0 < se < v
+
+
+def test_reported_standard_error_matches_the_spread_across_seeds(counts, contested):
+    P = {**CLEAN, "RR_new_pct": 0.5}
+    runs = [evpr_detail(counts, contested, P, observations=OBS, draws=2000, seed=k)["RR_new_pct"]
+            for k in range(25)]
+    vals = [v for v, _ in runs]
+    mean = sum(vals) / len(vals)
+    sd = (sum((x - mean) ** 2 for x in vals) / (len(vals) - 1)) ** 0.5
+    se = sum(e for _, e in runs) / len(runs)
+    assert 0.6 * sd < se < 1.6 * sd
+
+
+def test_evpr_returns_the_same_values_as_evpr_detail(counts, contested):
+    P = {**CLEAN, "RR_new_pct": 0.5}
+    d = evpr_detail(counts, contested, P, observations=OBS, draws=500, seed=2)
+    assert evpr(counts, contested, P, observations=OBS, draws=500, seed=2) == {k: v for k, (v, _) in d.items()}
+
+
+def test_round_to_se_keeps_only_the_digits_the_draws_support():
+    assert round_to_se(0.109436, 0.0029) == 0.109
+    assert round_to_se(0.0390123, 0.0015) == 0.039
+    assert round_to_se(0.0007123, 0.00014) == 0.0007
+    assert round_to_se(0.0, 0.0) == 0.0 and round_to_se(1.23456789, 0.0) == 1.23456789
+
+
+def test_an_assessable_series_with_zero_observations_gets_the_uniform_prior(counts, contested):
+    # P is not None but m = 0: Beta(1, 1), a different branch from P is None, must also be Uniform[0, 1]
+    P = {s: 0.7 for s in SERIES}
+    beta0 = evpr(counts, contested, P, observations={s: 0 for s in SERIES}, draws=3000, seed=5)
+    uniform = evpr(counts, contested, P, prior="uniform", draws=3000, seed=5)
+    assert beta0 == uniform and beta0["RR_new_pct"] > 0.0
