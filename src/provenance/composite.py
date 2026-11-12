@@ -93,7 +93,8 @@ class CompositeReport:
     n_testable: int               # how many tests could run
     observations: dict[str, int]  # test name -> observations behind its score; testable tests only
     min_observations: int | None  # min(observations.values()); None if none testable
-    collapsed_by: list[str]       # names of tests scoring exactly 0.0, in input order
+    collapsed_by: list[str]       # tests scoring exactly 0.0, in input order (not necessarily
+                                  # collapsing the composite: under rule="arithmetic" a 0.0 may not)
 
 
 def composite_report(results: list[TestResult], *, rule: str = DEFAULT_RULE) -> CompositeReport:

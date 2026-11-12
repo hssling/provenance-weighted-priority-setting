@@ -193,25 +193,25 @@ def test_rank_changes_names_which_interventions_moved(mod, counts, synth):
 
 def test_rank_changes_reports_correct_ranks():
     before = [dict(intervention="A", target="t", BOPAS=3.0), dict(intervention="B", target="t", BOPAS=2.0)]
-    after = [dict(intervention="A", target="t", BOPAS_adj=1.0), dict(intervention="B", target="t", BOPAS_adj=2.0)]
+    after = [dict(intervention="A", target="t", unassessable=False, BOPAS_adj=1.0), dict(intervention="B", target="t", unassessable=False, BOPAS_adj=2.0)]
     assert rank_changes(before, after) == [RankChange("A", "t", 1, 2), RankChange("B", "t", 2, 1)]
 
 
 def test_tied_scores_share_a_rank_so_input_order_cannot_manufacture_a_change():
     before = [dict(intervention="A", target="t", BOPAS=0.0), dict(intervention="B", target="t", BOPAS=0.0)]
-    after = [dict(intervention="B", target="t", BOPAS_adj=0.0), dict(intervention="A", target="t", BOPAS_adj=0.0)]
+    after = [dict(intervention="B", target="t", unassessable=False, BOPAS_adj=0.0), dict(intervention="A", target="t", unassessable=False, BOPAS_adj=0.0)]
     assert rank_changes(before, after) == []
 
 
 def test_rank_changes_pairs_cells_by_identity_not_position():
     before = [dict(intervention="A", target="t", BOPAS=3.0), dict(intervention="B", target="t", BOPAS=2.0)]
-    after = [dict(intervention="B", target="t", BOPAS_adj=2.0), dict(intervention="A", target="t", BOPAS_adj=3.0)]
+    after = [dict(intervention="B", target="t", unassessable=False, BOPAS_adj=2.0), dict(intervention="A", target="t", unassessable=False, BOPAS_adj=3.0)]
     assert rank_changes(before, after) == []
 
 
 def test_rank_changes_rejects_mismatched_cell_sets():
     before = [dict(intervention="A", target="t", BOPAS=3.0)]
-    after = [dict(intervention="B", target="t", BOPAS_adj=3.0)]
+    after = [dict(intervention="B", target="t", unassessable=False, BOPAS_adj=3.0)]
     with pytest.raises(ValueError):
         rank_changes(before, after)
 
@@ -306,11 +306,11 @@ def test_missing_outputs_dir_is_a_loud_failure_not_a_quiet_mkdir(fresh_loader, t
 # ---- rank_changes must not be able to emit meaningless movement -----------------------------
 
 def test_cells_zero_before_and_after_are_never_reported():
-    row = lambda i, v: dict(intervention=i, target="t", BOPAS=v, BOPAS_adj=v)
+    row = lambda i, v: dict(intervention=i, target="t", BOPAS=v, unassessable=False, BOPAS_adj=v)
     before = [dict(intervention="A", target="t", BOPAS=2.0), dict(intervention="D", target="t", BOPAS=1.0),
               dict(intervention="B", target="t", BOPAS=0.0), dict(intervention="C", target="t", BOPAS=0.0)]
-    after = [dict(intervention="A", target="t", BOPAS_adj=0.0), dict(intervention="D", target="t", BOPAS_adj=1.0),
-             dict(intervention="B", target="t", BOPAS_adj=0.0), dict(intervention="C", target="t", BOPAS_adj=0.0)]
+    after = [dict(intervention="A", target="t", unassessable=False, BOPAS_adj=0.0), dict(intervention="D", target="t", unassessable=False, BOPAS_adj=1.0),
+             dict(intervention="B", target="t", unassessable=False, BOPAS_adj=0.0), dict(intervention="C", target="t", unassessable=False, BOPAS_adj=0.0)]
     # A (2.0 -> 0.0) and D move; B and C were never in contention though A now ties them at rank 2
     assert rank_changes(before, after) == [RankChange("A", "t", 1, 2), RankChange("D", "t", 2, 1)]
 
@@ -375,7 +375,7 @@ def test_real_traj_fixture_reproduces_the_published_slope_cis(real_traj):
 
 def _cells(b, a):
     return ([dict(intervention=k, target="t", BOPAS=v) for k, v in b.items()],
-            [dict(intervention=k, target="t", BOPAS_adj=v) for k, v in a.items()])
+            [dict(intervention=k, target="t", unassessable=False, BOPAS_adj=v) for k, v in a.items()])
 
 
 def test_a_swap_of_distinct_scores_is_an_inversion():
@@ -406,3 +406,11 @@ def test_real_data_change_is_a_tie_split(counts, real_traj):
 
 def test_kind_does_not_affect_equality_of_the_rank_fields():
     assert RankChange("A", "t", 1, 2, "inversion") == RankChange("A", "t", 1, 2, "tie_split")
+
+
+def test_rank_changes_rejects_rows_lacking_the_unassessable_flag():
+    # Fail closed: a hand-built row must not silently count as assessable.
+    before = [dict(intervention="A", target="t", BOPAS=1.0)]
+    after = [dict(intervention="A", target="t", BOPAS_adj=1.0)]
+    with pytest.raises(ValueError, match="unassessable"):
+        rank_changes(before, after)

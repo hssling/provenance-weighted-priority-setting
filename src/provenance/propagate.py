@@ -167,7 +167,8 @@ def rank_changes(before: list[dict], after: list[dict]) -> list[RankChange]:
 
     Cells are paired by (intervention, target), not by position. Ranks are on the published
     (rounded) scores, so a rank change can also arise when rounding creates or breaks a tie.
-    Empty list means the ranking is unchanged. Two classes of cell are structurally excluded:
+    Empty list means the ranking is unchanged. `after` must be a propagate() output: rows
+    without the `unassessable` key raise ValueError rather than counting as assessable. Two classes of cell are structurally excluded:
 
     - cells scoring zero BOTH before and after: they were never in contention, so there is no
       movement to report (without this, zeroing the only live series would "move" every dead cell
@@ -185,7 +186,11 @@ def rank_changes(before: list[dict], after: list[dict]) -> list[RankChange]:
     for v in (*b.values(), *a.values()):
         if isinstance(v, float) and math.isnan(v):
             raise ValueError("NaN score cannot be ranked")
-    out_of_ranking = {(r["intervention"], r["target"]) for r in after if r.get("unassessable")}
+    # Fail closed: a row without the flag is not assumed assessable. `after` must be the
+    # output of propagate (PropagationResult), which always sets `unassessable`.
+    if any("unassessable" not in r for r in after):
+        raise ValueError("`after` rows lack 'unassessable'; pass the PropagationResult from propagate()")
+    out_of_ranking = {(r["intervention"], r["target"]) for r in after if r["unassessable"]}
     b = {k: v for k, v in b.items() if k not in out_of_ranking}
     a = {k: v for k, v in a.items() if k not in out_of_ranking}
     rb, ra = _ranks(b), _ranks(a)

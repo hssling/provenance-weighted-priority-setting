@@ -18,7 +18,8 @@ almost nothing, a change among distant ones a great deal. Units here are BOPAS p
 
 THE PRIOR (an assumption, not a finding; Ruling FF). Default: q_s ~ Beta(P_s*m_s + 1, (1-P_s)*m_s + 1),
 independent across series, where P_s is the composite and m_s the total testable observations behind
-it (sum of CompositeReport.observations). Mean (P_s*m_s+1)/(m_s+2), which shrinks P_s toward 0.5 by an amount that depends on m_s; it is TWO-SIDED (a series that passes its tests
+it (sum of CompositeReport.observations). Mean (P_s*m_s+1)/(m_s+2), which shrinks P_s toward
+0.5 by an amount that depends on m_s; it is TWO-SIDED (a series that passes its tests
 may still be bad: the failure this project has found most often is a test that silently missed a
 problem) and its width is set by the evidence count, not a free parameter. It is the same
 Beta(k+1, n-k+1) construction the parent project uses for literature support (lower_beta_bound).
@@ -107,8 +108,8 @@ def evpr(node_counts, traj_rows, provenance: dict[str, float | None], *, observa
 
 
 def evpr_detail(node_counts, traj_rows, provenance: dict[str, float | None], *, observations=None,
-         prior: str = "beta", draws: int = DEFAULT_DRAWS, seed: int = 0,
-                **bopas_kwargs) -> dict[str, tuple[float, float]]:
+                 prior: str = "beta", draws: int = DEFAULT_DRAWS, seed: int = 0,
+                 **bopas_kwargs) -> dict[str, tuple[float, float]]:
     """series key -> (expected gain in BOPAS points from resolving that series' provenance,
     Monte Carlo standard error of that gain).
 

@@ -29,7 +29,7 @@ from provenance.evpr import (PRIORS, evpr_prior_sensitivity, observations_from_r
                              round_to_se)
 from provenance.existence import (NODE_LABELS, TB_BUDGET_MAPPING, TB_BUDGET_PARTIAL,  # noqa: E402
                                   existence_report)
-from provenance.identity import identity_score                                    # noqa: E402
+from provenance.identity import TOLERANCE as IDENTITY_TOLERANCE, identity_score  # noqa: E402
 from provenance.implausibility import derive_bound, implausibility_score          # noqa: E402
 from provenance.propagate import provenance_from_results, rank_changes            # noqa: E402
 from provenance.series import (BUDGET_CSV, EXP_CSV, ITR_CSV, NTEP_TRAJECTORIES_CSV,  # noqa: E402
@@ -422,7 +422,7 @@ def main() -> str:
     for s in load_trajectories(NTEP_TRAJECTORIES_CSV).values():
         d = identity_score(_identity_view(s, rows)).detail["identity"]
         t1_n += len(d)
-        t1_ok += sum(1 for v in d.values() if 0.9 <= v <= 1.1)
+        t1_ok += sum(1 for v in d.values() if 1.0 - IDENTITY_TOLERANCE <= v <= 1.0 + IDENTITY_TOLERANCE)
 
     pooled_results, pooled_bounds = audit_ntep(pooled_reference=True)
     pooled_prov = provenance_from_results({k: composite_inputs(v) for k, v in pooled_results.items()})
