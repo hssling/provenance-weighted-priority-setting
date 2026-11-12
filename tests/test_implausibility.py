@@ -81,3 +81,20 @@ def test_derive_bound_without_comparable_changes_raises():
         derive_bound([_s([1.0]), _s([None, 2.0])])
     with pytest.raises(ValueError):
         derive_bound([_s([1.0, 2.0])], percentile=1.5)
+
+
+def test_recorded_real_data_result_reference_cpp_dstb_all_countries():
+    # RECORDS an outcome; it is not a target. Reference set, fixed in advance of looking at
+    # the result: budget_cpp_dstb (DS-TB cost per patient) for every country in the WHO
+    # budget file, i.e. the same kind of quantity as the known case (a unit cost) but a
+    # different regimen. The derived bound is ~1.92 (a 192% year-on-year change), and it
+    # catches NOTHING in India's budget_cpp_xdr. That null is reported, not tuned away:
+    # the reference is itself too volatile for T3 to discriminate unit-cost series.
+    import csv
+    with open(BUDGET_CSV, newline="", encoding="utf-8-sig") as fh:
+        isos = sorted({r["iso3"] for r in csv.DictReader(fh)})
+    ref = [load_who_budget(BUDGET_CSV, i)["budget_cpp_dstb"] for i in isos]
+    b = derive_bound(ref)
+    assert len(ref) == 215 and b == pytest.approx(1.917, abs=0.001)
+    r = implausibility_score(load_who_budget(BUDGET_CSV, "IND")["budget_cpp_xdr"], bound=b)
+    assert r.score == 1.0 and r.detail["exceed"] == []
