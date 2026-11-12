@@ -11,6 +11,7 @@ from pathlib import Path
 DATA_DIR = Path(__file__).resolve().parents[2] / "data"
 BUDGET_CSV = DATA_DIR / "TB_budget_2026-11-12.csv"
 EXP_CSV = DATA_DIR / "TB_expenditure_utilisation_2026-08-25.csv"
+ITR_CSV = DATA_DIR / "india_tb_report_table16_1.csv"
 
 _ABSENT = {"", "NA"}
 _ID_COLUMNS = {"country", "iso2", "iso3", "iso_numeric", "g_whoregion", "year"}
@@ -114,3 +115,41 @@ def load_who_budget(path: Path, iso3: str) -> dict[str, IndicatorSeries]:
 
 def load_who_expenditure(path: Path, iso3: str) -> dict[str, IndicatorSeries]:
     return _load(Path(path), iso3, EXP_IDENTITIES, "WHO TB expenditure and utilisation")
+
+
+_ITR_COLUMNS = (("requested", "itr_requested", "Requested"),
+                ("approved", "itr_approved", "Approved"),
+                ("released", "itr_released", "Released"),
+                ("spent", "itr_spent", "Spent"))
+_ITR_NOTES = {
+    "approved": {
+        2022: "Excludes cash grant released directly by NHM under the RCH Flexible Pool.",
+        2023: "Excludes cash grant released directly by NHM under the RCH Flexible Pool.",
+    },
+    "spent": {
+        2023: "As at 15.03.2024; partial year.",
+    },
+}
+
+
+def load_india_tb_report(path: Path) -> dict[str, IndicatorSeries]:
+    """India TB Report 2024, Table 16.1 (p.174). Rupees crore; fiscal years labelled by start year.
+
+    Blank cells (e.g. released for 2022-23, not printed in the report) load as None.
+    """
+    path = Path(path)
+    with open(path, newline="", encoding="utf-8-sig") as fh:
+        rows = sorted(csv.DictReader(fh), key=lambda r: int(r["year"]))
+    years = [int(r["year"]) for r in rows]
+    source = "India TB Report 2024, Table 16.1"
+    out = {}
+    for col, key, label in _ITR_COLUMNS:
+        out[key] = IndicatorSeries(
+            key=key,
+            label=label,
+            years=list(years),
+            values=[_parse(r[col]) for r in rows],
+            source=source,
+            notes=dict(_ITR_NOTES.get(col, {})),
+        )
+    return out
