@@ -6,3 +6,9 @@ outputs/
 
 # publisher guideline PDFs: copyrighted, keep local
 manuscript/submission/*.pdf
+
+# Author-only files: signed forms, Elsevier declaration downloads, Word lock files.
+# Kept on disk, never committed: the repository is public.
+manuscript/submission/**/*.pdf
+manuscript/submission/**/declarationStatement*
+manuscript/submission/**/~$*

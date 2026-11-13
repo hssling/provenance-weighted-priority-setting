@@ -46,7 +46,10 @@ def main() -> int:
     errs: list[str] = []
     # Every document in a paper's folder is an upload; the folders hold
     # nothing else. Figures are images and carry no text to check.
-    uploads = sorted(f for f in S.glob("paper_*/*") if f.suffix in (".md", ".docx"))
+    # Word's "~$" owner files appear while a document is open; they are not
+    # documents, and reading one as a .docx crashed this check.
+    uploads = sorted(f for f in S.glob("paper_*/*")
+                     if f.suffix in (".md", ".docx") and not f.name.startswith("~$"))
     if not uploads:
         print("FAILED: no upload files found; run manuscript/build_submission.py")
         return 1
