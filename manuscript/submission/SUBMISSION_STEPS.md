@@ -63,6 +63,7 @@ paper_a/   paper_b/
   04_manuscript_unblinded.docx  → upload this one for Paper B (not anonymized)
   05_RECORD_checklist.docx      reporting checklist
   06_supplementary.docx         supplementary material, online only
+  07_tables.docx                every table, with its caption and note, in one separate file
 figures/
   figure_a1_two_accounts_of_the_same_shortfall.png   Paper A, Figure 1
   figure_a2_interventions_to_budget_lines.png        Paper A, Figure 2
@@ -73,8 +74,9 @@ figures/
 All four figures are 300 dpi PNG and at least 3,600 pixels wide, which is IJE's stated minimum and
 comfortably above anything HPP requires. The build asserts both, so a figure cannot silently fall short.
 
-Tables are currently inside the manuscript files. **Before uploading, cut each table into its own file**
-as both journals require, keeping the caption with the table and leaving the in-text citation in place.
+Tables are **already split out** into `07_tables.docx`, as both journals require. Each manuscript keeps a
+`[Table N about here]` marker where the table stood, and every in-text citation is left in place. The build
+asserts that the number of tables split out equals the number of table captions, so none can be lost.
 
 Figure captions and alt text are already in a `Figure captions` section at the end of each main document,
 as IJE specifies; paste the same text into the portal's caption box so the two match exactly.

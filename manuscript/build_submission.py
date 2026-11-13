@@ -111,16 +111,26 @@ def main() -> int:
         text, _ = blind(src)
         d = OUT / key
         d.mkdir(exist_ok=True)
-        dest = d / "03_manuscript_blinded.md"
-        dest.write_text(text, encoding="utf-8")
         for leak in ("Siddalingaiah", "hssling", "ORCID", "Shridevi", "0000-0002",
                      "github.com", "zenodo."):
             assert leak not in text, f"{key}: blinded copy still contains {leak!r}"
-        print(f"{key:<9}{abstract:>10}{body:>8}{refs:>6}{tables:>8}  {dest.relative_to(HERE)}")
 
+        # Both journals want tables in a separate file, not in the text. Each
+        # table leaves a placement marker; its in-text citation stays put.
+        blinded_body, table_blocks = split_tables(text)
+        unblinded_body, unblinded_tables = split_tables(src)
+        assert len(table_blocks) == tables == len(unblinded_tables), (
+            f"{key}: {tables} table captions but {len(table_blocks)} tables split out")
+        dest = d / "03_manuscript_blinded.md"
+        dest.write_text(blinded_body, encoding="utf-8")
         # The unblinded source goes in too: a single-blind journal wants that
         # one, and having both means the choice is made at upload, not here.
-        (d / "04_manuscript_unblinded.md").write_text(src, encoding="utf-8")
+        (d / "04_manuscript_unblinded.md").write_text(unblinded_body, encoding="utf-8")
+        # Tables are written from the blinded text: they carry no author
+        # identity in either paper, and the blinded form is safe for both.
+        (d / "07_tables.md").write_text(
+            "# Tables\n\n" + "\n\n---\n\n".join(table_blocks) + "\n", encoding="utf-8")
+        print(f"{key:<9}{abstract:>10}{body:>8}{refs:>6}{tables:>8}  {dest.relative_to(HERE)}")
 
         stamp_counts(d / "01_title_page.md", abstract, body, tables, refs)
 
@@ -136,6 +146,42 @@ def main() -> int:
           "into the portal from here, not from memory.")
     print(f"\n{to_docx()}")
     return 0
+
+
+def split_tables(text: str) -> tuple[str, list[str]]:
+    """Lift each table -- caption, rows and the italic note under it -- out
+    of the text, leaving '[Table N about here]' where it stood."""
+    lines = text.split("\n")
+    out: list[str] = []
+    tables: list[str] = []
+    i = 0
+    while i < len(lines):
+        m = re.match(r"^\*\*Table (\d+)\.", lines[i])
+        if not m:
+            out.append(lines[i])
+            i += 1
+            continue
+        block = [lines[i]]
+        i += 1
+        seen_rows = False
+        while i < len(lines):
+            ln = lines[i]
+            if ln.startswith("|"):
+                seen_rows = True
+            elif ln.strip() == "":
+                pass
+            elif seen_rows and ln.startswith("*") and not ln.startswith("**"):
+                pass                                    # the table's own note
+            else:
+                break
+            block.append(ln)
+            i += 1
+        while block and not block[-1].strip():
+            block.pop()
+        assert any(b.startswith("|") for b in block), f"Table {m.group(1)} has no rows"
+        tables.append("\n".join(block))
+        out += [f"[Table {m.group(1)} about here]", ""]
+    return "\n".join(out), tables
 
 
 def stamp_counts(page: Path, abstract: int, body: int, tables: int,
