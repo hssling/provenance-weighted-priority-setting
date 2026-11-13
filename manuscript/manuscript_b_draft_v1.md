@@ -1,6 +1,6 @@
-# Not every reported number is a measurement: a reproducible screen of 443 variables in six WHO tuberculosis datasets
+# The label says what kind, not how old: a reproducible screen of 443 variables in six WHO tuberculosis datasets
 
-**Running title:** Measurement or estimate in WHO TB data
+**Running title:** Kind and vintage in WHO TB data
 
 **Author:** Siddalingaiah H S
 Department of Community Medicine, Shridevi Institute of Medical Sciences and Research Hospital, Tumkur – 572106, Karnataka, India.
@@ -12,13 +12,13 @@ Correspondence: hssling@yahoo.com · ORCID 0000-0002-4771-8285
 
 ## Abstract
 
-**Background.** WHO publishes country-reported tuberculosis data as annual country-by-year tables, and secondary analyses treat the variables within them interchangeably. A number in such a return may be measured that year, or an estimate entered once and restated. Only the first supports inference about change. Nothing in the files says which is which.
+**Background.** WHO publishes country-reported tuberculosis data as annual country-by-year tables, with variable definitions in a separate dictionary. The dictionary labels some quantities as estimates, but a label describes the kind of quantity, not the vintage of each value, and it is not in the data file. Analysts who join on column names never meet it.
 
-**Methods.** We screened all 443 numeric variables with at least 100 observations across six WHO TB datasets from a single programme — budget, expenditure and utilisation, notifications, treatment outcomes, laboratory diagnostic services, and contact tracing. All tests run on the published files alone: variables with five or fewer distinct values are set aside as categorical flags; the rest are assessed on **repetition** (share of consecutive country-year pairs holding an identical value), **granularity**, **internal identity** and **bounds**. No single test condemns a variable; the signature is several at once.
+**Methods.** We screened all 443 numeric variables with at least 100 observations across six WHO TB datasets (budget, expenditure and utilisation, notifications, treatment outcomes, laboratory diagnostic services, contact tracing). Using the published files alone, variables with five or fewer distinct values were set aside as categorical; the rest were assessed on **repetition** (share of consecutive country-year pairs holding an identical value), **granularity**, **internal identity** and **bounds**. The verdicts were then compared with the dictionary's labels.
 
-**Results.** Of 358 continuous variables, 206 screened as measurement-like, 68 mixed and 84 estimate-like — but the proportion differs sharply by dataset, and along an unexpected line. Median repetition was 13.0% for budget, 15.4% for expenditure, 15.6% for notifications and 3.5% for contact tracing, against **63.0% for laboratory diagnostic services** (53.5% under a more inclusive rule); treatment outcomes fell between, at 33.0%. The financial identities reconcile in 98.9–100% of testable country-years. By contrast `hospd_prct_mdr`, the share of drug-resistant TB patients hospitalised, holds 81 distinct values across 1,421 observations, 35.3% of them exactly 100, and is unchanged between first and last reporting year in 42% of the 178 countries with four or more years.
+**Results.** Of 358 continuous variables, 206 screened as measurement-like, 68 mixed and 84 estimate-like, and the proportion differs by dataset: median repetition was 13.0% for budget, 15.4% for expenditure, 15.6% for notifications and 3.5% for contact tracing, against **63.0% for laboratory diagnostic services**. The dictionary labels six variables as estimated or typical, all in the expenditure file; the screen places none of them in the measurement-like class (four estimate-like, two mixed; chance probability 0.006). For one of them, `hospd_prct_mdr` (share of drug-resistant TB patients hospitalised), 69.6% of consecutive country-year pairs are identical and 42% of the 178 countries with four or more years never change their entry. The label does not say this, and no field in any file does. The screen also flags 80 variables the dictionary does not label, but 70 of these are dominated by repeated zeros, including the one financial example, `cf_tot_usaid`; the screen cannot separate a repeated zero from a repeated estimate.
 
-**Conclusions.** The division is not between financial and service data — an earlier reading this replication refuted — but between quantities a programme **counts** from its records and quantities that **characterise** its standing configuration. The first are re-measured; the second are reasonably restated until they change. Trend analyses of the second kind describe reporting behaviour, not practice. A provenance flag per variable-year would resolve this at negligible cost. An earlier version of this screen misclassified an entire dataset by failing to set aside yes/no flags: a screen that classifies variables needs validating like any other instrument.
+**Conclusions.** A trend analysis needs to know whether a value was revised, not only what kind of quantity it is. WHO's labels settle the second and are silent on the first. A per-value vintage flag in the data file would settle it. An earlier version of this paper claimed that nothing in the files distinguishes measurements from estimates; that was wrong for the hospitalisation and visit variables and is retracted (§4.1).
 
 **Keywords:** Data Accuracy; Datasets as Topic; Health Services Research; Reproducibility of Results; Tuberculosis; World Health Organization
 
@@ -26,11 +26,11 @@ Correspondence: hssling@yahoo.com · ORCID 0000-0002-4771-8285
 
 ## 1. Background
 
-WHO's Global Tuberculosis Programme collects and republishes country-reported data on TB financing and service delivery [1,2]. The files are widely used: for investment cases, for cross-country comparison of cost and delivery models, and as covariates in modelling studies. They are distributed as flat annual tables with a shared data dictionary, and their variables are, in practice, treated as equivalent — each a country's report for that year.
+WHO's Global Tuberculosis Programme collects and republishes country-reported data on TB financing and service delivery [1,2]. The files are widely used: for investment cases, for cross-country comparison of cost and delivery models, and as covariates in modelling studies. They are distributed as flat annual tables. The data files carry column names only; the definitions are in a separate dictionary file. In practice the variables are treated as equivalent — each a country's report for that year.
 
-This paper asks a prior question. A number in an annual return may be a measurement taken that year; it may be an estimate entered once and repeated because no one revised it; or it may be a convention. These are different kinds of object, and only the first supports inference about change over time. Nothing in the published files says which is which.
+This paper asks a prior question. A number in an annual return may be a measurement taken that year, or an estimate entered once and repeated because no one revised it. Only a value that is re-established each year supports inference about change over time. WHO's dictionary does say, for some variables, that the quantity is an estimate; for example the share of patients hospitalised is defined as an "Estimated percentage". Two things remain unsaid. The label is in a different file from the data. And it describes the kind of quantity, not the vintage of each value: whether this year's entry was revised from last year's, or simply restated.
 
-The quality of routine health data has been assessed in other settings [3,4]. To our knowledge, there is no prior work screening these datasets for that distinction. The question is tractable because several signatures of non-measurement are computable from the published file alone, without reference to any external source.
+The quality of routine health data has been assessed in other settings [3,4]. To our knowledge, there is no prior work screening these datasets for vintage. The question is tractable because several signatures of restatement are computable from the published file alone, without reference to any external source. We also compare the screen's verdicts with the dictionary's labels, which gives the screen a partial check that it otherwise lacks.
 
 ---
 
@@ -38,7 +38,7 @@ The quality of routine health data has been assessed in other settings [3,4]. To
 
 ### 2.1 Data
 
-Six files from WHO's TB programme, retrieved August to November 2026 and archived with the analysis code:
+Six files from WHO's TB programme, all retrieved in November 2026 and archived with the analysis code. File versions are WHO's own release dates: 12 November 2026 for the budget file and 25 August 2026 for the other five and the dictionary.
 
 - **TB budget** — 1,720 rows, 2018–2025, 43 columns.
 - **TB expenditure and utilisation** — 2,123 rows, 2017–2026, 46 columns.
@@ -49,7 +49,7 @@ Six files from WHO's TB programme, retrieved August to November 2026 and archive
 
 The first two were screened first (77 variables); the other four were added as a replication after the first analysis was complete, and the replication overturned two of the first analysis's conclusions (§3.1, §4.1).
 
-WHO's published data dictionary [5] supplied every variable definition. The dictionary is used, not the column names: definitions and names diverge in ways that matter, as in `budget_prog`, defined as *"programme costs to treat drug-susceptible TB"* rather than programme costs generally.
+WHO's published data dictionary [5] supplied every variable definition, and its labels are the comparison standard in §3.5. The dictionary is used, not the column names: definitions and names diverge in ways that matter, as in `budget_prog`, defined as *"programme costs to treat drug-susceptible TB"* rather than programme costs generally.
 
 ### 2.2 The screens
 
@@ -66,6 +66,8 @@ Each is computable from the published file. These screens are our own operationa
 **S3 Identity.** Where a total and its components are both published, do the components sum to the total within 1%? This tests internal consistency rather than external validity, and a variable can be internally perfect while being an estimate.
 
 **S4 Bounds.** Where a definition implies a range — a percentage must lie in [0, 100] — do the values respect it?
+
+**S5 Comparison with the dictionary.** After classification, each variable's dictionary definition was read for a label of estimation. We counted a variable as *labelled* if its definition contains "estimat" or "typical". "Expected" (as in expected funding) and "average" were not counted: the first describes a forecast, the second a statistic. The rule is a convention and the result depends on it (§5).
 
 **No single screen condemns a variable.** A small integer count is legitimately round; a stable quantity legitimately repeats. We therefore count how many of four tests a continuous variable trips (repetition, distinct ratio, modal share, roundness) and classify it as *measurement-like* (0–1), *mixed* (2) or *estimate-like* (3–4). Thresholds are conventions, stated in the code so a reader can change them; the classification is insensitive to small changes where the underlying distribution is strongly bimodal (§3.1).
 
@@ -161,13 +163,36 @@ The extreme case is instructive beyond the pairing. The maximum ratio is **28,41
 
 We report this failure mode because we committed it ourselves. We also mis-reported its magnitude: an earlier draft gave the maximum as 687%, which was the largest value in a filtered subset we happened to be examining rather than the maximum in the data. Both errors were found the same way — by a value that looked wrong forcing a check — and neither would have been caught by the screens in §2.2.
 
+### 3.5 The screen's verdicts against the dictionary's labels
+
+Of the 443 variables, the dictionary labels **six** as estimated or typical (S5), all in the expenditure file: `hospd_prct_dstb`, `hospd_prct_mdr`, `hospd_dur_dstb`, `hospd_dur_mdr`, `hcfvisit_dstb` and `hcfvisit_mdr`. Table 3 cross-tabulates them against the screen.
+
+**Table 3. Screen verdict by dictionary label.**
+
+| | Estimate-like | Mixed | Measurement-like | Categorical | Untestable |
+|---|---:|---:|---:|---:|---:|
+| Labelled (6) | 4 | 2 | 0 | 0 | 0 |
+| Not labelled (437) | 80 | 66 | 206 | 42 | 43 |
+
+**Where they agree.** All six labelled variables are classified non-measurement-like, four estimate-like and two mixed, and none measurement-like. Of the 358 continuous variables 152 are non-measurement-like, so six labelled variables falling there by chance has probability 0.006. We read this as agreement, not proof: six variables, one file, and the six come in related pairs, so they are not independent.
+
+**Where they disagree.** The screen flags 80 estimate-like variables that the dictionary does not label. Most are not evidence of estimation. Seventy of the 80 have zero as their most common value; in the notifications and outcomes files all 48 of the estimate-like variables do, mostly small counts of rare events. A repeated zero is what a stable absence of events looks like. The one financial variable among the 80, `cf_tot_usaid`, is defined as "Expected funding from USAID (US Dollars)", with no hint of estimation, yet screens estimate-like (64.4% repetition; 64.3% of values held by a single number). That number is zero. Among consecutive-year pairs with either value non-zero, 12.6% are identical, against 2.5-6.8% for the other expected-funding sources (§4.2). The screen therefore picked out a real difference between USAID and the other sources, but most of what it flagged is a repeated zero, and we do not call `cf_tot_usaid` an unlabelled estimate.
+
+**What the comparison does and does not show.** The dictionary and the screen answer different questions. The dictionary says what a variable is; the screen says whether its values move. They agree where an estimate is labelled and moves rarely. The hospitalisation variables are the clearest case: they are labelled, and the screen shows the label's practical consequence, which the label itself does not state.
+
 ---
 
 ## 4. Discussion
 
-### 4.1 Counted versus characterised: a retraction of our earlier reading
+### 4.1 Kind is labelled, vintage is not: a retraction of our central claim
 
-**An earlier version of this paper said the division ran between financial and utilisation variables. Our own replication refutes that.** The reading rested on two files in which every high-repetition variable happened to be a utilisation variable, so the two explanations could not be told apart. Four further datasets from the same programme and countries separate them. Notifications and contact tracing are service-delivery data, not financial, and repeat 15.6% and 3.5% of the time, like or below the financial files; laboratory diagnostic services repeats 63.0% of the time. A financial/utilisation boundary predicts none of that. (The earlier version's classification was also inflated by a screen defect, the missing S0; the contact-tracing result in §3.1 is its clearest demonstration.)
+**An earlier version of this paper said, in its abstract and here, that "nothing in the files distinguishes" measurements from estimates. That was wrong.** WHO's dictionary defines `hospd_prct_dstb`, `hospd_prct_mdr`, `hospd_dur_dstb` and `hospd_dur_mdr` as "Estimated" quantities and `hcfvisit_dstb` and `hcfvisit_mdr` as "Typical" ones. Four of the five variables the earlier version used as its headline example were therefore already labelled by WHO,, which the earlier text did not account for. What was wrong was the inference that the files are silent; what survives is narrower.
+
+Three things survive. First, the label sits in a different file from the data, so an analyst joining on the 46 bare column names of the expenditure file never meets the word "Estimated". Second, the label describes the kind of quantity, not the vintage of each value. "Estimated percentage hospitalised" does not tell a reader that 69.6% of consecutive country-year pairs are identical, or that 42% of the 178 countries with four or more years never change their entry, and no field in any file does. That is what determines whether a trend analysis is possible, and it is this paper's finding. Third, the screen can be checked against the labels (§3.5): it agrees with them where they exist and flags variables they leave unlabelled, though the one financial example, `cf_tot_usaid`, turned out to reflect repeated zeros rather than repeated estimates, which limits what the screen can claim.
+
+### 4.1.1 Counted versus characterised: an earlier retraction
+
+**A still earlier version said the division ran between financial and utilisation variables. Our own replication refutes that.** The reading rested on two files in which every high-repetition variable happened to be a utilisation variable, so the two explanations could not be told apart. Four further datasets from the same programme and countries separate them. Notifications and contact tracing are service-delivery data, not financial, and repeat 15.6% and 3.5% of the time, like or below the financial files; laboratory diagnostic services repeats 63.0% of the time. A financial/utilisation boundary predicts none of that. (The earlier version's classification was also inflated by a screen defect, the missing S0; the contact-tracing result in §3.1 is its clearest demonstration.)
 
 What survives is a distinction of kind. Quantities a programme can **count from its own records** (money spent, cases notified, contacts screened) are re-derived each year and repeat 13.0-15.6% of the time in the three large files, 3.5% in contact tracing. Quantities that **characterise the system's standing configuration** (laboratory infrastructure, typical share hospitalised and typical stay, visits per patient) repeat at 63.0% (53.5% under the inclusive rule) in laboratory diagnostic services and at 61.5-69.6% for the hospitalisation and visit variables of the expenditure file. A programme cannot count its way to the second kind; it can only describe it, and describes it the same way until something changes. This is a post hoc reading of six datasets, not a tested hypothesis, and the treatment-outcomes file (33.0%, unexplained) sits awkwardly between the two.
 
@@ -177,7 +202,7 @@ Distributing both kinds under one schema, one dictionary and no provenance field
 
 We do not read the repetition as carelessness, and the replication strengthens the benign reading. A programme asked every year for its laboratory configuration will reasonably restate its standing answer; a hospitalisation share and average stay are properties of a service-delivery model that does not change annually. The reporting behaviour is sensible; what is missing is the flag that would let an analyst see it. This is inference from the shape of the data, not from any account of how countries completed the return (§5).
 
-The one financial variable in this range, `cf_tot_usaid`, points the same way: a fixed external commitment, restated unchanged until it changes. Repetition here is a feature of the quantity, not a defect in the reporting.
+The one financial variable the screen flags, `cf_tot_usaid`, is a different case and we do not read it as a restated estimate. Its dictionary definition ("Expected funding from USAID") carries no label of estimation, like every other financial variable. But 64.3% of its values are zero, and the high repetition is largely countries repeatedly reporting no USAID funding. Restricted to consecutive-year pairs in which either value is non-zero, 12.6% are identical (191 pairs), higher than the other expected-funding sources (2.5% for Global Fund, 3.4% for other grants, 6.8% for domestic) but far from the 61-70% of the hospitalisation variables. An earlier version of this section called `cf_tot_usaid` a fixed external commitment restated until it changes; the data do not support that, and the sentence is withdrawn.
 
 ### 4.3 Implications for secondary analysis
 
@@ -191,11 +216,13 @@ The one financial variable in this range, `cf_tot_usaid`, points the same way: a
 
 ### 4.4 What would fix it
 
-**A provenance flag per variable-year.** Three values — *measured*, *estimated*, *carried forward* — would make every analysis in this paper unnecessary and every downstream analysis sounder. Countries presumably know which applies when they complete the return, though we cannot observe that process (§5). Provenance metadata is a recognised element of data stewardship [11], with a substantial technical literature [12].
+**A vintage flag per value.** Because the kind of quantity is often already labelled (§4.1), the remedy is not to add a kind field. It is to record, for each variable-year, whether the value was newly established, re-confirmed or restated unchanged from the previous return, or the year in which it was last revised. Countries presumably know which applies when they complete the return, though we cannot observe that process (§5). Provenance metadata is a recognised element of data stewardship [11], with a substantial technical literature [12].
+
+**Ship the labels with the data.** The dictionary's definitions, including its "Estimated" and "Typical" labels, would reach analysts if they were carried in the data file or its column metadata, so that they are not a separate download that a join on column names bypasses.
 
 **A stated denominator pairing.** Where a file publishes two plausible denominators, the dictionary should say which belongs with which numerator.
 
-**Publish the screen with the data.** The tests here are generic. Running them at release and shipping the results table would let every user see, before analysis, which variables carry annual information. Documentation shipped with a dataset has precedent in the datasheet proposal [13].
+**Publish the screen with the data.** The tests here are generic. Running them at release and shipping the results table would let every user see, before analysis, which variables carry annual information; until a vintage flag exists, this is a stand-in for it. Documentation shipped with a dataset has precedent in the datasheet proposal [13].
 
 ---
 
@@ -209,7 +236,7 @@ Variables with fewer than 100 observations were excluded, so the screen is silen
 
 We screened six files from one programme at one point in time. Whether the counted/characterised division generalises to other WHO disease programmes is an open and directly testable question. The division itself was found post hoc, and the treatment-outcomes file does not fit it cleanly.
 
-**The screen needed its own validation, and had not had it.** Before S0 existed it produced a false positive on the contact-tracing dataset, labelling a set of ordinary yes/no flags as estimate-like, and we found it only by replication on a further dataset. A screen that classifies variables is a measuring instrument and must itself be validated against cases whose answer is known; we did not do this before the first analysis, and both the five-or-fewer-values convention of S0 and the untestable class of S0b were added in response to failures. Other failure modes may remain: a six-valued code, for example, would not be caught by S0.
+**The screen's validation is partial.** Before S0 existed it produced a false positive on the contact-tracing dataset, labelling a set of ordinary yes/no flags as estimate-like, and we found it only by replication on a further dataset. Both the five-or-fewer-values convention of S0 and the untestable class of S0b were added in response to failures. The comparison with the dictionary (§3.5) is the first external check, and it is thin: it covers six variables, all in one file, defined by a wording rule we chose, and it can show only that the screen does not miss labelled estimates, not that the 80 variables it flags beyond them are estimates. We found that 70 of those 80 have zero as their most common value, as do 71 of all 84 estimate-like variables, including 21 of the 31 in the laboratory file. A repeated zero (no such test performed, no such event) is not a restated estimate, and the screen does not distinguish them; the laboratory median of 63.0% in §3.1 should be read with that in mind. The hospitalisation and visit variables are not affected (of the four labelled estimate-like variables, only one has zero as its most common value). Other failure modes may remain: a six-valued code, for example, would not be caught by S0.
 
 The 43 untestable variables are unclassified, not clean; they are concentrated in treatment outcomes and laboratory data.
 
@@ -219,9 +246,9 @@ Finally, we cannot observe the national reporting process, so §4.2's benign int
 
 ## 6. Conclusions
 
-Across six WHO TB datasets, variables a programme counts from its own records (expenditure, notifications, contacts screened) behave like annual measurements, repeating 15.6% of the time or less, and the financial ones are arithmetically immaculate. Variables that describe the system's standing configuration (laboratory capacity, hospitalisation share and stay, visits per patient) behave like standing estimates, repeating 53.5-69.6% of the time. Of the 77 variables first screened, five are estimate-like, not six: `hosp_type_mdr` is a categorical code. Our first reading of the division as financial versus utilisation was wrong, and our own replication showed it. Both kinds are published under one name with nothing to tell them apart.
+WHO's dictionary tells an analyst what kind of quantity a variable is, for example that the share of drug-resistant TB patients hospitalised is an estimate. It is a separate file from the data, and it does not say how often each value is revised. Across six WHO TB datasets, variables a programme counts from its own records (expenditure, notifications, contacts screened) repeat 15.6% of the time or less, while the hospitalisation and visit variables repeat 61.5-69.6% of the time and, for 42% of countries with four or more years, never change. The screen agrees with every one of the dictionary's labels (six of six fall outside the measurement-like class), but it cannot separate a repeated estimate from a repeated zero, which limits what it says about the 80 variables the dictionary leaves unlabelled. Of the 77 variables first screened, five are estimate-like, not six: `hosp_type_mdr` is a categorical code. Our first reading of the division as financial versus utilisation was wrong, and so was our claim that nothing in the files distinguishes measurements from estimates.
 
-The remedy is a single flag the reporting country is presumably already in a position to supply. Until it exists, the screen presented here is a few seconds of work that tells an analyst which of these widely used numbers can support the question being asked.
+The remedy is a vintage flag per value, which the reporting country is presumably already in a position to supply, and the dictionary's labels carried in the data file. Until then, the screen is a few seconds of work that tells an analyst which of these numbers can support a question about change.
 
 ---
 
@@ -257,7 +284,7 @@ The remedy is a single flag the reporting country is presumably already in a pos
 
 ## Notes for the author — not for submission
 
-1. **References placed (13, Vancouver, numbered by first appearance).** Still outstanding: (a) refs were verified by Crossref record or WHO page, not read in full -- re-read Maiga 2019 (3), Lundin 2022 (4), Bassili 2013 (8), Ho 2017 (9) and Herschel 2017 (12) against the sentences they support; (b) the WHO Module 4 (ref 10) was confirmed to cover models of care but its specific wording on hospitalisation was not checked -- read the relevant section; (c) the dictionary defines `hospd_prct_mdr`, `hospd_dur_mdr` and related fields as "Estimated ..."; the abstract's "Nothing in the files says which is which" and §1 should be reconciled with this before submission; (d) the screens have no external validation or citable precedent for country-reported programme data (see §2.2); (e) RECORD, Munafo, Kenett and Loveday were considered and left out as not supporting a specific sentence.
+1. **References placed (13, Vancouver, numbered by first appearance).** Still outstanding: (a) refs were verified by Crossref record or WHO page, not read in full -- re-read Maiga 2019 (3), Lundin 2022 (4), Bassili 2013 (8), Ho 2017 (9) and Herschel 2017 (12) against the sentences they support; (b) the WHO Module 4 (ref 10) was confirmed to cover models of care but its specific wording on hospitalisation was not checked -- read the relevant section; (c) [done 13 Nov 2026] the dictionary labels the hospitalisation and visit variables as "Estimated" or "Typical"; the central claim was retracted and rebuilt around vintage (abstract, §1, §3.5, §4.1, §4.4, §6). NOTE: the new §3.5 comparison found that `cf_tot_usaid` is mostly repeated zeros, and that 70 of 80 unlabelled estimate-like variables are zero-dominated; see FINDINGS §2.3; `verification/dictionary_vs_screen.py` regenerates the numbers; (d) the screens have no external validation or citable precedent for country-reported programme data (see §2.2); (e) RECORD, Munafo, Kenett and Loveday were considered and left out as not supporting a specific sentence.
 2. **Companion paper.** The India financing analysis (`manuscript_draft_v1.md`) shares §3.4's dataset and the general theme. They must cite each other and be written independently — run `check_self_similarity.py` across both before submitting either.
 3. **Possible strengthening:** repeat the screen on one other WHO programme dataset (HIV or malaria financing) to test whether the counted/characterised division generalises beyond TB. Same code.
 4. **Honest framing to preserve:** §3.4 discloses an error we made. Keep it. A methods paper about data traps that conceals its author's own is worth less.
