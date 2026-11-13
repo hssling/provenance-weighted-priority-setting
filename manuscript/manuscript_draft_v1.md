@@ -22,6 +22,12 @@ Correspondence: hssling@yahoo.com · ORCID 0000-0002-4771-8285
 
 **Keywords:** Antitubercular Agents; Costs and Cost Analysis; Financing, Government; Health Expenditures; Health Priorities; Healthcare Financing; India; Program Evaluation; Tuberculosis
 
+## Key messages
+
+- WHO's tuberculosis funding gap is read as a measure of under-resourcing, but India reported expected funding exactly equal to budget required in all eight years from 2018 to 2025, so its published gap is zero by construction rather than by observation.
+- Fourteen of the 106 countries with five or more years of data report the same way, while India's own national accounts record an annual shortfall of 5.4% to 46.1% between funds requested and approved, which the indicator cannot show.
+- Six of eleven tuberculosis interventions have no budget line and three more map only to drugs-only lines, so spending on them cannot be identified in the published record. Both problems are correctable without new money: publish unmet need as a field in its own right, and tag expenditure to interventions rather than to commodity classes.
+
 ---
 
 ## 1. Introduction

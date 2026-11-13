@@ -16,6 +16,12 @@
 
 **Keywords:** Data Accuracy; Datasets as Topic; Health Services Research; Reproducibility of Results; Tuberculosis; World Health Organization
 
+## Key messages
+
+- WHO's tuberculosis data dictionary states what kind of quantity a variable holds, and labels six of them "Estimated" or "Typical", but no field in any published file records whether a given value was re-measured for that year or carried forward from the previous one.
+- Screening all 443 numeric variables across six datasets separates quantities a programme counts from its own records, which repeat in 13.0% to 15.6% of consecutive country-year pairs, from those that characterise its standing configuration, which repeat in 63.0%.
+- The division is not an artefact of repeated zeros: excluding pairs in which both values are zero the gap widens rather than closes, and the file with the highest repetition holds the fewest zero-dominated variables of any in the set. A per-value vintage flag in the data file would resolve the ambiguity at negligible cost.
+
 ---
 
 ## 1. Background
