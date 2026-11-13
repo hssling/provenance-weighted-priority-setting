@@ -8,8 +8,8 @@ screen between them returns 0.6% (A against B) and 0.4% (B against A).
 | title | What a tuberculosis budget cannot see | The label says what kind, not how old |
 | target | *Health Policy and Planning*, Original Article | *International Journal of Epidemiology* |
 | abstract | 249 words | 331 words |
-| main text | 2,900 words | 4,533 words |
-| tables / figures | 2 / 0 | 5 / 0 |
+| main text | 2,904 words | 4,548 words |
+| tables / figures | 2 / 0 | 6 / 0 |
 | references | 16 | 13 |
 
 Counts are derived by `manuscript/build_submission.py`, never typed. Rerun it after any edit; it also rewrites the

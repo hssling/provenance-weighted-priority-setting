@@ -152,7 +152,9 @@ Reported separately as categorical: `hosp_type_mdr` (n = 1,631; 4 distinct value
 
 ### 3.2 The financial data is internally immaculate
 
-All five component-to-total identities reconcile in **100%** of testable country-years:
+Four of the five component-to-total identities reconcile in **100%** of testable country-years, and the fifth in **98.9%** (Table 5).
+
+**Table 5. Component-to-total identities in the budget and expenditure files.**
 
 | Identity | Reconcile | Untestable |
 |---|---|---|
@@ -186,9 +188,9 @@ We report this failure mode because we committed it ourselves. We also mis-repor
 
 ### 3.5 The screen's verdicts against the dictionary's labels
 
-Of the 443 variables, the dictionary labels **six** as estimated or typical (S5), all in the expenditure file: `hospd_prct_dstb`, `hospd_prct_mdr`, `hospd_dur_dstb`, `hospd_dur_mdr`, `hcfvisit_dstb` and `hcfvisit_mdr`. Table 5 cross-tabulates them against the screen.
+Of the 443 variables, the dictionary labels **six** as estimated or typical (S5), all in the expenditure file: `hospd_prct_dstb`, `hospd_prct_mdr`, `hospd_dur_dstb`, `hospd_dur_mdr`, `hcfvisit_dstb` and `hcfvisit_mdr`. Table 6 cross-tabulates them against the screen.
 
-**Table 5. Screen verdict by dictionary label.**
+**Table 6. Screen verdict by dictionary label.**
 
 | | Estimate-like | Mixed | Measurement-like | Categorical | Untestable |
 |---|---:|---:|---:|---:|---:|
@@ -231,7 +233,7 @@ The one financial variable the screen flags, `cf_tot_usaid`, is a different case
 
 **Cross-sectional comparison is weaker than it looks.** With 81 distinct values over 199 countries, much apparent between-country variation is variation between conventional answers.
 
-**Internal consistency is not validity.** The financial variables reconcile perfectly and are still subject to definitional change, pooling and reporting convention; perfect arithmetic says nothing about whether a line item means the same thing in two countries. WHO's data quality framework likewise separates internal from external consistency [6].
+**Internal consistency is not validity.** The financial variables reconcile at 98.9% to 100% and are still subject to definitional change, pooling and reporting convention; perfect arithmetic says nothing about whether a line item means the same thing in two countries. WHO's data quality framework likewise separates internal from external consistency [6].
 
 **Published coverage is not evidential weight.** 1,421 observations across 199 countries reads as a strong dataset; after accounting for repetition the independent information is a small fraction of that.
 

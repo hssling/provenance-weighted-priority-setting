@@ -57,7 +57,7 @@ Upload in this order:
 | 2 | `paper_a/01_title_page.md` | Title page (not for review) |
 | 3 | `paper_a/03_manuscript_blinded.md` *or* the unblinded source | Main document |
 
-Counts to enter: abstract **249 words**, main text **2,900 words**, **2 tables**, **0 figures**,
+Counts to enter: abstract **249 words**, main text **2,904 words**, **2 tables**, **0 figures**,
 **16 references**.
 
 The abstract is 249 against a 250-word limit, so it has **no margin**. If the journal's current limit is
@@ -76,7 +76,7 @@ style (2–3 bullets, roughly 35–50 words each, full sentences), confirmed aga
 | 2 | `paper_b/01_title_page.md` | Title page (not for review) |
 | 3 | `paper_b/03_manuscript_blinded.md` *or* the unblinded source | Main document |
 
-Counts to enter: abstract **331 words**, main text **4,533 words** (blinded copy 4,526), **5 tables**,
+Counts to enter: abstract **331 words**, main text **4,548 words** (blinded copy 4,541), **6 tables**,
 **0 figures**, **13 references**.
 
 Also carries a three-bullet **Key messages** box; IJE uses the same convention.

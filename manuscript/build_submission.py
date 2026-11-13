@@ -8,11 +8,18 @@ That failure mode has already cost this project once: a cover letter claimed
 Writes manuscript/submission/paper_{a,b}/03_manuscript_blinded.md and prints
 the counts the title pages must state.
 
+If pandoc is on PATH it also writes a .docx beside every .md in the
+submission folders, because neither target journal accepts Markdown. Without
+pandoc it says so and writes the Markdown only; the build still succeeds, so
+the counts and the blinding never depend on a tool being installed.
+
 Usage: python -I manuscript/build_submission.py
 """
 from __future__ import annotations
 
 import re
+import shutil
+import subprocess
 import sys
 from pathlib import Path
 
@@ -101,8 +108,37 @@ def main() -> int:
                      "github.com", "zenodo."):
             assert leak not in text, f"{key}: blinded copy still contains {leak!r}"
         print(f"{key:<9}{abstract:>10}{body:>8}{refs:>6}{tables:>8}  {dest.relative_to(HERE)}")
+
+        # The unblinded source goes in too: a single-blind journal wants that
+        # one, and having both means the choice is made at upload, not here.
+        (d / "04_manuscript_unblinded.md").write_text(src, encoding="utf-8")
+
     print("\nState these counts on the title pages. Do not retype them from memory.")
+    print(f"\n{to_docx()}")
     return 0
+
+
+def to_docx() -> str:
+    """Convert every .md under submission/ to .docx. Optional by design."""
+    pandoc = shutil.which("pandoc")
+    if not pandoc:
+        return ("pandoc not on PATH: wrote Markdown only. Neither journal accepts "
+                "Markdown, so convert before uploading.")
+    made, failed = [], []
+    for md in sorted(OUT.rglob("*.md")):
+        if md.name == "README.md" or md.name == "SUBMISSION_STEPS.md":
+            continue                      # working documents, not uploads
+        docx = md.with_suffix(".docx")
+        proc = subprocess.run(
+            [pandoc, str(md), "-f", "markdown+pipe_tables", "-o", str(docx),
+             "--standalone", "--wrap=none"],
+            capture_output=True, text=True, encoding="utf-8", errors="replace")
+        (made if proc.returncode == 0 and docx.exists() else failed).append(
+            md.relative_to(OUT).as_posix())
+    msg = f"pandoc: wrote {len(made)} .docx beside the Markdown"
+    if failed:
+        msg += f"; FAILED on {failed}"
+    return msg
 
 
 if __name__ == "__main__":
