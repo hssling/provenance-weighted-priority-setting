@@ -18,6 +18,8 @@ authors:
       and Research Hospital, Tumkur, Karnataka, India
 license: MIT
 repository-code: "https://github.com/hssling/provenance-weighted-priority-setting"
+doi: "10.5281/zenodo.24187366"
+version: "v1.0.0"
 keywords:
   - data quality
   - data provenance

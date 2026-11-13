@@ -67,7 +67,7 @@ Each is computable from the published file. These screens are our own operationa
 
 ### 2.3 Reproducibility
 
-The screen is a single pure-Python script with no third-party dependency. It regenerates every figure in this paper from the raw files in one command [7] (including the pre-S0 counterfactual of §3.1) and writes a per-variable results table. Code, archived inputs and the results table: [repository URL and DOI to be inserted at acceptance].
+The screen is a single pure-Python script with no third-party dependency. It regenerates every figure in this paper from the raw files in one command [7] (including the pre-S0 counterfactual of §3.1) and writes a per-variable results table. Code, archived inputs and the results table: [repository URL withheld for blind review], [archive DOI withheld for blind review].
 
 ### 2.4 Ethics
 
@@ -285,7 +285,7 @@ The remedy is a vintage flag per value, which the reporting country is presumabl
 
 **Funding.** None. **Competing interests.** None declared. **Ethical clearance.** Not required (§2.4).
 
-**Data availability.** Inputs are public WHO datasets; the archived copies, the screening script and the per-variable results table are deposited at [URL and DOI at acceptance].
+**Data availability.** Inputs are public WHO datasets; the archived copies, the screening script and the per-variable results table are deposited at [repository and archive DOI withheld for blind review].
 
 **Use of generative AI.** The author used a large language model as a drafting and analysis assistant. All analytical decisions, verification and conclusions are the author's, who takes full responsibility.
 

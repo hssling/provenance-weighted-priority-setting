@@ -16,7 +16,7 @@ I am submitting for your consideration an Original Article, "What a tuberculosis
 
 **Related work by the same author, disclosed in full.** A companion paper from the same project, screening 443 variables across six WHO tuberculosis datasets for data vintage, is being submitted separately to a different journal. The two share one dataset, are written to stand alone, and a text-overlap screen between them returns 0.6%. A separate manuscript on drug-resistant tuberculosis outcomes in India (IJTB-S-26-01305) is under review at the Indian Journal of Tuberculosis and is cited here as unpublished. I will inform you of any change in the status of either.
 
-**Data and code.** All inputs are public. The archived input files, the analysis code and a verification suite are deposited in a public repository and will be archived with a DOI at acceptance.
+**Data and code.** All inputs are public. The archived input files, the analysis code and a verification suite are deposited at https://github.com/hssling/provenance-weighted-priority-setting and archived at Zenodo, doi:10.5281/zenodo.24187367.
 
 **Use of generative AI.** I used a large language model as a drafting and analysis assistant. Every analytical decision, every verification and every conclusion is mine, and I take full responsibility for the content.
 

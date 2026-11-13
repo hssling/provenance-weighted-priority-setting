@@ -237,7 +237,7 @@ Neither finding is about how much money tuberculosis control receives. Both are 
 
 **Ethical clearance.** Not required (see Methods 2.5).
 
-**Data availability.** All inputs are publicly available: WHO TB budget and expenditure datasets, and the India TB Report 2024. Analysis code, the archived input files, the intervention-to-budget-line mapping with its definitional basis, and the verification suite are deposited at [repository URL and DOI to be inserted at acceptance].
+**Data availability.** All inputs are publicly available: WHO TB budget and expenditure datasets, and the India TB Report 2024. Analysis code, the archived input files, the intervention-to-budget-line mapping with its definitional basis, and the verification suite are deposited at https://github.com/hssling/provenance-weighted-priority-setting and archived at Zenodo, doi:10.5281/zenodo.24187367 (release v1.0.0; the concept DOI doi:10.5281/zenodo.24187366 always resolves to the latest version).
 
 **Use of generative artificial intelligence.** The author used a large language model as a drafting and analysis assistant. All analytical decisions, data verification and conclusions are the author's. The author reviewed and edited all content and takes full responsibility for it.
 

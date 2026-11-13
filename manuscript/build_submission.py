@@ -58,6 +58,21 @@ def blind(text: str) -> tuple[str, int]:
         text = text[:i].rstrip() + "\n"
     # self-citations that name the author
     text = re.sub(r"Siddalingaiah HS?\.?", "[Author]", text)
+    # The deposit identifiers de-anonymise the submission: the repository URL
+    # carries the author's username, and resolving the DOI shows the author
+    # record. A journal reviewing blind expects these to be withheld and given
+    # to the editor instead. The unblinded source keeps them in full.
+    text = re.sub(r"https://github\.com/[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+",
+                  "[repository URL withheld for blind review]", text)
+    text = re.sub(r"doi:10\.5281/zenodo\.[0-9]+",
+                  "[archive DOI withheld for blind review]", text)
+    # tidy what those substitutions leave behind
+    text = text.replace("[repository URL withheld for blind review] and archived at Zenodo, "
+                        "[archive DOI withheld for blind review]",
+                        "[repository and archive DOI withheld for blind review]")
+    text = re.sub(r" \(release v[0-9.]+; the concept DOI "
+                  r"\[archive DOI withheld for blind review\][^)]*\)", "", text)
+    text = re.sub(r" +([.,;])", r"\1", text)      # space left before punctuation
     return re.sub(r"\n{3,}", "\n\n", text), removed
 
 
@@ -82,7 +97,9 @@ def main() -> int:
         d.mkdir(exist_ok=True)
         dest = d / "03_manuscript_blinded.md"
         dest.write_text(text, encoding="utf-8")
-        assert "Siddalingaiah" not in text and "hssling" not in text and "ORCID" not in text, key
+        for leak in ("Siddalingaiah", "hssling", "ORCID", "Shridevi", "0000-0002",
+                     "github.com", "zenodo."):
+            assert leak not in text, f"{key}: blinded copy still contains {leak!r}"
         print(f"{key:<9}{abstract:>10}{body:>8}{refs:>6}{tables:>8}  {dest.relative_to(HERE)}")
     print("\nState these counts on the title pages. Do not retype them from memory.")
     return 0

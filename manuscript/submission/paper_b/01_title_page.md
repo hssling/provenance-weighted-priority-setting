@@ -30,7 +30,7 @@ ORCID 0000-0002-4771-8285
 
 **Ethical approval.** Not required. The study uses only published aggregate datasets, with no individual-level records and no patient-identifiable information.
 
-**Data and code availability.** All inputs are published WHO Global Tuberculosis Programme datasets. The archived input files as downloaded, the screening script, the per-variable results table and the verification suite are deposited at https://github.com/hssling/provenance-weighted-priority-setting and archived at Zenodo [DOI at acceptance].
+**Data and code availability.** All inputs are published WHO Global Tuberculosis Programme datasets. The archived input files as downloaded, the screening script, the per-variable results table and the verification suite are deposited at https://github.com/hssling/provenance-weighted-priority-setting and archived at Zenodo, doi:10.5281/zenodo.24187367 (release v1.0.0; the concept DOI doi:10.5281/zenodo.24187366 always resolves to the latest version).
 
 **Use of generative AI.** The author used a large language model as a drafting and analysis assistant. All analytical decisions, verification and conclusions are the author's, who takes full responsibility for the content.
 

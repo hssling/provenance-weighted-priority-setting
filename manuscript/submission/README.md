@@ -41,16 +41,26 @@ title page.
   gate on a percentage: no journal publishes a numeric threshold and inventing one would dress a guess as a rule.
   It is a screen, not iThenticate — run the institutional check before uploading.
 
+## Deposit
+
+Archived at Zenodo on 13 November 2026, from GitHub release v1.0.0.
+
+- **Version DOI, cite this one:** 10.5281/zenodo.24187367 — the exact archived state every number in both papers
+  was computed from.
+- Concept DOI: 10.5281/zenodo.24187366 — always resolves to the latest version.
+
+Both data-availability statements now carry the version DOI. The **blinded** copies do not: the repository URL
+contains the author's GitHub username and resolving the DOI shows the author record, so both are replaced with
+"[repository and archive DOI withheld for blind review]". Give the identifiers to the editor separately if the
+journal reviews blind. `build_submission.py` fails the build if any identifier survives into a blinded copy.
+
 ## Outstanding, in order
 
-1. **Zenodo DOI.** Enable the webhook at zenodo.org/account/settings/github for
-   `provenance-weighted-priority-setting`, then tag v1.0.0. Both data-availability statements say "[DOI at
-   acceptance]" and need the real DOI before the final upload. This needs the repository owner; it cannot be done
-   from here.
-2. **Confirm each journal's current limits** — abstract length, main-text length, and whether *Health Policy and
+1. **Confirm each journal's current limits** — abstract length, main-text length, and whether *Health Policy and
    Planning* still requires its Key Messages box (3 to 5 bullets). The publisher's author-guideline pages are
    bot-protected and could not be read automatically; open them in a normal browser. Paper A's abstract is 249 words
    against a 250-word limit, so it has no margin if the limit has changed.
-3. **One incomplete citation.** Paper A ref [13], the JSSTD paper, is listed as forthcoming; Crossref returned 404,
+2. **One incomplete citation.** Paper A ref [13], the JSSTD paper, is listed as forthcoming; Crossref returned 404,
    so volume, pages and DOI are still pending. Supply them if the paper has appeared, or keep "Forthcoming".
-4. **Decide on blinded versus unblinded** per journal, as above.
+3. **Decide blinded versus unblinded** per journal, as above. The blinded copies also give a main-text count 7 words
+   shorter for Paper B, which is the withheld identifier; the title pages state the unblinded counts.
