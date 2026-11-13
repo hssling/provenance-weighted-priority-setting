@@ -4,9 +4,11 @@ Two papers, two journals, submitted independently. Do one completely before star
 field typed for Paper A is never reused unchecked for Paper B.
 
 Both journals are Oxford University Press titles and both use an online system reached from the journal's own
-homepage. Their author-guideline and portal pages are bot-protected, so none of the limits below were read
-automatically — **check each against the journal's live guidelines before uploading**. Everything about the
-manuscripts themselves was verified from the files and the code.
+homepage. **Health Policy and Planning's limits below were read from the journal's own author-guidelines PDF**
+(saved in this folder, not committed: it is the publisher's copyrighted document). The *International Journal
+of Epidemiology* guidelines have **not** been read — its portal and guideline pages are bot-protected — so
+check paper B's limits before uploading. Everything about the manuscripts themselves was verified from the
+files and the code.
 
 ---
 
@@ -31,7 +33,8 @@ cover letter in an earlier project claimed 400 dpi for 600 dpi figures because a
 
 ## 1. Decide blinded or unblinded, per journal
 
-Check each journal's stated review model.
+*Health Policy and Planning* is **double-anonymized** — confirmed from its guidelines — so paper A uploads
+blinded. Paper B's journal has not been checked; confirm before choosing.
 
 - **Single-blind** (reviewers see the author): upload the full source, `manuscript/manuscript_draft_v1.md` or
   `manuscript_b_draft_v1.md`, converted to the required format. These carry the repository URL and the Zenodo
@@ -57,14 +60,22 @@ Upload in this order:
 | 2 | `paper_a/01_title_page.md` | Title page (not for review) |
 | 3 | `paper_a/03_manuscript_blinded.md` *or* the unblinded source | Main document |
 
-Counts to enter: abstract **249 words**, main text **2,904 words**, **2 tables**, **0 figures**,
+Counts to enter: abstract **249 words**, main text **2,944 words**, **2 tables**, **0 figures**,
 **16 references**.
 
-The abstract is 249 against a 250-word limit, so it has **no margin**. If the journal's current limit is
-lower, cut from the Results paragraph, which carries the most compressible detail.
+Confirmed from the journal's author guidelines on 13 November 2026:
 
-The manuscript contains a **Key messages** box of three bullets immediately after the keywords, in the house
-style (2–3 bullets, roughly 35–50 words each, full sentences), confirmed against published HPP articles.
+| requirement | HPP asks for | this paper |
+|---|---|---|
+| Abstract | maximum 300 words | 249, so 51 words of headroom |
+| Main text | maximum 6,000 words (quantitative or fixed design) | 2,944 |
+| Key Messages | 3–4 bullets | 3 |
+| References | **author-date (Harvard)**, alphabetical | converted from Vancouver |
+| Review model | **double-anonymized** | upload the blinded copy, `03_` |
+| Structure | Title page, Abstract, Key Messages, Introduction, Methods, Results, Discussion, Conclusion, Acknowledgements, References | matches, with Limitations as its own section before Conclusions |
+
+Because review is double-anonymized, **the blinded copy is not optional for this journal.** Give the
+repository URL and the Zenodo DOI to the editor in the confidential comments box.
 
 ---
 

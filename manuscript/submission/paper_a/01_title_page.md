@@ -17,7 +17,7 @@ ORCID 0000-0002-4771-8285
 | item | count |
 |---|---:|
 | Abstract (structured) | 249 words |
-| Main text, Introduction to Conclusions, excluding tables and references | 2,904 words |
+| Main text, Introduction to Conclusions, excluding tables and references | 2,944 words |
 | Tables | 2 |
 | Figures | 0 |
 | References | 16 |

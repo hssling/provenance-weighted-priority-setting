@@ -6,7 +6,7 @@
 Department of Community Medicine, Shridevi Institute of Medical Sciences and Research Hospital, Tumkur – 572106, Karnataka, India.
 Correspondence: hssling@yahoo.com · ORCID 0000-0002-4771-8285
 
-**Target journal:** *Health Policy and Planning* (Original Article). Abstract 250 words.
+**Target journal:** *Health Policy and Planning* (Original Article). Verified against the journal's author guidelines, 13 November 2026: abstract maximum **300** words, main text maximum **6,000** for a quantitative or fixed-design study, Key Messages **3-4** bullets, **author-date (Harvard)** referencing, and **double-anonymized** peer review, so the blinded copy is the one to upload.
 
 ---
 
@@ -32,9 +32,9 @@ Correspondence: hssling@yahoo.com · ORCID 0000-0002-4771-8285
 
 ## 1. Introduction
 
-Tuberculosis control is planned against money. National strategic plans cost their activities, and the WHO Global TB Report [1] publishes, for every high-burden country, the budget required for the coming year and the funding expected against it. The difference between those two quantities — the **funding gap** — is read as a measure of under-resourcing. Funding-need figures of this kind are used in TB investment cases and advocacy [2], and the gap is shown in the Report's country comparisons [1].
+Tuberculosis control is planned against money. National strategic plans cost their activities, and the Global TB Report (WHO 2025) publishes, for every high-burden country, the budget required for the coming year and the funding expected against it. The difference between those two quantities — the **funding gap** — is read as a measure of under-resourcing. Funding-need figures of this kind are used in TB investment cases and advocacy (Reid et al. 2019), and the gap is shown in the Report's country comparisons (WHO 2025).
 
-We should be precise about what the indicator is and is not used for, because our argument does not depend on overstating it. The Global Fund's published allocation methodology takes disease burden and economic capacity as the inputs to its allocation formula, followed by a qualitative adjustment [16]; it does **not** list the WHO reported funding gap among them. The gap's influence is of a different kind — it is the figure published, quoted and compared when a programme's resourcing is discussed. An indicator need not enter a formula to shape a judgement.
+We should be precise about what the indicator is and is not used for, because our argument does not depend on overstating it. The Global Fund's published allocation methodology takes disease burden and economic capacity as the inputs to its allocation formula, followed by a qualitative adjustment (Global Fund 2024); it does **not** list the WHO reported funding gap among them. The gap's influence is of a different kind — it is the figure published, quoted and compared when a programme's resourcing is discussed. An indicator need not enter a formula to shape a judgement.
 
 An indicator used that way carries an implicit claim: that the two numbers behind it are independently determined, so their difference is informative. This paper asks whether that claim holds, and finds that for India it does not. To our knowledge, no study has examined the validity of the WHO funding-gap indicator, or the cross-country comparability of health-financing indicators of this kind.
 
@@ -50,11 +50,11 @@ A second question follows from the first. Even where financing *is* recorded, it
 
 Three public sources, retrieved in November 2026:
 
-1. **WHO TB budget dataset** (`TB_budget`, WHO release of 12 November 2026; 1,720 rows, 215 countries, 2018–2025, 43 variables): budget required and funding expected, each disaggregated into eleven line items, plus expected funding by source (domestic, Global Fund, USAID, other) and budgeted cost per patient treated [3].
-2. **WHO TB expenditure and utilisation dataset** (`TB_expenditure_utilisation`, WHO release of 25 August 2026; 2017–2026): actual expenditure and funds received, on the same line-item structure [3].
-3. **India TB Report 2024 [4], Table 16.1** (p.174): budget requested, budget estimates/approved, total releases to states, and total expenditure for 2017-18 to 2023-24, in ₹ crore.
+1. **WHO TB budget dataset** (`TB_budget`, WHO release of 12 November 2026; 1,720 rows, 215 countries, 2018–2025, 43 variables): budget required and funding expected, each disaggregated into eleven line items, plus expected funding by source (domestic, Global Fund, USAID, other) and budgeted cost per patient treated (WHO 2026a).
+2. **WHO TB expenditure and utilisation dataset** (`TB_expenditure_utilisation`, WHO release of 25 August 2026; 2017–2026): actual expenditure and funds received, on the same line-item structure (WHO 2026a).
+3. **India TB Report (Central TB Division 2024), Table 16.1** (p.174): budget requested, budget estimates/approved, total releases to states, and total expenditure for 2017-18 to 2023-24, in ₹ crore.
 
-WHO's data dictionary [5] (release of 25 August 2026) was used to establish what each variable covers. This is not incidental: an early version of this analysis mapped active case finding to `budget_prog` on the strength of the name, when the dictionary defines it as *"programme costs to **treat** drug-susceptible TB"*. Case finding is not treatment, and the mapping was wrong. Every mapping reported here was checked against its definition.
+WHO's data dictionary (WHO 2026b) (release of 25 August 2026) was used to establish what each variable covers. This is not incidental: an early version of this analysis mapped active case finding to `budget_prog` on the strength of the name, when the dictionary defines it as *"programme costs to **treat** drug-susceptible TB"*. Case finding is not treatment, and the mapping was wrong. Every mapping reported here was checked against its definition.
 
 ### 2.2 Comparing sources that are not in the same units
 
@@ -66,11 +66,11 @@ An earlier formulation compared year-on-year proportional change in each source,
 
 ### 2.3 Mapping interventions to budget lines
 
-Eleven tuberculosis interventions were mapped onto WHO budget line items by definition. Their ranking, and the definitions of the interventions themselves, are taken as given from a separate manuscript under review [6], in which they are ordered by a priority score built from the favourability of coded literature, not from a formal evidence synthesis. The mapping to budget lines does not depend on that ranking (§5). Each mapping was classified as **full** (the line covers the intervention), **partial** (the line covers part of it), or **absent** (no line exists). Mapping is declared data and is published with the code.
+Eleven tuberculosis interventions were mapped onto WHO budget line items by definition. Their ranking, and the definitions of the interventions themselves, are taken as given from a separate manuscript under review (Siddalingaiah 2026a), in which they are ordered by a priority score built from the favourability of coded literature, not from a formal evidence synthesis. The mapping to budget lines does not depend on that ranking (§5). Each mapping was classified as **full** (the line covers the intervention), **partial** (the line covers part of it), or **absent** (no line exists). Mapping is declared data and is published with the code.
 
 ### 2.4 Reproducibility
 
-All analysis is pure-Python with no third-party numerical dependency. Every figure in this paper is regenerated from the raw files by a single command, following the practice of computational reproducibility [7], and a verification suite (255 tests) checks the derived quantities, including that every number quoted here is reproduced from source rather than transcribed. Code and data: [repository URL to be inserted at acceptance].
+All analysis is pure-Python with no third-party numerical dependency. Every figure in this paper is regenerated from the raw files by a single command, following the practice of computational reproducibility (Peng 2011), and a verification suite (255 tests) checks the derived quantities, including that every number quoted here is reproduced from source rather than transcribed. Code and data: [repository URL to be inserted at acceptance].
 
 ### 2.5 Ethics
 
@@ -82,7 +82,7 @@ Not required. The analysis uses aggregated, publicly available financial and pro
 
 ### 3.1 India's reported funding gap is zero by construction
 
-In all eight years 2018–2025, India reported expected funding (`cf_tot`) **exactly equal** to budget required (`budget_tot`). The reported gap is therefore identically zero in every year — not as a finding about financing, but as a consequence of how the two fields are populated. WHO's dictionary defines `budget_tot` as "Total budget required (US Dollars)" and `cf_tot` as "Total expected funding for all budget line items (US Dollars)" [5]; neither definition states that the two should be equal, so the equality is a reporting convention we infer from the data, not one WHO documents.
+In all eight years 2018–2025, India reported expected funding (`cf_tot`) **exactly equal** to budget required (`budget_tot`). The reported gap is therefore identically zero in every year — not as a finding about financing, but as a consequence of how the two fields are populated. WHO's dictionary defines `budget_tot` as "Total budget required (US Dollars)" and `cf_tot` as "Total expected funding for all budget line items (US Dollars)" (WHO 2026b); neither definition states that the two should be equal, so the equality is a reporting convention we infer from the data, not one WHO documents.
 
 This is not universal practice. Among 106 countries with at least five years of data, **14** report budget equal to expected funding in every year. **44** report a non-zero gap in every year, including Vietnam (~72% mean gap), Nigeria (~69%), Indonesia (~59%) and China (~10%). Pakistan reports gaps of 43–66% from 2018 to 2023 and exactly zero in 2024 and 2025 — one of several countries whose reporting convention changes mid-series.
 
@@ -112,19 +112,19 @@ The two sources disagree in every overlapping year at any tolerance below 5 perc
 
 WHO data give total expenditure as **72%** of budget required across the period (range 45–98%). The national accounts give ₹15,063.46 crore spent against ₹18,388.23 crore approved — **82%** — and against ₹23,169.14 crore requested — **65%**.
 
-Two agencies, two accounting systems, two currencies, and the same direction. Where the sources disagree is on *need*; where they agree is on *execution*. Under-execution of health budgets is a recognised problem in health financing [8]. We do not explain it here: neither source records why funds went unspent, and explanations such as limited absorptive capacity would need data we do not have.
+Two agencies, two accounting systems, two currencies, and the same direction. Where the sources disagree is on *need*; where they agree is on *execution*. Under-execution of health budgets is a recognised problem in health financing (Piatti-Funfkirchen et al. 2021). We do not explain it here: neither source records why funds went unspent, and explanations such as limited absorptive capacity would need data we do not have.
 
 **A caution about the national table.** Table 16.1 is internally inconsistent. Over 2017–2021, the only years for which `released` is printed, releases sum to ₹3,825.31 crore while expenditure sums to ₹13,312.14 crore — spending 3.5 times the funds the same table reports as released — and 2017 expenditure is 150% of the approved figure. Expenditure can legitimately exceed release where states spend from carried-over or own funds, but the table does not say so, and the `released` column cannot be reconciled with `spent` from the page alone. The three published column totals reconcile exactly, so the table is internally consistent in its totals; the inconsistency lies between its rows. The ratios above use `requested`, `approved` and `spent`, and do not involve `released`.
 
 ### 3.4 Financing has domesticated almost completely
 
-Global Fund support fell from **37% of actual TB expenditure in 2017 to 1% in 2025**. Domestic financing rose from 62% to 96%. USAID contributed 1–7% throughout. Earlier work on TB financing, which ends in 2011, analysed trends in domestic and donor funding [9], and domestic spending on AIDS programmes has been analysed for 12 countries [10]; neither reaches the period studied here, and the 2017–2025 figures are our own analysis of WHO data.
+Global Fund support fell from **37% of actual TB expenditure in 2017 to 1% in 2025**. Domestic financing rose from 62% to 96%. USAID contributed 1–7% throughout. Earlier work on TB financing, which ends in 2011, analysed trends in domestic and donor funding (Floyd et al. 2013), and domestic spending on AIDS programmes has been analysed for 12 countries (Resch et al. 2015); neither reaches the period studied here, and the 2017–2025 figures are our own analysis of WHO data.
 
 This is the clearest signal in the dataset and it is monotone. It also changes what the funding-gap indicator would be *for*: on our reasoning, an indicator built to describe the external financing landscape has diminishing purchase on a programme financed almost entirely from domestic sources. We know of no study that tests this.
 
 ### 3.5 Six of eleven interventions have no budget line at all
 
-**Table 2. Interventions, in the rank order of a literature-favourability score from a manuscript under review [6], against the budget classification.**
+**Table 2. Interventions, in the rank order of a literature-favourability score from a manuscript under review (Siddalingaiah 2026a), against the budget classification.**
 
 | Rank | Intervention | WHO budget line | Coverage |
 |---:|---|---|---|
@@ -140,9 +140,9 @@ This is the clearest signal in the dataset and it is monotone. It also changes w
 | 10 | Milk pasteurisation / dairy food chain | — | **Absent** |
 | 11 | Integrated TB-HIV-diabetes care | `budget_tbhiv` | Partial — *TB/HIV only* |
 
-*Ranking and intervention definitions are taken as given from [6] (under review) and were not re-derived here. The rank is a priority-action score built from vocabulary-coded abstracts, without human validation, and its order changes with the coding rule; it is not a formal evidence ranking.*
+*Ranking and intervention definitions are taken as given from Siddalingaiah (2026a, under review) and were not re-derived here. The rank is a priority-action score built from vocabulary-coded abstracts, without human validation, and its order changes with the coding rule; it is not a formal evidence ranking.*
 
-**Six of eleven interventions are fiscally untraceable, and only two map fully.** This count does not depend on the ranking. As a secondary observation, three of the six (ranks 2, 4 and 5) fall in the top five of the literature-favourability score in [6]; because that score is not human-validated and its order is sensitive to its coding rule, we report this as descriptive and do not rest an argument on it.
+**Six of eleven interventions are fiscally untraceable, and only two map fully.** This count does not depend on the ranking. As a secondary observation, three of the six (ranks 2, 4 and 5) fall in the top five of the literature-favourability score in Siddalingaiah (2026a); because that score is not human-validated and its order is sensitive to its coding rule, we report this as descriptive and do not rest an argument on it.
 
 The pattern is not about priority. It is about **procurement**. Every full or partial mapping corresponds to something a programme *buys*: drugs (`budget_tpt`, `budget_sld`), laboratory equipment and supplies (`budget_lab`), cash transfers to patients (`budget_patsup`). Every absent mapping corresponds to something a programme *does*: ventilation and triage in facilities, finding cases actively, engaging private providers, working across the animal-human interface.
 
@@ -166,13 +166,13 @@ Three consequences follow directly.
 
 **Cross-country comparisons of TB funding gaps are not comparing like with like.** A country reporting a 70% gap and a country reporting 0% may be describing the same financial reality through different conventions. Any judgement that reads the gap as need — and any rule that someday did — would systematically favour the former. We note again that the Global Fund's formula does not, so this is a caution about interpretation rather than a claim about current allocation.
 
-**A country can domesticate its financing and simultaneously become harder to assess.** India's external financing fell to 1% of expenditure while its reported gap stayed at zero — so, on the reasoning of §3.4, neither the international indicator nor the external-financing share now carries information about domestic adequacy, which is more usually assessed through public expenditure and fiscal space [11]. The national accounts do, but they are not comparable across countries and, as shown, are internally inconsistent in at least one published table.
+**A country can domesticate its financing and simultaneously become harder to assess.** India's external financing fell to 1% of expenditure while its reported gap stayed at zero — so, on the reasoning of §3.4, neither the international indicator nor the external-financing share now carries information about domestic adequacy, which is more usually assessed through public expenditure and fiscal space (Tandon and Cashin 2010). The national accounts do, but they are not comparable across countries and, as shown, are internally inconsistent in at least one published table.
 
-**Priority-setting cannot reach interventions with no line item.** An intervention that cannot be costed in the accounts cannot be defended at budget time, tracked in execution, or evaluated for value for money. Three of the five interventions the literature-favourability score places highest are in that position, with the caveat on that score given in §5. This is a hypothesis, not a finding: a plausible mechanism by which service and systems interventions could be under-resourced relative to commodities — not because they are judged less valuable, but because the budget has no place to put them. We have not shown that they are under-resourced, and we know of no study that tests the mechanism. Programme-based budgeting, which would organise budgets around what a programme does, is reported to remain relatively superficial in many low- and middle-income countries [12]; that is compatible with the mechanism but does not demonstrate it.
+**Priority-setting cannot reach interventions with no line item.** An intervention that cannot be costed in the accounts cannot be defended at budget time, tracked in execution, or evaluated for value for money. Three of the five interventions the literature-favourability score places highest are in that position, with the caveat on that score given in §5. This is a hypothesis, not a finding: a plausible mechanism by which service and systems interventions could be under-resourced relative to commodities — not because they are judged less valuable, but because the budget has no place to put them. We have not shown that they are under-resourced, and we know of no study that tests the mechanism. Programme-based budgeting, which would organise budgets around what a programme does, is reported to remain relatively superficial in many low- and middle-income countries (Bertone et al. 2026); that is compatible with the mechanism but does not demonstrate it.
 
 ### 4.3 Replication in a second programme
 
-The same structural absence was found in a separate analysis, by the same author, of India's National AIDS and STD Control Programme [13], where sexually transmitted infection services, pre-exposure prophylaxis and surveillance likewise had no traceable line item while blood transfusion services — a commodity-intensive activity — were separately disaggregated.
+The same structural absence was found in a separate analysis, by the same author, of India's National AIDS and STD Control Programme (Siddalingaiah 2026b), where sexually transmitted infection services, pre-exposure prophylaxis and surveillance likewise had no traceable line item while blood transfusion services — a commodity-intensive activity — were separately disaggregated.
 
 Two programmes, two ministry demands, two disease areas, the same division between what is bought and what is done. That makes fiscal invisibility a candidate structural property of disease-control financing rather than an artefact of one programme's accounts.
 
@@ -180,7 +180,7 @@ Two programmes, two ministry demands, two disease areas, the same division betwe
 
 Both findings have concrete, low-cost remedies.
 
-**Publish unmet need as its own field.** WHO's reporting form could ask for budget required, funding expected **and** a separate statement of whether expected funding reflects need or availability. One additional field would make the existing indicator interpretable and would distinguish the 14 countries from the 44. Modelled estimates of resource need for health systems generally [14] and of TB spending by source and function [15] exist, but they are external reconstructions; they do not replace the reporting form stating the distinction itself.
+**Publish unmet need as its own field.** WHO's reporting form could ask for budget required, funding expected **and** a separate statement of whether expected funding reflects need or availability. One additional field would make the existing indicator interpretable and would distinguish the 14 countries from the 44. Modelled estimates of resource need for health systems generally (Stenberg et al. 2017) and of TB spending by source and function (Su et al. 2020) exist, but they are external reconstructions; they do not replace the reporting form stating the distinction itself.
 
 **Tag expenditure to interventions, not only to commodity classes.** A programme that reports what it spent on active case finding, infection control and private-sector engagement — even approximately, even as a share — becomes auditable on those activities. Without such tagging, no quantity of analysis can recover what was spent on them.
 
@@ -194,7 +194,7 @@ This is a secondary analysis of reported data; we observe reporting behaviour, n
 
 The intervention-to-budget-line mapping reflects analytic judgement, albeit judgement anchored to published definitions rather than to names. Readers who disagree with a specific mapping can recompute from the published file.
 
-The ranking used to order the eleven interventions is external to this analysis and is not defended here [6]. It comes from a manuscript under review, rests on the favourability of coded literature rather than a formal evidence synthesis, and that manuscript reports that its rank order is sensitive to the coding rule used. The count of interventions with no budget line does not depend on the ranking being correct, only on the interventions being plausible candidates; the statement that three of the top five are among them does depend on it, and is descriptive only for that reason.
+The ranking used to order the eleven interventions is external to this analysis and is not defended here (Siddalingaiah 2026a). It comes from a manuscript under review, rests on the favourability of coded literature rather than a formal evidence synthesis, and that manuscript reports that its rank order is sensitive to the coding rule used. The count of interventions with no budget line does not depend on the ranking being correct, only on the interventions being plausible candidates; the statement that three of the top five are among them does depend on it, and is descriptive only for that reason.
 
 The national accounts cover 2017-18 to 2023-24 while the WHO budget data cover 2018–2025, so the overlapping window for direct comparison is six years.
 
@@ -214,22 +214,37 @@ Neither finding is about how much money tuberculosis control receives. Both are 
 
 ## References
 
-1. World Health Organization. Global tuberculosis report 2025. Geneva: World Health Organization; 2025.
-2. Reid MJA, Arinaminpathy N, Bloom A, Bloom BR, Boehme C, Chaisson R, et al. Building a tuberculosis-free world: the Lancet Commission on tuberculosis. Lancet. 2019;393(10178):1331-84. doi:10.1016/S0140-6736(19)30024-8
-3. World Health Organization. Global Tuberculosis Programme country data: TB budget, and TB expenditure and utilisation datasets. Geneva: World Health Organization; 2026. Available from: https://extranet.who.int/tme/ [data files dated 25 August and 12 November 2026]. This data-collection system no longer accepts updates; the archived input files are deposited with the analysis code.
-4. Central TB Division, Ministry of Health and Family Welfare, Government of India. India TB Report 2024: National TB Elimination Programme annual report. New Delhi: Ministry of Health and Family Welfare; 2024.
-5. World Health Organization. Global Tuberculosis Programme data dictionary [file TB_dictionary_2026-08-25.csv]. Geneva: World Health Organization; 2026. Archived with the analysis code.
-6. Siddalingaiah HS. Drug-resistant tuberculosis in India, 2017-2024: improving outcomes, no worsening axis, and a caution for NTEP trend analysis. Manuscript IJTB-S-26-01305, submitted to the Indian Journal of Tuberculosis, 13 November 2026. Under review; unpublished.
-7. Peng RD. Reproducible research in computational science. Science. 2011;334(6060):1226-7. doi:10.1126/science.1213847
-8. Piatti-Funfkirchen M, Barroy H, Pivodic F, Margini F. Budget execution in health. Washington, DC: World Bank; 2021. doi:10.1596/36583
-9. Floyd K, Fitzpatrick C, Pantoja A, Raviglione M. Domestic and donor financing for tuberculosis care and control in low-income and middle-income countries: an analysis of trends, 2002-11, and requirements to meet 2015 targets. Lancet Glob Health. 2013;1(2):e105-15. doi:10.1016/S2214-109X(13)70032-9
-10. Resch S, Ryckman T, Hecht R. Funding AIDS programmes in the era of shared responsibility: an analysis of domestic spending in 12 low-income and middle-income countries. Lancet Glob Health. 2015;3(1):e52-61. doi:10.1016/S2214-109X(14)70342-0
-11. Tandon A, Cashin C. Assessing public expenditure on health from a fiscal space perspective. Washington, DC: World Bank; 2010. (HNP Discussion Paper.) doi:10.1596/13613
-12. Bertone MP, Barroy H, Sparkes S, Sempe L, Yungrattanachai M, Witter S. Political economy of budgeting reforms: a comparative analysis of the adoption and implementation of programme-based budgeting in health across seven LMIC countries. Int J Health Plann Manage. 2026 Sep 29 [online ahead of print]. doi:10.1002/hpm.70142
-13. Siddalingaiah HS. India's human immunodeficiency virus and sexually transmitted infection response at the close of NACP-V: an evidence-practice gap analysis and a priority agenda for clinical sexually transmitted infection services. J Skin Sex Transm Dis. doi:10.25259/JSSTD_120_2026 [accepted 10 September 2026; in production, volume and pages not yet assigned].
-14. Stenberg K, Hanssen O, Edejer TT, Bertram M, Brindley C, Meshreky A, et al. Financing transformative health systems towards achievement of the health Sustainable Development Goals: a model for projected resource needs in 67 low-income and middle-income countries. Lancet Glob Health. 2017;5(9):e875-87. doi:10.1016/S2214-109X(17)30263-2
-15. Su Y, Garcia Baena I, Harle AC, Crosby SW, Micah AE, Siroka A, et al. Tracking total spending on tuberculosis by source and function in 135 low-income and middle-income countries, 2000-17: a financial modelling study. Lancet Infect Dis. 2020;20(8):929-42. doi:10.1016/S1473-3099(20)30124-9
-16. The Global Fund to Fight AIDS, Tuberculosis and Malaria. Allocation methodology for Grant Cycle 8 (2026-2028 allocation period). Board paper GF/B52/08B, 52nd Board Meeting, 20-22 November 2024. Geneva: The Global Fund; 2024. Available from: https://archive.theglobalfund.org/media/15310/archive_bm52-08b-allocation-methodology-gc8_report_en.pdf
+Bertone MP, Barroy H, Sparkes S et al. 2026. Political economy of budgeting reforms: a comparative analysis of the adoption and implementation of programme-based budgeting in health across seven LMIC countries. *The International Journal of Health Planning and Management*, published online 29 September 2026. doi: 10.1002/hpm.70142
+
+Central TB Division, Ministry of Health and Family Welfare, Government of India. 2024. *India TB Report 2024: National TB Elimination Programme Annual Report*. New Delhi: Ministry of Health and Family Welfare.
+
+Floyd K, Fitzpatrick C, Pantoja A et al. 2013. Domestic and donor financing for tuberculosis care and control in low-income and middle-income countries: an analysis of trends, 2002-11, and requirements to meet 2015 targets. *The Lancet Global Health* **1**: e105-15.
+
+Global Fund to Fight AIDS, Tuberculosis and Malaria. 2024. *Allocation Methodology for Grant Cycle 8 (2026-2028 Allocation Period)*. Board paper GF/B52/08B, 52nd Board Meeting, 20-22 November 2024. Geneva: The Global Fund. https://archive.theglobalfund.org/media/15310/archive_bm52-08b-allocation-methodology-gc8_report_en.pdf, accessed 13 November 2026.
+
+Peng RD. 2011. Reproducible research in computational science. *Science* **334**: 1226-7.
+
+Piatti-Funfkirchen M, Barroy H, Pivodic F et al. 2021. *Budget Execution in Health*. Washington, DC: World Bank. doi: 10.1596/36583
+
+Reid MJA, Arinaminpathy N, Bloom A et al. 2019. Building a tuberculosis-free world: the Lancet Commission on tuberculosis. *The Lancet* **393**: 1331-84.
+
+Resch S, Ryckman T, Hecht R. 2015. Funding AIDS programmes in the era of shared responsibility: an analysis of domestic spending in 12 low-income and middle-income countries. *The Lancet Global Health* **3**: e52-61.
+
+Siddalingaiah HS. 2026a. Drug-resistant tuberculosis in India, 2017-2024: improving outcomes, no worsening axis, and a caution for NTEP trend analysis. Manuscript IJTB-S-26-01305, submitted to the *Indian Journal of Tuberculosis*, 13 November 2026. Under review.
+
+Siddalingaiah HS. 2026b. India's human immunodeficiency virus and sexually transmitted infection response at the close of NACP-V: an evidence-practice gap analysis and a priority agenda for clinical sexually transmitted infection services. *Journal of Skin and Sexually Transmitted Diseases*, in production; volume and pages not yet assigned. doi: 10.25259/JSSTD_120_2026
+
+Stenberg K, Hanssen O, Edejer TT et al. 2017. Financing transformative health systems towards achievement of the health Sustainable Development Goals: a model for projected resource needs in 67 low-income and middle-income countries. *The Lancet Global Health* **5**: e875-87.
+
+Su Y, Garcia Baena I, Harle AC et al. 2020. Tracking total spending on tuberculosis by source and function in 135 low-income and middle-income countries, 2000-17: a financial modelling study. *The Lancet Infectious Diseases* **20**: 929-42.
+
+Tandon A, Cashin C. 2010. *Assessing Public Expenditure on Health from a Fiscal Space Perspective*. Health, Nutrition and Population Discussion Paper. Washington, DC: World Bank. doi: 10.1596/13613
+
+World Health Organization (WHO). 2025. *Global Tuberculosis Report 2025*. Geneva: World Health Organization.
+
+World Health Organization (WHO). 2026a. Global Tuberculosis Programme country data: TB budget, and TB expenditure and utilisation datasets. Geneva: World Health Organization. https://extranet.who.int/tme/, data files dated 25 August and 12 November 2026. This data-collection system no longer accepts updates; the archived input files are deposited with the analysis code.
+
+World Health Organization (WHO). 2026b. Global Tuberculosis Programme data dictionary (file TB_dictionary_2026-08-25.csv). Geneva: World Health Organization. Archived with the analysis code.
 
 ---
 

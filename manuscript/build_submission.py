@@ -63,8 +63,12 @@ def blind(text: str) -> tuple[str, int]:
     i = text.find("## Notes for the author")
     if i != -1:
         text = text[:i].rstrip() + "\n"
-    # self-citations that name the author
-    text = re.sub(r"Siddalingaiah HS?\.?", "[Author]", text)
+    # Self-citations that name the author. Paper A uses Health Policy and
+    # Planning's author-date style, so the surname also appears bare, as in
+    # "(Siddalingaiah 2026a)" and "Siddalingaiah (2026a, under review)". Both
+    # journals reviewing these papers are double-anonymized, so the surname
+    # must go in every form it takes.
+    text = re.sub(r"Siddalingaiah(?: HS?)?\.?", "[Author]", text)
     # The deposit identifiers de-anonymise the submission: the repository URL
     # carries the author's username, and resolving the DOI shows the author
     # record. A journal reviewing blind expects these to be withheld and given
@@ -96,7 +100,12 @@ def main() -> int:
         nxt = reflist.find(chr(10) + '## ')
         if nxt != -1:
             reflist = reflist[:nxt]
-        refs = len(re.findall(r'^\d+\. ', reflist, flags=re.M))
+        # Paper A uses Health Policy and Planning's author-date style, paper B
+        # uses numbered Vancouver. Count whichever this one is, rather than
+        # silently reporting zero when the style changes -- which it did.
+        refs = (len(re.findall(r'^\d+\. ', reflist, flags=re.M))
+                or len(re.findall(r'^[A-Z][^\n|]*?\.\s\d{4}[a-z]?\.', reflist, flags=re.M)))
+        assert refs, f"{key}: counted no references; the list style may have changed"
         tables = len(re.findall(r"^\*\*Table \d+\.", src, flags=re.M))
 
         text, _ = blind(src)
@@ -113,9 +122,35 @@ def main() -> int:
         # one, and having both means the choice is made at upload, not here.
         (d / "04_manuscript_unblinded.md").write_text(src, encoding="utf-8")
 
-    print("\nState these counts on the title pages. Do not retype them from memory.")
+        stamp_counts(d / "01_title_page.md", abstract, body, tables, refs)
+
+    print("\nThese counts are written into the title pages by this script. Type them "
+          "into the portal from here, not from memory.")
     print(f"\n{to_docx()}")
     return 0
+
+
+def stamp_counts(page: Path, abstract: int, body: int, tables: int,
+                 refs: int) -> None:
+    """Write the derived counts into the title page's count table.
+
+    These were hand-maintained and went stale three times in one afternoon,
+    each time because an edit elsewhere moved a number. Each row must match,
+    or the title page has been restructured and the build should say so
+    rather than quietly leave the old figure in place.
+    """
+    if not page.exists():
+        return
+    s = page.read_text(encoding="utf-8")
+    rows = [(r"(\| Abstract \(structured\) \| )[\d,]+( words \|)", abstract),
+            (r"(\| Main text,[^|]*\| )[\d,]+( words \|)", body),
+            (r"(\| Tables \| )\d+( \|)", tables),
+            (r"(\| References \| )\d+( \|)", refs)]
+    for pat, value in rows:
+        s, n = re.subn(pat, lambda m: f"{m.group(1)}{value:,}{m.group(2)}", s)
+        if n != 1:
+            raise SystemExit(f"{page.name}: expected one row for {pat!r}, found {n}")
+    page.write_text(s, encoding="utf-8")
 
 
 def to_docx() -> str:

@@ -3,3 +3,6 @@ __pycache__/
 .superpowers/
 outputs/
 .pytest_cache/
+
+# publisher guideline PDFs: copyrighted, keep local
+manuscript/submission/*.pdf
