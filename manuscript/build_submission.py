@@ -250,10 +250,21 @@ def write_ijtb_extras(d: Path, lay: dict, src: str) -> None:
     caps = src[src.index("## Figure captions") + len("## Figure captions"):]
     if "\n---" in caps:
         caps = caps[:caps.index("\n---")]
+    # Each figure gets its own heading, its preview embedded, then its caption,
+    # as in the author's IJTB-S-26-01305 captions file: an editor or reviewer
+    # sees figure and caption together without opening the TIFF masters.
+    blocks = []
+    for m in re.finditer(r"(?ms)^\*\*Figure (\d+)\..*?(?=^\*\*Figure \d+\.|\Z)", caps):
+        k = int(m.group(1))
+        preview = lay["preview"].format(n=91 + k, k=k)
+        blocks.append(f"## Figure {k}\n\n![]({preview}){{width=6.3in}}\n\n"
+                      + m.group(0).strip())
+    figures = len(re.findall(r"(?m)^\*\*Figure \d+\.", src))
+    assert len(blocks) == figures, f"{len(blocks)} caption blocks for {figures} figures"
     (d / lay["captions"]).write_text(
-        f"# Figure captions\n\n**Manuscript.** {title}\n\n"
-        "Figures are supplied separately as 600 dpi TIFF files for production, with PNG "
-        "previews.\n\n" + caps.strip() + "\n", encoding="utf-8")
+        f"# Figures\n\n**Manuscript.** {title}\n\n"
+        "Figures are supplied separately as 600 dpi TIFF files for production; PNG "
+        "previews are embedded below.\n\n" + "\n\n".join(blocks) + "\n", encoding="utf-8")
 
 
 def for_submission(text: str) -> str:
@@ -355,7 +366,9 @@ def to_docx() -> str:
         docx = md.with_suffix(".docx")
         proc = subprocess.run(
             [pandoc, str(md), "-f", "markdown+pipe_tables", "-o", str(docx),
-             "--standalone", "--wrap=none"],
+             "--standalone", "--wrap=none",
+             # images are named relative to their own folder, not the cwd
+             f"--resource-path={md.parent}"],
             capture_output=True, text=True, encoding="utf-8", errors="replace")
         ok = proc.returncode == 0 and docx.exists()
         if ok:

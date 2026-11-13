@@ -61,6 +61,19 @@ def main() -> int:
         if f.stem in names and not re.search(
                 r"Word count:\s*\*?\*?\s*[\d,]+ words", t):
             errs.append(f"  {f.relative_to(S)}: no word count on the title section")
+    # A captions file is where a reviewer sees each figure beside its caption.
+    # Paper A's was first built with the captions alone and no images, unlike
+    # the author's IJTB-S-26-01305 file, which embedded every preview.
+    for key, lay in LAYOUT.items():
+        if "captions" not in lay:
+            continue
+        docx = S / key / Path(lay["captions"]).with_suffix(".docx")
+        want = len(list((S / key).glob(lay["figure_glob"])))
+        got = (len([n for n in zipfile.ZipFile(docx).namelist() if n.startswith("word/media/")])
+               if docx.exists() else 0)
+        if got != want:
+            errs.append(f"  {docx.relative_to(S)}: embeds {got} figure image(s) for "
+                        f"{want} figure file(s)")
     if errs:
         print(f"FAILED: {len(errs)} problem(s) in the files that would be uploaded")
         print("\n".join(errs))
