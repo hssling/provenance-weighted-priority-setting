@@ -264,6 +264,10 @@ Three separate corrections changed the NTEP composites. Each is reported because
 | MDR_TSR_pct | 1.0 | declared 8 | 1.0 | 1.0 | 0.433 |
 | XDR_TSR_pct | 1.0 | declared 8 | 1.0 | 1.0 | 0.433 |
 
+Leave-one-out reference pool (the other five series), comparable steps: `RRMDR_notif_100k` 29,
+`RR_new_pct` 29, `preXDR_fqr_pct` 31, `MDR_TSR_pct` 28, `XDR_TSR_pct` 28, `BDQ_res_pct` 35; pooled
+(all six) 36.
+
 (`BDQ_res_pct`, two points: composite 1.0 on one observation; not in the grid.) No test scored
 exactly 0.0; no series is unassessable.
 
@@ -275,13 +279,15 @@ under the asymmetric statistic the disclosure mechanism was never exercised on r
 ### 4.3.1 The one positive result: an undeclared level shift found without looking for it
 
 T3 and T4 flag **`RR_new_pct` 2021: 2.5927 to 4.7320, +82.5%** (size 0.825 against a bound of
-0.337, derived leave-one-out from the *other five* series, so without reference to this series).
+0.337, derived leave-one-out from the *other five* series, so without reference to this series;
+that reference pool is 29 comparable steps).
 The series carries no note; the shift is **undeclared (silent)**. It is persistent: 2022 4.5076,
 2023 4.1850, 2024 3.6262 all stay above the pre-shift 2.5927. This is the series the specification
 names as motivating case #1 (DR-TB surveillance, apparent worsening of rifampicin resistance, which
 the specification attributes to a 2021 WHO definitional change plus DST scale-up). The instrument
-located the 2021 step from the data alone. **This is the strongest evidence in the project that the
-instrument works.** It is also robust to the percentile: the 2021 step is flagged at p80, p90, p95
+located the 2021 step from the data alone. This is the clearest positive result in the project, but
+its evidence base is modest: a 29-step reference pool drawn from five related WHO series, and one
+series. It is also robust to the percentile: the 2021 step is flagged at p80, p90, p95
 and p99, leave-one-out and pooled. Caveats: a flag is a candidate, not proof of a definitional
 change (the data alone cannot say why it moved), and it is one series.
 
@@ -298,14 +304,28 @@ change (the data alone cannot say why it moved), and it is one series.
   specification says a missed known case is "a reportable limitation, not a reason to tune the
   test". The bound was correctly not tuned. But the cause was not the bound: it was the structural
   blindness of the statistic to falls (2.2), which no choice of bound could have fixed.
-- **After the symmetric correction** (bound unchanged at 0.3211, derived and not adjusted), the 2020
+- **After the symmetric correction** (bound unchanged at 0.3211, derived and not adjusted; the leave-one-out reference pool for
+  `RRMDR_notif_100k` is 29 steps), the 2020
   step has size 0.347, exceeds the bound, is **declared** by the series note, and T4 (0.786) now
   exceeds T3 (0.714): the disclosure mechanism fires on real data for the first time, in one step
   on one series (T4 differs from T3 on 1 of 6 series). The same series' 2018 step (+47.9%) is
   flagged and silent.
-- **Fragility, reported.** The detection is bound-sensitive: size 0.347 sits just above the
-  leave-one-out p95 bound (0.321). It is flagged at p80, p90 and p95, but **not at p99** (bound
-  0.684) and **not under the pooled-reference p95** (bound 0.380; composite 0.857 against 0.786).
+- **Fragility, reported.** The detection is bound-sensitive and the cliff is adjacent to the
+  adopted convention: detection is lost anywhere above approximately **p96.6**. The 2020 step
+  size is 0.3467 against a p95 bound of 0.3211, a margin of about 7%. Sweep (leave-one-out):
+
+  | percentile | LOO bound | 2020 flagged |
+  |---|---|---|
+  | p80 | 0.1929 | yes |
+  | p90 | 0.2762 | yes |
+  | **p95** | **0.3211** | **yes (margin about 7%)** |
+  | p97.5 | 0.4727 | no |
+  | p99 | 0.6842 | no |
+
+  It is also **not flagged under the pooled-reference p95** (bound 0.380; composite 0.857 against 0.786).
+  The reference pool is small: at n=29 the p95 is a linear interpolation between the 27th and 28th
+  order statistics (0.3202 from `preXDR_fqr_pct` 2020 and 0.3217 from `XDR_TSR_pct` 2018), so the
+  bound rests on two adjacent observations.
   The earlier statement that "pooling all six gives the same composite" is no longer true. The
   leave-one-out bound is kept for the reason given in 4.3 (no series sets its own yardstick), not
   because it catches this case.
