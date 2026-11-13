@@ -281,7 +281,18 @@ exclude it.
   with the placement confirmed independently by all three published column
   totals (23169.14, 18388.23, 15063.46).
 
-A project about data provenance cannot leave its own provenance undocumented.
+A project about data provenance cannot leave its own provenance undocumented. Until 13 November 2026 it largely
+did: the three entries above were the whole record, there were no checksums, and six of the nine input files had no
+stated source at all. `data/raw_file_manifest.csv` now carries file id, authority, source, release date, SHA-256 and
+size for every input, and `verification/check_data_manifest.py` re-hashes them and fails the build on any mismatch,
+missing file or unlisted file. Where the acquisition route was not recorded at the time, the manifest says exactly
+that rather than reconstructing a plausible URL -- which is the distinction both papers are about.
+
+The manifest's column set is taken from the CAG-ICSSR road-safety project (`research_project/data_raw/
+raw_file_manifest.csv`), which records authority, resource page, direct download URL, retrieval date and SHA-256 for
+every raw file. That project's blind-file quality-control checklist also prompted the check that the blinded .docx
+files carry no author name in their document properties; pandoc leaves those empty, but opening and re-saving in Word
+would not.
 
 ---
 

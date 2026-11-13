@@ -173,7 +173,33 @@ def to_docx() -> str:
     msg = f"pandoc: wrote {len(made)} .docx beside the Markdown"
     if failed:
         msg += f"; FAILED on {failed}"
-    return msg
+    return msg + "\n" + check_docx_metadata()
+
+
+def check_docx_metadata() -> str:
+    """A blinded .docx can name its author in document properties even when
+    the text does not. Pandoc leaves those empty, but opening and re-saving
+    in Word stamps the account name into dc:creator and cp:lastModifiedBy,
+    and a reviewer sees it in File > Properties. Checked, not assumed.
+    """
+    import zipfile
+    leaks = []
+    for docx in sorted(OUT.rglob("03_manuscript_blinded.docx")):
+        try:
+            z = zipfile.ZipFile(docx)
+            meta = " ".join(z.read(n).decode("utf-8", "ignore")
+                            for n in ("docProps/core.xml", "docProps/app.xml")
+                            if n in z.namelist())
+        except Exception as exc:                       # noqa: BLE001
+            leaks.append(f"{docx.name}: unreadable ({exc})")
+            continue
+        for term in ("Siddalingaiah", "hssling", "Shridevi", "0000-0002"):
+            if term in meta:
+                leaks.append(f"{docx.relative_to(OUT).as_posix()}: "
+                             f"document properties contain {term!r}")
+    if leaks:
+        raise SystemExit("blinded .docx metadata leak:\n  " + "\n  ".join(leaks))
+    return "blinded .docx document properties: no author metadata"
 
 
 if __name__ == "__main__":

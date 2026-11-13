@@ -252,7 +252,7 @@ World Health Organization (WHO). 2026b. Global Tuberculosis Programme data dicti
 
 **Ethical clearance.** Not required (see Methods 2.5).
 
-**Data availability.** All inputs are publicly available: WHO TB budget and expenditure datasets, and the India TB Report 2024. Analysis code, the archived input files, the intervention-to-budget-line mapping with its definitional basis, and the verification suite are deposited at [repository and archive DOI withheld for blind review].
+**Data availability.** All inputs are publicly available: WHO TB budget and expenditure datasets, and the India TB Report 2024. Analysis code, the archived input files, the intervention-to-budget-line mapping with its definitional basis, and the verification suite are deposited at [repository and archive DOI withheld for blind review]. Every input file is listed in `data/raw_file_manifest.csv` with its SHA-256 digest, so the archived copies can be checked byte for byte against the ones analysed. The manifest also records what is not known: for six of the nine files the download route was not noted at acquisition, and it says so rather than reconstructing a plausible one.
 
 **Use of generative artificial intelligence.** The author used a large language model as a drafting and analysis assistant. All analytical decisions, data verification and conclusions are the author's. The author reviewed and edited all content and takes full responsibility for it.
 
