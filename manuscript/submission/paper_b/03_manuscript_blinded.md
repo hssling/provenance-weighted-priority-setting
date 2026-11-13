@@ -100,7 +100,7 @@ Of 443 variables meeting the inclusion threshold across the six files, **42 are 
 
 The last column is a sensitivity analysis on the S0b rule (§2.2). Excluding untestable variables, laboratory repetition is 63.0% against 13.0-15.6% for the budget, expenditure and notification files, 4.0 to 4.8 times as high; scoring them as zero, it is 53.5%, 3.4 to 4.1 times as high. The division holds under either rule; it does not depend on the rule that favours it.
 
-**Repeated zeros do not produce the division.** A repeated zero is a stable absence of events, not a carried-forward estimate, and most variables in these files are zero-dominated (§3.5). Repetition was therefore recomputed over the subset of adjacent pairs in which at least one of the two values is non-zero (Table 2). Every file falls, but not equally: the three large counted files converge on 5.2-9.2% while laboratory diagnostic services remains at 48.0%, a 5.2 to 9.2-fold gap, wider in relative terms than the unrestricted 4.0 to 4.8-fold one. The potential confound also runs the wrong way to explain the finding. Laboratory diagnostic services has the **lowest** share of zero-dominated variables of any file (24 of 41, 59%) and the highest repetition; treatment outcomes has the highest share (65 of 66, 98%) and, once zero-to-zero pairs are removed, ordinary repetition. The restricted statistic is reported only; it does not feed the classification in Table 1, which stands as specified.
+**Repeated zeros do not produce the division (Figure 1).** A repeated zero is a stable absence of events, not a carried-forward estimate, and most variables in these files are zero-dominated (§3.5). Repetition was therefore recomputed over the subset of adjacent pairs in which at least one of the two values is non-zero (Table 2). Every file falls, but not equally: the three large counted files converge on 5.2-9.2% while laboratory diagnostic services remains at 48.0%, a 5.2 to 9.2-fold gap, wider in relative terms than the unrestricted 4.0 to 4.8-fold one. The potential confound also runs the wrong way to explain the finding. Laboratory diagnostic services has the **lowest** share of zero-dominated variables of any file (24 of 41, 59%) and the highest repetition; treatment outcomes has the highest share (65 of 66, 98%) and, once zero-to-zero pairs are removed, ordinary repetition. The restricted statistic is reported only; it does not feed the classification in Table 1, which stands as specified.
 
 **Table 2. Repetition excluding adjacent pairs in which both values are zero.** Restricted to variables with at least 20 such pairs.
 
@@ -284,6 +284,12 @@ The remedy is a vintage flag per value, which the reporting country is presumabl
 11. Wilkinson MD, Dumontier M, Aalbersberg IJ, Appleton G, Axton M, Baak A, et al. The FAIR Guiding Principles for scientific data management and stewardship. Sci Data. 2016;3:160018. doi:10.1038/sdata.2016.18
 12. Herschel M, Diestelkamper R, Ben Lahmar H. A survey on provenance: what for? What form? What from? VLDB J. 2017;26(6):881-906. doi:10.1007/s00778-017-0486-1
 13. Gebru T, Morgenstern J, Vecchione B, Vaughan JW, Wallach H, Daume H 3rd, et al. Datasheets for datasets. Commun ACM. 2021;64(12):86-92. doi:10.1145/3458723
+
+## Figure captions
+
+**Figure 1. Repetition by dataset, before and after excluding repeated zeros.** Each point is one continuous variable; the horizontal position is the share of that variable's adjacent country-year pairs holding an identical value. The vertical rule marks the dataset median. The left panel uses all adjacent pairs; the right panel uses only pairs in which at least one of the two values is non-zero, since a repeated zero is a stable absence rather than a carried-forward estimate. Laboratory diagnostic services, shown in a separate colour, separates from the other five datasets in both panels, and the separation is wider in the right panel. TPT, tuberculosis preventive treatment.
+
+*Alt text: Two side-by-side dot plots of six WHO tuberculosis datasets. In the left panel most datasets cluster below 20% repetition while laboratory diagnostic services sits around 63%. In the right panel, excluding pairs where both values are zero, the other datasets fall to between 2% and 9% while laboratory diagnostic services remains at 48%, so the gap widens.*
 
 ---
 
