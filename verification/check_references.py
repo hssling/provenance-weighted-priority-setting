@@ -134,9 +134,44 @@ def check_author_date(text: str) -> list[str]:
     return errs + metadata("paper A", entries)
 
 
+def keywords(s: str) -> set[str]:
+    stop = {"health", "world", "organization", "geneva", "available", "annual",
+            "between", "should", "states", "which", "their", "these", "about"}
+    return {w for w in re.findall(r"[a-z]{6,}", s.lower()) if w not in stop}
+
+
+def check_supplement_citations(main_text: str, supp: Path) -> list[str]:
+    """A supplement in a separate file cites the main list by number, so a
+    renumbering of the main list does not reach it. After one did, its [5]
+    pointed at a newborn-indicator review instead of the WHO dictionary --
+    a valid number on the wrong paper, which a range check cannot see. So
+    each citation's surrounding text must share a keyword with the reference
+    it now points to."""
+    if not supp.exists():
+        return []
+    _, entries, _ = split(main_text)
+    by_num = {m.group(1): e for e in entries if (m := re.match(r"(\d+)\. (.*)", e))}
+    text = supp.read_text(encoding="utf-8")
+    errs = []
+    for m in re.finditer(r"\[(\d+(?:\s*,\s*\d+)*)\]", text):
+        nums = re.split(r"\s*,\s*", m.group(1))
+        if "0" in nums:            # "[0, 100]" is an interval; no reference is numbered 0
+            continue
+        context = keywords(text[max(0, m.start() - 300):m.start()])
+        for n in nums:
+            if n not in by_num:
+                errs.append(f"  paper B supplement: cites [{n}], which is not in the main list")
+            elif not context & keywords(by_num[n]):
+                errs.append(f"  paper B supplement: [{n}] points to '{by_num[n][:55]}...', "
+                            f"which shares nothing with the text citing it")
+    return errs
+
+
 def main() -> int:
     errs = check_author_date(A.read_text(encoding="utf-8"))
     errs += check_numbered(B.read_text(encoding="utf-8"))
+    errs += check_supplement_citations(
+        B.read_text(encoding="utf-8"), ROOT / "manuscript" / "supplementary_paper_b.md")
     if errs:
         print(f"FAILED: {len(errs)} reference problem(s)")
         print("\n".join(errs))

@@ -55,19 +55,16 @@ The table gives each journal's **limits** only. The paper's **current counts** a
 ## 2. Files to upload
 
 ```
-paper_a/   paper_b/
+paper_a/   and   paper_b/        each folder is the complete upload for its journal
   01_title_page.docx            title page, with the word count the journal asks for
   02_cover_letter.docx          cover letter
-  03_manuscript_blinded.docx    → upload this one for Paper A (double-anonymized)
-  04_manuscript_unblinded.docx  → upload this one for Paper B (not anonymized)
+  03_manuscript_blinded.docx    -> upload this one for Paper A (double-anonymized)
+  04_manuscript_unblinded.docx  -> upload this one for Paper B (not anonymized)
   05_RECORD_checklist.docx      reporting checklist
   06_supplementary.docx         supplementary material, online only
-  07_tables.docx                every table, with its caption and note, in one separate file
-figures/
-  figure_a1_two_accounts_of_the_same_shortfall.png   Paper A, Figure 1
-  figure_a2_interventions_to_budget_lines.png        Paper A, Figure 2
-  figure_b1_screen_flow.png                          Paper B, Figure 1
-  figure_b2_repetition_by_dataset.png                Paper B, Figure 2
+  07_tables.docx                every table, with its caption and note
+  08_Figure_1.png               Figure 1, 300 dpi
+  08_Figure_2.png               Figure 2, 300 dpi
 ```
 
 All four figures are 300 dpi PNG and at least 3,600 pixels wide, which is IJE's stated minimum and

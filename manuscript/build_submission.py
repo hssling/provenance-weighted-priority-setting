@@ -42,7 +42,12 @@ IDENTIFYING = [
 
 
 def count_words(text: str) -> int:
-    text = re.sub(r"^\|.*$", "", text, flags=re.M)        # tables
+    """Main-text words as both journals define them: tables are excluded, and
+    a table's caption and the note beneath it are part of the table. Section
+    headings are kept, which errs on the side of over-counting."""
+    text = re.sub(r"^\|.*$", "", text, flags=re.M)                  # table rows
+    text = re.sub(r"^\*\*Table \d+\..*$", "", text, flags=re.M)     # captions
+    text = re.sub(r"^\[Table \d+ about here\]$", "", text, flags=re.M)
     text = re.sub(r"\*\*|`|#", "", text)
     return len(text.split())
 
@@ -134,9 +139,17 @@ def main() -> int:
 
         stamp_counts(d / "01_title_page.md", abstract, body, tables, refs)
 
-        # The supplementary file belongs with its paper, so it converts to
-        # .docx with everything else and cannot be forgotten at upload.
+        # Figures belong in the paper's own folder, named by the figure number
+        # the text cites, so each folder is the complete upload for its journal.
         letter = key[-1]
+        figdir = HERE.parent / "figures"
+        figs = sorted(figdir.glob(f"figure_{letter}*.png"))
+        assert figs, f"{key}: no figures found in {figdir}; run figures/make_figures.py"
+        for old in d.glob("08_Figure_*.png"):
+            old.unlink()
+        for fig in figs:
+            n = re.match(rf"figure_{letter}(\d+)_", fig.name).group(1)
+            shutil.copyfile(fig, d / f"08_Figure_{n}.png")
         supp = HERE / f"supplementary_paper_{letter}.md"
         if supp.exists():
             (d / "06_supplementary.md").write_text(

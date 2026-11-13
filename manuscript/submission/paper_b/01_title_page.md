@@ -16,11 +16,11 @@ ORCID 0000-0002-4771-8285
 
 | item | count |
 |---|---:|
-| Abstract (structured) | 250 words |
-| Main text, Background to Conclusions, excluding tables and references | 2,998 words |
+| Abstract (structured) | 245 words |
+| Main text, Background to Conclusions, excluding tables and references | 2,930 words |
 | Tables | 6 |
 | Figures | 0 |
-| References | 14 |
+| References | 15 |
 
 **Keywords.** Data Accuracy; Datasets as Topic; Health Services Research; Reproducibility of Results; Tuberculosis; World Health Organization
 
