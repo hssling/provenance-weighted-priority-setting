@@ -20,7 +20,7 @@ The *International Journal of Epidemiology* requires RECORD for studies using ro
 | **STROBE 5** | Setting, locations, periods | §2.1 and Supplementary S0 give each file's rows, years and columns | §2.1; Supplementary S0 |
 | **STROBE 6a / RECORD 6.1** | Eligibility criteria and selection methods | Every numeric variable with ≥100 non-missing values; the two rules that set variables aside (S0, S0b) are stated with their counts | §2.2; Figure 1 |
 | **RECORD 6.2** | Reference any validation of the codes or algorithms used for selection | **None exists.** We know of no published validation of these screens for country-reported programme data, and we say so rather than implying one | §2.2; §5 |
-| **RECORD 6.3** | If validation was done for this study, give methods and results | The screen's verdicts are compared against WHO's own dictionary labels as an external standard (§3.5); agreement is reported with its chance probability | §3.5 |
+| **RECORD 6.3** | If validation was done for this study, give methods and results | The screen's verdicts are compared against WHO's own dictionary labels as an external standard (§3.4); agreement is reported with its chance probability | §3.4 |
 | **RECORD 6.4** | Consider a flow diagram for the data linkage process | No linkage; a flow diagram is nonetheless provided for variable selection and classification | Figure 1 |
 | **STROBE 7 / RECORD 7.1** | Define all variables; give the complete list of codes and algorithms | Every screen is defined in §2.2 and specified in full in Supplementary S1; the code that computes them is deposited, and the per-variable results table is published | §2.2; Supplementary S1; data availability |
 | **STROBE 8** | Data sources and measurement | §2.1; all six input files are archived and hashed | §2.1; `data/raw_file_manifest.csv` |
@@ -35,7 +35,7 @@ The *International Journal of Epidemiology* requires RECORD for studies using ro
 | **STROBE 14** | Descriptive data | Table 1, Table 2, Figure 2 | §3.1 |
 | **STROBE 15** | Outcome data | **Not applicable.** No outcome events | — |
 | **STROBE 16** | Main results with estimates and precision | Repetition by dataset and by variable, with medians and full distributions; no confidence intervals are reported because every variable in the population is screened rather than sampled | §3.1, Tables 1–2, Figure 2 |
-| **STROBE 17** | Other analyses | Comparison against dictionary labels; zero-exclusion sensitivity | §3.1, §3.5 |
+| **STROBE 17** | Other analyses | Comparison against dictionary labels; zero-exclusion sensitivity | §3.1, §3.4 |
 | **STROBE 18** | Key results | §6 | §6 |
 | **STROBE 19 / RECORD 19.1** | Limitations, including the implications of using data not created to answer this question | The data were created for programme monitoring, not for provenance research; what the screen cannot establish is stated first, and the method's own failure modes are reported | §5; Supplementary S3 |
 | **STROBE 20** | Interpretation | §4, §6 | §4, §6 |

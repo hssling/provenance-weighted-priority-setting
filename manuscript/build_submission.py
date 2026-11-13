@@ -112,6 +112,10 @@ def main() -> int:
                 or len(re.findall(r'^[A-Z][^\n|]*?\.\s\d{4}[a-z]?\.', reflist, flags=re.M)))
         assert refs, f"{key}: counted no references; the list style may have changed"
         tables = len(re.findall(r"^\*\*Table \d+\.", src, flags=re.M))
+        # Figures were the one count the title page carried by hand. It read
+        # "0" for both papers, typed before any figure existed, long after
+        # each paper had two. Counted from the captions now, like the rest.
+        figures = len(re.findall(r"^\*\*Figure \d+\.", src, flags=re.M))
 
         text, _ = blind(src)
         d = OUT / key
@@ -137,14 +141,16 @@ def main() -> int:
             "# Tables\n\n" + "\n\n---\n\n".join(table_blocks) + "\n", encoding="utf-8")
         print(f"{key:<9}{abstract:>10}{body:>8}{refs:>6}{tables:>8}  {dest.relative_to(HERE)}")
 
-        stamp_counts(d / "01_title_page.md", abstract, body, tables, refs)
+        stamp_counts(d / "01_title_page.md", abstract, body, tables, refs, figures)
 
         # Figures belong in the paper's own folder, named by the figure number
         # the text cites, so each folder is the complete upload for its journal.
         letter = key[-1]
         figdir = HERE.parent / "figures"
         figs = sorted(figdir.glob(f"figure_{letter}*.png"))
-        assert figs, f"{key}: no figures found in {figdir}; run figures/make_figures.py"
+        assert len(figs) == figures, (
+            f"{key}: {figures} figure captions but {len(figs)} figure files in "
+            f"{figdir}; run figures/make_figures.py")
         for old in d.glob("08_Figure_*.png"):
             old.unlink()
         for fig in figs:
@@ -198,7 +204,7 @@ def split_tables(text: str) -> tuple[str, list[str]]:
 
 
 def stamp_counts(page: Path, abstract: int, body: int, tables: int,
-                 refs: int) -> None:
+                 refs: int, figures: int) -> None:
     """Write the derived counts into the title page's count table.
 
     These were hand-maintained and went stale three times in one afternoon,
@@ -212,6 +218,7 @@ def stamp_counts(page: Path, abstract: int, body: int, tables: int,
     rows = [(r"(\| Abstract \(structured\) \| )[\d,]+( words \|)", abstract),
             (r"(\| Main text,[^|]*\| )[\d,]+( words \|)", body),
             (r"(\| Tables \| )\d+( \|)", tables),
+            (r"(\| Figures \| )\d+( \|)", figures),
             (r"(\| References \| )\d+( \|)", refs)]
     for pat, value in rows:
         s, n = re.subn(pat, lambda m: f"{m.group(1)}{value:,}{m.group(2)}", s)

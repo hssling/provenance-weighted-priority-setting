@@ -41,6 +41,8 @@ def main() -> int:
     # Self-similarity gates on a factual condition (a long verbatim run), not a
     # percentage, so it is safe in the suite. It skips cleanly if a comparison
     # document is missing from this machine.
+    results.append(run("verification/check_consistency.py",
+                       [sys.executable, str(ROOT / "verification" / "check_consistency.py")]))
     results.append(run("verification/check_language.py",
                        [sys.executable, str(ROOT / "verification" / "check_language.py")]))
     results.append(run("verification/check_references.py",
@@ -59,6 +61,12 @@ def main() -> int:
     print(f"\n{len(results) - failed}/{len(results)} checks passed")
     return 1 if failed else 0
 
+
+# Quoted manuscript text carries the rupee and section signs. Under Windows'
+# default console encoding, printing them raised UnicodeEncodeError, so a
+# check that had found a problem crashed instead of reporting it.
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
 if __name__ == "__main__":
     sys.exit(main())

@@ -59,5 +59,11 @@ def main() -> int:
     return 0
 
 
+# Quoted manuscript text carries the rupee and section signs. Under Windows'
+# default console encoding, printing them raised UnicodeEncodeError, so a
+# check that had found a problem crashed instead of reporting it.
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+
 if __name__ == "__main__":
     sys.exit(main())

@@ -7,12 +7,9 @@ screen between them returns 0.6% (A against B) and 0.4% (B against A).
 |---|---|---|
 | title | What a tuberculosis budget cannot see | The label says what kind, not how old |
 | target | *Health Policy and Planning*, Original Article | *International Journal of Epidemiology* |
-| abstract | 249 words | 331 words |
-| main text | 2,904 words | 4,548 words |
-| tables / figures | 2 / 0 | 6 / 0 |
-| references | 16 | 13 |
 
-Counts are derived by `manuscript/build_submission.py`, never typed. Rerun it after any edit; it also rewrites the
+Current counts are on each paper's title page, `01_title_page`, which `manuscript/build_submission.py`
+writes on every run. They are deliberately not repeated here, where they could go stale. Rerun it after any edit; it also rewrites the
 blinded copies. A cover letter in an earlier project claimed 400 dpi for 600 dpi figures because a number was typed
 rather than derived, which is why nothing here is typed.
 

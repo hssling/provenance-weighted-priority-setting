@@ -119,14 +119,44 @@ def main() -> int:
                     ctx = body[max(0, m.start() - 40):m.end() + 20].replace("\n", " ")
                     errors.append(f"  {name}: placeholder in {label}: ...{ctx}...")
 
+        # The RECORD checklist tells a reviewer where to find each item. Paper
+        # B's pointed at section 3.5 after that section had been renumbered
+        # 3.4, so every pointer in it must resolve in its own paper.
+        record = (paper.parent / "submission" / f"paper_{name[-1].lower()}"
+                  / "05_RECORD_checklist.md")
+        if record.exists():
+            rec = record.read_text(encoding="utf-8")
+            tables = set(re.findall(r"(?m)^\*\*Table (\d+)\.", text))
+            figures = set(re.findall(r"(?m)^\*\*Figure (\d+)\.", text))
+            for m in re.finditer(r"§\s?(\d+(?:\.\d+)*)", rec):
+                if m.group(1) not in have:
+                    errors.append(f"  {name}: RECORD checklist points to §{m.group(1)}, "
+                                  f"which does not exist")
+            for kind, pool in (("Table", tables), ("Figure", figures)):
+                for m in re.finditer(rf"{kind}s? (\d+)(?:\s*[–-]\s*(\d+))?", rec):
+                    for n in range(int(m.group(1)), int(m.group(2) or m.group(1)) + 1):
+                        if str(n) not in pool:
+                            errors.append(f"  {name}: RECORD checklist points to "
+                                          f"{kind} {n}, which does not exist")
+            for ref in supplementary_refs(rec):
+                if ref not in sup_have:
+                    errors.append(f"  {name}: RECORD checklist points to "
+                                  f"Supplementary {ref}, which does not exist")
+
     if errors:
         print(f"FAILED: {len(errors)} broken reference(s) or placeholder(s)")
         print("\n".join(errors))
         return 1
-    print("PASSED: every section and supplementary cross-reference resolves, "
-          "and no placeholder remains in either paper or supplement")
+    print("PASSED: every section and supplementary cross-reference resolves, in "
+          "both papers and their RECORD checklists, and no placeholder remains")
     return 0
 
+
+# Quoted manuscript text carries the rupee and section signs. Under Windows'
+# default console encoding, printing them raised UnicodeEncodeError, so a
+# check that had found a problem crashed instead of reporting it.
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
 if __name__ == "__main__":
     sys.exit(main())
