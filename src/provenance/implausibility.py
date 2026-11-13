@@ -1,10 +1,10 @@
 """T3: adjacent-period implausibility. Standard library only.
 
 Is a year-on-year proportional change larger than the underlying process could plausibly
-produce? A step is a violation when |v[y] / v[y-1] - 1| > bound. score = within-bound
-steps / comparable steps. "Size" is inversion-symmetric (triangulate._steps: fold change - 1,
-a monotone function of |log(v/prev)|), so a fall is as flaggable as an equal-fold rise. The
-raw |v/prev - 1| is not: it is capped at 1 for any fall, so with a bound >= 1 no fall of any
+produce? A step is a violation when its size, max(v[y]/v[y-1], v[y-1]/v[y]) - 1 (the fold
+change minus one; triangulate._steps), exceeds bound. score = within-bound steps / comparable
+steps. The size is symmetric under inversion and monotone in |log(v/prev)|, so a decline and the
+equal-fold rise are equally flaggable. The raw |v/prev - 1| is not: it is capped at 1 for any fall, so with a bound >= 1 no fall of any
 size could be flagged. A step is comparable only for consecutive years with both values
 present and a non-zero base (same rule as T2); a series with no comparable step (e.g. a
 single point) returns testable=False, score=None, never a clean score and never an error.
@@ -14,10 +14,10 @@ whose own p95 step is a doubling or halving (bound >= STABLE_BOUND_MAX = 1.0) is
 that wide would pass a process that doubles and halves at will, and "no violations" would then
 be an artefact of the reference, not evidence about the series. When the precondition fails the
 score is testable=False, score=None, never 1.0. 1.0 is a convention (a factor of two), not a
-fitted value; it is also the point at which the old asymmetric statistic went blind to falls.
+fitted value.
 
-The bound is DERIVED, not chosen: derive_bound() takes a high percentile of the absolute
-year-on-year changes of a reference set believed stable. It must not be tuned against the
+The bound is DERIVED, not chosen: derive_bound() takes a high percentile of the symmetric
+step sizes (as defined above) of a reference set believed stable. It must not be tuned against the
 cases we already know about; which series form the reference set is reported with the result.
 """
 from __future__ import annotations
@@ -32,6 +32,8 @@ from .triangulate import _changes, _steps
 DEFAULT_PERCENTILE = 0.95
 
 # Largest derived bound at which the reference set still counts as stable (see PRECONDITION).
+# Rationale: a reference whose own p95 step is a doubling or halving is not stable enough to
+# judge anything.
 STABLE_BOUND_MAX = 1.0
 
 
