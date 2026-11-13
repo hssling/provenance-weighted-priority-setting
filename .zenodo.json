@@ -1,0 +1,24 @@
+{
+  "title": "Provenance screening for routine health-programme data: an instrument and two applications to WHO tuberculosis datasets",
+  "description": "<p>Reproducible screens that distinguish, from the published file alone, which variables in a country-reported health dataset carry annual measurements and which carry carried-forward estimates or categorical status flags.</p><p>Applied to 443 numeric variables across six WHO Global Tuberculosis Programme datasets (budget; expenditure and utilisation; notifications; treatment outcomes; laboratory diagnostic services; contact tracing and preventive treatment), and to India's national TB financing accounts from the India TB Report 2024.</p><p>Contains: the screening instrument and its five tests; a propagation and expected-value-of-audit module; the archived WHO input files as downloaded; a 255-test verification suite; and FINDINGS.md, a durable record of every verified result and every correction made during development, including four self-corrections found by replication.</p>",
+  "upload_type": "software",
+  "license": "MIT",
+  "creators": [
+    {
+      "name": "Siddalingaiah, H S",
+      "orcid": "0000-0002-4771-8285",
+      "affiliation": "Department of Community Medicine, Shridevi Institute of Medical Sciences and Research Hospital, Tumkur, Karnataka, India"
+    }
+  ],
+  "keywords": [
+    "data quality",
+    "data provenance",
+    "tuberculosis",
+    "health financing",
+    "reproducibility",
+    "routine health information systems",
+    "World Health Organization",
+    "India"
+  ],
+  "access_right": "open"
+}
