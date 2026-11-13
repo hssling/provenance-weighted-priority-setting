@@ -12,7 +12,7 @@ Correspondence: hssling@yahoo.com · ORCID 0000-0002-4771-8285
 
 ## Abstract
 
-**Background.** The World Health Organization's tuberculosis (TB) funding gap — budget required minus funding expected — is reported annually for every high-burden country and used in investment cases and resource allocation. Whether it measures what it claims to, for any given country, has not been examined.
+**Background.** The World Health Organization's tuberculosis (TB) funding gap — budget required minus funding expected — is published annually for every high-burden country and read as a measure of under-resourcing. Whether it measures what it appears to, for any given country, has not to our knowledge been examined.
 
 **Methods.** We analysed WHO's reported TB budget and expenditure data for 215 countries (2017–2025) against India's national programme accounts. The sources were compared through dimensionless internal ratios, requiring no currency conversion, and eleven evidence-ranked interventions were mapped onto WHO budget lines by their published definitions rather than their names.
 
@@ -26,7 +26,9 @@ Correspondence: hssling@yahoo.com · ORCID 0000-0002-4771-8285
 
 ## 1. Introduction
 
-Tuberculosis control is planned against money. National strategic plans cost their activities, the Global Fund allocates against stated need, and the WHO Global TB Report publishes, for every high-burden country, the budget required for the coming year and the funding expected against it. The difference between those two quantities — the **funding gap** — is read as a measure of under-resourcing. It appears in investment cases, in advocacy, and in the comparative tables that shape where external financing goes.
+Tuberculosis control is planned against money. National strategic plans cost their activities, and the WHO Global TB Report publishes, for every high-burden country, the budget required for the coming year and the funding expected against it. The difference between those two quantities — the **funding gap** — is read as a measure of under-resourcing, and appears in investment cases, advocacy and comparative tables.
+
+We should be precise about what the indicator is and is not used for, because our argument does not depend on overstating it. The Global Fund's allocation formula distributes funds by disease burden and economic capacity, with qualitative adjustment; it does **not** take the WHO reported funding gap as an input. The gap's influence is of a different kind — it is the figure published, quoted and compared when a programme's resourcing is discussed. An indicator need not enter a formula to shape a judgement.
 
 An indicator used that way carries an implicit claim: that the two numbers behind it are independently determined, so their difference is informative. This paper asks whether that claim holds, and finds that for India it does not.
 
@@ -154,7 +156,7 @@ In both cases the number exists, is published, and is read as a measurement. In 
 
 Three consequences follow directly.
 
-**Cross-country comparisons of TB funding gaps are not comparing like with like.** A country reporting a 70% gap and a country reporting 0% may be describing the same financial reality through different conventions. Any allocation rule that reads the gap as need will systematically favour the former.
+**Cross-country comparisons of TB funding gaps are not comparing like with like.** A country reporting a 70% gap and a country reporting 0% may be describing the same financial reality through different conventions. Any judgement that reads the gap as need — and any rule that someday did — would systematically favour the former. We note again that the Global Fund's formula does not, so this is a caution about interpretation rather than a claim about current allocation.
 
 **A country can domesticate its financing and simultaneously become harder to assess.** India's external financing fell to 1% of expenditure while its reported gap stayed at zero — so neither the international indicator nor the external-financing share now carries information about domestic adequacy. The national accounts do, but they are not comparable across countries and, as shown, are internally inconsistent in at least one published table.
 
