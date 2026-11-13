@@ -126,8 +126,9 @@ def main() -> int:
 
         # Both journals want tables in a separate file, not in the text. Each
         # table leaves a placement marker; its in-text citation stays put.
-        blinded_body, table_blocks = split_tables(text)
-        unblinded_body, unblinded_tables = split_tables(src)
+        blinded_body, table_blocks = split_tables(add_word_count(text, body))
+        unblinded_body, unblinded_tables = split_tables(
+            add_word_count(for_submission(src), body))
         assert len(table_blocks) == tables == len(unblinded_tables), (
             f"{key}: {tables} table captions but {len(table_blocks)} tables split out")
         dest = d / "03_manuscript_blinded.md"
@@ -165,6 +166,32 @@ def main() -> int:
           "into the portal from here, not from memory.")
     print(f"\n{to_docx()}")
     return 0
+
+
+def for_submission(text: str) -> str:
+    """Remove what is for the author only, keeping the author's identity.
+
+    The blinded copy has always lost these, inside blind(). The unblinded copy
+    was written straight from the source, so paper B's upload to IJE carried a
+    "Target journal" line naming the alternative journals considered -- one
+    "held as a fallback" -- and the whole "Notes for the author -- not for
+    submission" section. Both are now removed from every upload."""
+    text = re.sub(r"(?m)^\*\*Target journal:\*\*.*\n?", "", text)
+    i = text.find("## Notes for the author")
+    if i != -1:
+        text = text[:i].rstrip() + "\n"
+    return re.sub(r"\n{3,}", "\n\n", text)
+
+
+def add_word_count(text: str, body: int) -> str:
+    """IJE: "The main document should include a title page with author names
+    and affiliations. The word count should be included on the title page."
+    The count is the one the build derived, never typed."""
+    line = (f"**Word count:** {body:,} words (main text, excluding abstract, key "
+            f"messages, tables, figures, references and declarations)")
+    m = re.search(r"(?m)^\*\*Running title:\*\*.*$", text)
+    assert m, "no running title to anchor the word count"
+    return text[:m.end()] + "\n\n" + line + text[m.end():]
 
 
 def split_tables(text: str) -> tuple[str, list[str]]:

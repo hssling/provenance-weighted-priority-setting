@@ -2,11 +2,11 @@
 
 **Running title:** Kind and vintage in WHO TB data
 
+**Word count:** 2,930 words (main text, excluding abstract, key messages, tables, figures, references and declarations)
+
 **Author:** Siddalingaiah H S
 Department of Community Medicine, Shridevi Institute of Medical Sciences and Research Hospital, Tumkur – 572106, Karnataka, India.
 Correspondence: hssling@yahoo.com · ORCID 0000-0002-4771-8285
-
-**Target journal:** *International Journal of Epidemiology* (OUP; hybrid, so the subscription route carries no article-processing charge). Alternatives, both also hybrid: *Journal of Clinical Epidemiology*, *International Journal of Health Policy and Management*. *BMC Medical Research Methodology* is the closest topical fit but is fully open access with an article-processing charge, so it is held as a fallback only. Abstract 347 words (confirm the journal's current limit before upload).
 
 ---
 
@@ -213,10 +213,3 @@ Two changes would settle this at source: a vintage flag for each value, which th
 **Use of generative AI.** The author used a large language model as a drafting and analysis assistant. All analytical decisions, verification and conclusions are the author's, who takes full responsibility.
 
 ---
-
-## Notes for the author — not for submission
-
-1. **References placed (13, Vancouver, numbered by first appearance).** Still outstanding: (a) [done 13 Nov 2026] Maiga 2019 (3), Lundin 2022 (4), Bassili 2013 (8) and Ho 2017 (9) were read against the sentences they support via Europe PMC and all four support them; the Bassili DOI 10.4269/ajtmh.13-0004 was re-confirmed as the TB review, not the mosquito paper the mistyped 13-0040 returns. Herschel 2017 (12) supports only a generic 'substantial technical literature' claim and was not read in full; (b) the WHO Module 4 (ref 10) was confirmed to cover models of care but its specific wording on hospitalisation was not checked -- read the relevant section; (c) [done 13 Nov 2026] the dictionary labels the hospitalisation and visit variables as "Estimated" or "Typical"; the central claim was retracted and rebuilt around vintage (abstract, §1, §3.4, §4.1, §4.4, §6). NOTE: the new §3.4 comparison found that `cf_tot_usaid` is mostly repeated zeros, and that 70 of 80 unlabelled estimate-like variables are zero-dominated; see FINDINGS §2.3; `verification/dictionary_vs_screen.py` regenerates the numbers; (d) the screens have no external validation or citable precedent for country-reported programme data (see §2.2); (e) RECORD, Munafo, Kenett and Loveday were considered and left out as not supporting a specific sentence.
-2. **Companion paper.** The India financing analysis (`manuscript_draft_v1.md`) shares §3.4's dataset and the general theme. They must cite each other and be written independently — run `check_self_similarity.py` across both before submitting either.
-3. **Possible strengthening:** repeat the screen on one other WHO programme dataset (HIV or malaria financing) to test whether the counted/characterised division generalises beyond TB. Same code. A seventh TB file (TB_ppm) was screened on 13 Nov 2026 and is consistent but yields only two testable variables; it is reported in §5 and does not test generalisation beyond TB.
-4. **Honest framing to preserve:** §3.4 discloses an error we made. Keep it. A methods paper about data traps that conceals its author's own is worth less.

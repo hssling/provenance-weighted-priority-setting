@@ -2,6 +2,8 @@
 
 **Running title:** Kind and vintage in WHO TB data
 
+**Word count:** 2,930 words (main text, excluding abstract, key messages, tables, figures, references and declarations)
+
 ---
 
 ## Abstract

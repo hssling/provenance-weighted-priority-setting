@@ -2,11 +2,11 @@
 
 **Running title:** What a TB budget cannot see
 
+**Word count:** 4,948 words (main text, excluding abstract, key messages, tables, figures, references and declarations)
+
 **Author:** Siddalingaiah H S
 Department of Community Medicine, Shridevi Institute of Medical Sciences and Research Hospital, Tumkur – 572106, Karnataka, India.
 Correspondence: hssling@yahoo.com · ORCID 0000-0002-4771-8285
-
-**Target journal:** *Health Policy and Planning* (Original Article). Verified against the journal's author guidelines, 13 November 2026: abstract maximum **300** words, main text maximum **6,000** for a quantitative or fixed-design study, Key Messages **3-4** bullets, **author-date (Harvard)** referencing, and **double-anonymized** peer review, so the blinded copy is the one to upload.
 
 ---
 
@@ -277,7 +277,6 @@ World Health Organization (WHO). 2026b. Global Tuberculosis Programme data dicti
 
 World Health Organization (WHO). 2026c. *WHO TB data collection form 2026*, version 2026-03-25. Geneva: World Health Organization. Distributed in the Global TB Programme's report repository at https://github.com/GTB-TME/gtbreport2026 (doc/who_tb_dcf2026.pdf), accessed 13 November 2026; not distributed with the datasets.
 
-
 ## Figure captions
 
 **Figure 1. Two accounts of the same years.** India's funding gap as reported to WHO, against the shortfall recorded in India's own programme accounts, 2018–2023. The WHO-reported gap is zero in every year because expected funding is reported equal to budget required; over the same years the national accounts record approvals falling short of requests by 5.4% to 46.1%. Values are percentages of the amount required (WHO) or requested (national accounts). For the national accounts, each year denotes the first year of India's April–March fiscal year, as in the India TB Report (2018 denotes 2018–19); the WHO series is plotted by its reporting year. Sources: WHO TB budget dataset (WHO 2026a) and India TB Report 2024, Table 16.1 (Central TB Division 2024).
@@ -305,15 +304,3 @@ World Health Organization (WHO). 2026c. *WHO TB data collection form 2026*, vers
 **Use of generative artificial intelligence.** The author used a large language model as a drafting and analysis assistant. All analytical decisions, data verification and conclusions are the author's. The author reviewed and edited all content and takes full responsibility for it.
 
 ---
-
-## Notes for the author — not for submission
-
-**Before submitting:**
-1. [done 13 Nov 2026] Repository public, Zenodo v1.0.0 minted: version DOI 10.5281/zenodo.24187367, concept DOI 10.5281/zenodo.24187366, both inserted in SS2.4 and Data availability.
-2. [done 13 Nov 2026] Target journal: *Health Policy and Planning*. Abstract cut to 249 words against its 250 limit, so there is no margin if that limit has moved. Key messages box added (three bullets, house style confirmed against published HPP articles). The journal's guideline page is bot-protected and was not read; confirm the limits in a browser.
-3. **References placed (16, Vancouver, numbered by first appearance).** (a) [done] SS1 Global Fund statement cites ref 16 (Board paper GF/B52/08B, read in full; the formula inputs are burden and economic capacity, and the paper does not name the WHO funding gap; it does say technical partners gave input on funding needs, so keep the wording at 'does not list ... among them'). (b) [done 13 Nov 2026] JSSTD ref 13 now carries the DOI printed on the journal's R14 proof, 10.25259/JSSTD_120_2026. It returns 404 today because the article is in production and the DOI is registered at publication; that is expected and is stated in the reference. Add volume and pages when the issue is released. (c) [done] Bertone 2026 cited as '2026 Sep 29 [online ahead of print]'; Crossref, PubMed and OpenAlex all carry null volume and pages, so this will not need revisiting. (d) OPEN: whether *Health Policy and Planning* accepts an under-review citation (ref 6) for Table 2 -- if not, give the ranking its own methods paragraph. (e) [done 13 Nov 2026] Reid 2019 (ref 2) and Su 2020 (ref 15) read in full text; both support the sentences citing them.
-4. [done 13 Nov 2026] Self-similarity run with `verification/check_self_similarity.py`, which now includes the JSSTD paper. SS4.3 replicates its finding in a second programme and was the likeliest source of overlap; the measured share is **0.0%**, so the relationship is conceptual and the citation carries it. Paper B 0.6%, TB-BOPAS 0.3%, IJTB review 0.2%, combined 0.9%, no verbatim run over 40 words.
-5. OPEN: consider whether Table 2's ranking needs its own methods paragraph or can be cited.
-6. [done 13 Nov 2026] Novelty claim tested by a pre-registered search, `manuscript/novelty_search.md`: protocol written and committed before any query ran. Verdict NEEDS SOFTENING, not refuted. Floyd et al. (2007) describes the WHO global financial monitoring system that produces `budget_tot` and `cf_tot` and sets out its limitations, so "the indicator is unexamined" was too strong and a TB-financing reviewer could have cited it against us. It does not touch the finding: it never asks whether the two quantities are independently determined, never counts countries reporting them equal, never discusses a zero gap. The abstract and §1 now claim the narrower and true thing. Paper B's novelty claim STANDS unchanged.
-
-**Deliberately excluded from this draft:** the provenance-weighting instrument, the five tests, the composite, EVPR, and the BOPAS propagation. None of it is needed for these findings, and the instrument's central claim — that provenance weighting reorders priorities — is not yet supported. Keeping it out makes this paper defensible now and leaves the methods paper intact for when D2/D3 exist.

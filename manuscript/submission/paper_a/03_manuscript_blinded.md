@@ -2,6 +2,8 @@
 
 **Running title:** What a TB budget cannot see
 
+**Word count:** 4,948 words (main text, excluding abstract, key messages, tables, figures, references and declarations)
+
 ---
 
 ## Abstract
