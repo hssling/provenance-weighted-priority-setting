@@ -45,22 +45,62 @@ BUDGET_DEFINITIONS: dict[str, str] = {
     "budget_tbhiv": "Budget required for collaborative TB/HIV activities (US Dollars)",
 }
 
-# Node key -> WHO TB budget column, or None for no line item. Each mapped column's definition
-# is in BUDGET_DEFINITIONS above. check_mapping_targets() guards typos (a real intervention
-# mistyped into a false "invisible"); it cannot catch a wrong-but-real column, so the
-# definitions are the check against that.
+# The data dictionary is an abbreviation of the data collection form, and for budget_prog
+# the abbreviation changes the meaning. The form (doc/who_tb_dcf2026.pdf in WHO's own
+# gtbreport2026 repository) is the instrument countries actually complete, so it governs.
+# Transcribed verbatim; the divergence is itself a finding and is reported, not smoothed.
+DCF_DEFINITIONS: dict[str, str] = {
+    "budget_lab": "Building, maintaining, and renovating TB laboratories, laboratory equipment "
+                  "purchase and maintenance, consumables for all tests (including TB screening "
+                  "for people living with HIV/AIDS and diagnosis of latent TB infection), "
+                  "quality assurance, retooling and the transportation of specimens.",
+    "budget_prog": "The management and supervision of the TB control programme, training, policy "
+                   "development, meetings, visits for supervision, purchase of office "
+                   "equipment/vehicles, construction of buildings for use by programme staff, "
+                   "routine surveillance, advocacy and communication, public-private mix "
+                   "activities, community engagement, active case-finding, infection control, "
+                   "management of TB drug procurement and distribution, and programme activities "
+                   "linked to contact investigation for TB preventive treatment",
+    "budget_tpt": "Drugs for TB preventive treatment, as per latest WHO guidance "
+                  "(6H, 9H, 4R, 3HR and Levofloxacin)",
+    "budget_sld": "Drugs to treat drug-resistant TB (RR-TB, MDR-TB, pre-XDR-TB or XDR-TB). "
+                  "Include drugs to deal with adverse event",
+    "budget_patsup": "Cash transfers, food packages, transportation vouchers, educational and "
+                     "emotional support to patient or other in-kind benefits given to TB "
+                     "patients, mobile phone (airtime or device for V.O.T), medications "
+                     "monitors (digital box, 99 DOTS)",
+    "budget_tbhiv": "Collaboration between TB and HIV programmes aimed at reducing the impact of "
+                    "HIV-related TB.",
+}
+
+# Node key -> WHO TB budget column, or None when no line covers the activity at all. Judged
+# against DCF_DEFINITIONS, not against the column name and not against the dictionary's
+# abbreviation. check_mapping_targets() guards typos; it cannot catch a wrong-but-real column,
+# so the definitions are the check against that.
 TB_BUDGET_MAPPING: dict[str, str | None] = {
-    "molecular_dx": "budget_lab",        # full match: Xpert is laboratory equipment and supplies
-    "airborne_ipc": None,                # no WHO line
-    "tpt": "budget_tpt",                 # partial: drugs only (see TB_BUDGET_PARTIAL)
-    "wgs_dst": None,                     # no WHO line
-    "acf": None,                         # no line. budget_prog is treatment, not finding (ruling S)
-    "short_regimen": "budget_sld",       # partial: drugs only (see TB_BUDGET_PARTIAL)
-    "bovine_tb": None,                   # no WHO line
-    "private_sector": None,              # no WHO line
-    "nutrition": "budget_patsup",        # full match: patient support is broader than nutrition but contains it
-    "milk_pasteurisation": None,         # no WHO line
-    "tb_hiv_dm": "budget_tbhiv",         # partial: TB/HIV arms only (see TB_BUDGET_PARTIAL)
+    "molecular_dx": "budget_lab",        # "consumables for all tests", equipment purchase
+    "airborne_ipc": "budget_prog",       # the form names "infection control" (see TB_BUDGET_POOLED)
+    "tpt": "budget_tpt",                 # commodity only (see TB_BUDGET_COMMODITY_ONLY)
+    "wgs_dst": "budget_lab",             # sequencing is laboratory equipment and consumables
+    "acf": "budget_prog",                # the form names "active case-finding" (TB_BUDGET_POOLED)
+    "short_regimen": "budget_sld",       # commodity only (see TB_BUDGET_COMMODITY_ONLY)
+    "bovine_tb": None,                   # animal health; outside the TB programme budget
+    "private_sector": "budget_prog",     # the form names "public-private mix" (TB_BUDGET_POOLED)
+    "nutrition": "budget_patsup",        # the form names "food packages"
+    "milk_pasteurisation": None,         # food safety; outside the TB programme budget
+    "tb_hiv_dm": "budget_tbhiv",         # TB/HIV arms only (see TB_BUDGET_COMMODITY_ONLY)
+}
+
+# Activities the form names inside a line that pools many unrelated activities. The form
+# acknowledges them; the published data cannot separate them, because the whole line is one
+# number. This is a different condition from having no line, and from having a line that
+# covers only a commodity, so it is recorded separately rather than collapsed into either.
+TB_BUDGET_POOLED: dict[str, str] = {
+    "airborne_ipc": "budget_prog names 'infection control' among fourteen activities pooled in "
+                    "one figure, from staff supervision to drug procurement management.",
+    "acf": "budget_prog names 'active case-finding' among fourteen pooled activities.",
+    "private_sector": "budget_prog names 'public-private mix activities' among fourteen pooled "
+                      "activities.",
 }
 
 # Node keys mapped to a budget line that covers only part of the node. Mapped, so not invisible
@@ -72,11 +112,18 @@ TB_BUDGET_MAPPING: dict[str, str | None] = {
 # (delivery, contact tracing, adherence, programme work) is pooled in a line that cannot be
 # attributed to it. Read a low budget share for these nodes as a floor on tracked spending,
 # not as a measure of spending on the intervention.
-TB_BUDGET_PARTIAL: dict[str, str] = {
-    "tpt": "budget_tpt covers TB preventive treatment drugs only. Delivery, contact tracing and adherence support are not covered.",
+TB_BUDGET_COMMODITY_ONLY: dict[str, str] = {
+    "tpt": "budget_tpt covers TB preventive treatment drugs only. Delivery, contact tracing and adherence support are not covered; the form puts contact investigation in budget_prog, pooled.",
     "short_regimen": "budget_sld covers drugs to treat drug-resistant TB only. Rollout programme work is not covered; DR-TB programme costs sit in budget_mdrmgt, which no node maps to.",
     "tb_hiv_dm": "budget_tbhiv covers collaborative TB/HIV activities. The diabetes arm is not covered.",
 }
+
+# Kept under the old name so nothing that imported it breaks silently.
+TB_BUDGET_PARTIAL = TB_BUDGET_COMMODITY_ONLY
+
+# No WHO budget line is specific to any one of these interventions: every line pools several
+# activities. This is the finding, and it is stated as data rather than left to prose.
+TB_BUDGET_SEPARABLE: dict[str, bool] = {key: False for key in TB_BUDGET_MAPPING}
 
 
 @dataclass(frozen=True)

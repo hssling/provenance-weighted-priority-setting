@@ -27,7 +27,8 @@ from provenance.composite import composite_report, composite_sensitivity        
 from provenance.declared import declared_score                                    # noqa: E402
 from provenance.evpr import (PRIORS, evpr_prior_sensitivity, observations_from_results,  # noqa: E402
                              round_to_se)
-from provenance.existence import (NODE_LABELS, TB_BUDGET_MAPPING, TB_BUDGET_PARTIAL,  # noqa: E402
+from provenance.existence import (NODE_LABELS, TB_BUDGET_MAPPING,  # noqa: E402
+                                  TB_BUDGET_COMMODITY_ONLY, TB_BUDGET_POOLED,
                                   existence_report)
 from provenance.identity import identity_score                                    # noqa: E402
 from provenance.implausibility import derive_bound, implausibility_score          # noqa: E402
@@ -268,15 +269,31 @@ def audit_financing() -> dict:
             "n_steps": n_steps, "n_countries": len(ref), "zero_share": zero_share}
 
 
+def _coverage(key: str, rep) -> str:
+    """Four conditions, not two. "none" means no WHO line covers the activity at
+    all. "pooled" means the data collection form names the activity inside a line
+    it shares with many others, so the figure exists but cannot be attributed.
+    "commodity" means the line covers the drug or one arm, not the delivery.
+    "dominant" means the line's scope is largely this activity -- still shared.
+    No intervention has a line of its own, which is the point."""
+    if key not in rep.mapped:
+        return "none"
+    if key in TB_BUDGET_POOLED:
+        return "pooled"
+    if key in TB_BUDGET_COMMODITY_ONLY:
+        return "commodity"
+    return "dominant"
+
+
 def invisibility_rows() -> list[dict]:
     rep = existence_report(NODE_LABELS, TB_BUDGET_MAPPING)
     out = []
     for rank, (key, label) in enumerate(NODE_LABELS.items(), start=1):
         out.append(dict(evidence_rank=rank, node=key, intervention=label,
                         budget_line=rep.mapped.get(key, ""), existence_score=rep.score[key],
-                        coverage="none" if key not in rep.mapped
-                        else ("partial" if key in TB_BUDGET_PARTIAL else "full"),
-                        coverage_note=TB_BUDGET_PARTIAL.get(key, "")))
+                        coverage=_coverage(key, rep),
+                        coverage_note=(TB_BUDGET_POOLED.get(key)
+                                       or TB_BUDGET_COMMODITY_ONLY.get(key, ""))))
     return out
 
 
@@ -503,10 +520,14 @@ def build_summary(c: dict) -> str:
         P(f"  {r['series']:18} {r['test']:26} score={r['score']!s:6} {r['note']}")
     inv = c["invis"]
     none = [r["evidence_rank"] for r in inv if r["coverage"] == "none"]
+    n = lambda c: sum(r["coverage"] == c for r in inv)
     P("")
-    P(f"T5 existence: {len(none)} of {len(inv)} interventions have no budget line "
-      f"(ranks {', '.join(map(str, none))}); {sum(r['coverage'] == 'partial' for r in inv)} are mapped "
-      "only partially (drugs-only or TB/HIV-only lines). Reported separately, not folded into any composite.")
+    P(f"T5 existence: of {len(inv)} interventions, {len(none)} have no WHO budget line at all "
+      f"(ranks {', '.join(map(str, none))}); {n('pooled')} are named by the data collection form "
+      f"inside budget_prog, a line pooling fourteen activities; {n('commodity')} map to a line "
+      f"covering the commodity or one arm only; {n('dominant')} map to a line whose scope is "
+      "largely theirs. None has a line of its own. Reported separately, not folded into any "
+      "composite.")
     return "\n".join(L) + "\n"
 
 

@@ -5,72 +5,114 @@ import pytest
 
 from provenance.existence import (
     BUDGET_DEFINITIONS,
+    DCF_DEFINITIONS,
     NODE_LABELS,
+    TB_BUDGET_COMMODITY_ONLY,
     TB_BUDGET_MAPPING,
     TB_BUDGET_PARTIAL,
+    TB_BUDGET_POOLED,
+    TB_BUDGET_SEPARABLE,
     ExistenceReport,
     existence_report,
     check_mapping_targets,
 )
 from provenance.series import TestResult
 
-SIX_INVISIBLE = {
-    "Airborne infection prevention and control",
-    "Whole-genome sequencing for drug-susceptibility prediction",
-    "Active case finding",
+# Only two interventions have no WHO budget line, and both sit outside the TB
+# programme entirely. An earlier version of this file asserted six, because the
+# mapping was judged against the data dictionary's abbreviated definition of
+# budget_prog ("programme costs to treat drug-susceptible TB") instead of the
+# data collection form, which is the instrument countries complete and which
+# names active case-finding, infection control and public-private mix among the
+# activities that line covers.
+NO_LINE_AT_ALL = {
     "Bovine tuberculosis control",
-    "Private-sector engagement",
     "Milk pasteurisation / dairy food chain",
 }
 
 
-def test_six_of_eleven_tb_nodes_are_fiscally_invisible():
+def test_two_of_eleven_tb_nodes_have_no_budget_line():
     r = existence_report(NODE_LABELS, TB_BUDGET_MAPPING)
     assert len(NODE_LABELS) == 11
-    assert len(r.invisible) == 6
-    assert set(r.invisible) == SIX_INVISIBLE
-    assert "Airborne infection prevention and control" in r.invisible
-    assert "Active case finding" in r.invisible
+    assert len(r.invisible) == 2
+    assert set(r.invisible) == NO_LINE_AT_ALL
+    # Both sit outside the TB programme's own budget, not omitted within it.
+    assert "Bovine tuberculosis control" in r.invisible
 
 
-def test_active_case_finding_has_no_budget_line():
-    # WHO data dictionary: budget_prog is "Budget required for programme costs to treat
-    # drug-susceptible TB". Active case FINDING is not treatment, so ACF is invisible.
-    # Name-matching budget_prog to ACF was the error; the definition is the evidence.
-    assert TB_BUDGET_MAPPING["acf"] is None
+def test_no_intervention_has_a_budget_line_of_its_own():
+    # The finding. Two have no line; the other nine share a line with activities
+    # that are not theirs, so none can be costed from the published figure.
+    assert len(TB_BUDGET_SEPARABLE) == 11
+    assert not any(TB_BUDGET_SEPARABLE.values())
     r = existence_report(NODE_LABELS, TB_BUDGET_MAPPING)
-    assert r.score["acf"] == 0.0
-    assert "acf" not in r.mapped
+    assert len(r.invisible) + len(r.mapped) == 11
 
 
-def test_rank_two_intervention_has_no_budget_line():
+def test_the_three_pooled_activities_are_named_by_the_form():
+    # Each is named verbatim in the form's definition of the line it maps to.
+    for key, phrase in (("acf", "active case-finding"),
+                        ("airborne_ipc", "infection control"),
+                        ("private_sector", "public-private mix")):
+        assert key in TB_BUDGET_POOLED
+        line = TB_BUDGET_MAPPING[key]
+        assert line == "budget_prog"
+        assert phrase in DCF_DEFINITIONS[line].lower(), key
+
+
+def test_dictionary_and_form_disagree_about_budget_prog():
+    # The divergence that produced the earlier error, asserted so it cannot be
+    # quietly reconciled later: the dictionary says this line is for treatment,
+    # the form says it also covers finding and prevention.
+    assert "to treat" in BUDGET_DEFINITIONS["budget_prog"]
+    assert "active case-finding" not in BUDGET_DEFINITIONS["budget_prog"].lower()
+    assert "active case-finding" in DCF_DEFINITIONS["budget_prog"].lower()
+    assert "infection control" in DCF_DEFINITIONS["budget_prog"].lower()
+
+
+def test_active_case_finding_maps_to_the_pooled_programme_line():
+    # It has a line, and the line cannot be attributed to it. Both halves matter:
+    # claiming no line would be false, claiming it is costed would be false too.
+    assert TB_BUDGET_MAPPING["acf"] == "budget_prog"
     r = existence_report(NODE_LABELS, TB_BUDGET_MAPPING)
-    assert r.score["airborne_ipc"] == 0.0
-    assert "airborne_ipc" not in r.mapped
+    assert "acf" in r.mapped
+    assert NODE_LABELS["acf"] not in r.invisible
+    assert TB_BUDGET_SEPARABLE["acf"] is False
 
 
-def test_top_five_interventions_by_favourability_include_three_invisible():
-    # The finding that matters: three of the five best-evidenced interventions (ranks 2, 4
-    # and 5) cannot be tracked, defended at budget time, or evaluated for value.
-    keys = list(NODE_LABELS)  # insertion order is evidence rank 1..11
-    invisible_ranks = sorted(
-        i + 1 for i, k in enumerate(keys) if TB_BUDGET_MAPPING[k] is None)
-    assert invisible_ranks == [2, 4, 5, 7, 8, 10]
-    top_five_invisible = [i + 1 for i in range(5) if TB_BUDGET_MAPPING[keys[i]] is None]
-    assert top_five_invisible == [2, 4, 5]
+def test_rank_two_intervention_is_pooled_not_absent():
+    r = existence_report(NODE_LABELS, TB_BUDGET_MAPPING)
+    assert "airborne_ipc" in r.mapped
+    assert TB_BUDGET_SEPARABLE["airborne_ipc"] is False
+
+
+def test_ranks_of_the_interventions_with_no_line_at_all():
+    keys = list(NODE_LABELS)  # insertion order is the favourability rank 1..11
+    no_line = sorted(i + 1 for i, k in enumerate(keys) if TB_BUDGET_MAPPING[k] is None)
+    assert no_line == [7, 10]
+    # Neither is in the top five, so the earlier "three of the top five are
+    # invisible" observation does not survive and is not made anywhere.
+    assert not [r for r in no_line if r <= 5]
 
 
 def test_mapped_nodes_point_at_their_budget_lines():
     r = existence_report(NODE_LABELS, TB_BUDGET_MAPPING)
     assert r.mapped == {
         "molecular_dx": "budget_lab",
+        "airborne_ipc": "budget_prog",
         "tpt": "budget_tpt",
+        "wgs_dst": "budget_lab",
+        "acf": "budget_prog",
         "short_regimen": "budget_sld",
+        "private_sector": "budget_prog",
         "nutrition": "budget_patsup",
         "tb_hiv_dm": "budget_tbhiv",
     }
     assert set(r.score.values()) == {0.0, 1.0}
-    assert sum(r.score.values()) == 5.0
+    assert sum(r.score.values()) == 9.0
+    # Three of the nine share one line, which is why a mapped score of 1.0
+    # must not be read as "this intervention is costed".
+    assert sum(1 for v in r.mapped.values() if v == "budget_prog") == 3
 
 
 def test_tb_hiv_diabetes_is_mapped_but_recorded_as_partial():
@@ -137,9 +179,10 @@ def test_partial_mappings_are_exactly_tpt_sld_and_tb_hiv_diabetes():
 
 
 def test_partial_nodes_are_mapped_not_invisible():
-    # Partial coverage is a fact about the mapping, not an invisibility: the count stays 6.
+    # Commodity-only coverage is a fact about the mapping, not an invisibility.
     r = existence_report(NODE_LABELS, TB_BUDGET_MAPPING)
-    assert len(r.invisible) == 6
+    assert len(r.invisible) == 2
+    assert TB_BUDGET_PARTIAL is TB_BUDGET_COMMODITY_ONLY
     for node in TB_BUDGET_PARTIAL:
         assert node in r.mapped and r.score[node] == 1.0
         assert NODE_LABELS[node] not in r.invisible

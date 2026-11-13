@@ -53,6 +53,17 @@ KNOWN = {
         notes="Downloaded from the Global TB Programme's own report repository. "
               "India 2017-2026; the 2026 row reports exp_tot = 0 with all "
               "components blank."),
+    "who_tb_dcf2026.pdf": dict(
+        file_id="WHO-TB-DCF-2026-03-25",
+        authority="WHO Global Tuberculosis Programme",
+        source="https://github.com/GTB-TME/gtbreport2026 (doc/who_tb_dcf2026.pdf)",
+        release_date="2026-03-25",
+        notes="The data collection form countries complete. It governs what each "
+              "budget column means and it is NOT distributed with the datasets. Its "
+              "definition of budget_prog names active case-finding, infection control "
+              "and public-private mix activities; the data dictionary's abbreviation "
+              "of the same line (programme costs to treat drug-susceptible TB) does "
+              "not. Archived here because the mapping depends on it."),
     "india_tb_report_table16_1.csv": dict(
         file_id="INDIA-TB-REPORT-2024-T16-1",
         authority="Central TB Division, Ministry of Health and Family Welfare, "
@@ -99,7 +110,10 @@ def describe(p: Path) -> dict:
 
 
 def inputs() -> list[Path]:
-    return sorted(q for q in DATA.glob("*.csv") if q.name != MANIFEST.name)
+    """Every file in data/, not only the CSVs: the data collection form is an
+    input too, since it governs what each budget column means."""
+    return sorted(q for q in DATA.iterdir()
+                  if q.is_file() and q.name != MANIFEST.name)
 
 
 def write() -> int:

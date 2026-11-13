@@ -294,6 +294,53 @@ excluding zero-to-zero pairs. Consistent with the counted/characterised division
 programme, so it is weak evidence and is reported in Paper B §5 as such. The headline counts (443 variables, six files)
 exclude it.
 
+### 2.5 The dictionary is an abbreviation of the form, and the abbreviation changed a headline
+
+**The biggest correction in the project.** Paper A reported that **six of eleven** interventions had no budget line,
+among them active case finding, airborne infection control and private-sector engagement. That was wrong. The true
+figure is **two**, and both are outside the TB programme's budget by design (bovine TB, milk pasteurisation).
+
+**How it happened.** The mapping was judged against `data/TB_dictionary_2026-08-25.csv`, which defines `budget_prog`
+as "Budget required for programme costs **to treat** drug-susceptible TB". Ruling S used exactly that phrase to move
+active case finding from mapped to unmapped, and recorded it as a win for reading definitions over column names. It
+was the right method applied to the wrong document. WHO's **data collection form** -- `doc/who_tb_dcf2026.pdf` in the
+Global TB Programme's own `GTB-TME/gtbreport2026` repository, now archived as `data/who_tb_dcf2026.pdf` -- defines
+line 16.1.4 as covering, verbatim: "the management and supervision of the TB control programme, training, policy
+development, meetings, visits for supervision, purchase of office equipment/vehicles, construction of buildings for
+use by programme staff, routine surveillance, advocacy and communication, public-private mix activities, community
+engagement, **active case-finding**, **infection control**, management of TB drug procurement and distribution, and
+programme activities linked to contact investigation for TB preventive treatment".
+
+The dictionary is an abbreviation of the form and the abbreviation excludes two activities the form names. An analyst
+using the file that ships with the data reaches a false conclusion about what the programme budgets for, and nothing
+in the data or the dictionary reveals it. The form is a separate document, is not distributed with the datasets, and
+was found only by going to WHO's report repository.
+
+**What the finding becomes, and it is stronger.** Not absence but non-separability: **no intervention of the eleven
+has a budget line of its own**. Two have none; three (infection control, active case finding, private-sector
+engagement) are named inside `budget_prog`, one figure pooling fourteen activities; three are covered only as a drug
+or one arm; three sit in a line far broader than themselves. For none of the eleven can a published figure answer
+"what did this cost?" The division is procurement, not priority: lines name what a programme buys, and pool what it
+does.
+
+**Consequences.** `src/provenance/existence.py` now carries `DCF_DEFINITIONS` verbatim beside the dictionary's
+`BUDGET_DEFINITIONS`, with four coverage conditions (none, pooled, commodity-only, dominant) and
+`TB_BUDGET_SEPARABLE`, which is False for all eleven. A test asserts the dictionary and the form disagree, so the
+divergence cannot be quietly reconciled later. Six tests in `test_existence.py` and one in `test_d1_tb.py` asserted
+the old counts and were rewritten. Paper A's abstract, key messages, §2.3, §3.5, Table 2, Table 3 and conclusions are
+restated, and the error is reported in a new §4.1.1 rather than removed: it is the same failure the funding-gap
+result describes, in a different register.
+
+**The three-of-the-top-five observation does not survive.** The two interventions with no line are ranks 7 and 10, so
+the claim that three of the five most-favoured interventions are fiscally invisible is withdrawn, not restated.
+
+**Also from the form, and it supports Paper B.** Sections 16.1 and 17.1 both instruct: "Please leave data items empty
+if their values are not known. **Enter 0 only if the true value is zero.**" Paper B's treatment of a repeated zero as
+a repeated statement of true absence, rather than as missing data, is therefore backed by the primary instrument and
+not only by inference (§2.4).
+
+---
+
 ## 3. Data provenance
 
 - `data/TB_budget_2026-11-12.csv` — WHO TB budget dataset, 1,720 rows, 215

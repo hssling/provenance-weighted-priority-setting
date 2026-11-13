@@ -16,7 +16,7 @@ Correspondence: hssling@yahoo.com · ORCID 0000-0002-4771-8285
 
 **Methods.** We compared WHO's reported TB budget and expenditure data for 215 countries (2017–2025) with India's national programme accounts, using dimensionless internal ratios (no currency conversion), and mapped eleven TB interventions onto WHO budget lines by definition, not name.
 
-**Results.** India reported expected funding exactly equal to budget required in all eight years 2018–2025: its WHO funding gap is zero **by construction**, not by observation. Fourteen of the 106 countries with five or more years report this way; 44 report a non-zero gap every year. India's own accounts record ₹18,388 crore approved against ₹23,169 crore requested (shortfall 5.4–46.1% by year). The two sources agree on execution (72% and 82% of budget spent) and on Global Fund support falling from 37% of expenditure to 1%. **Six of the eleven interventions have no budget line**; three more map only to drugs-only lines, leaving delivery costs unattributable.
+**Results.** India reported expected funding exactly equal to budget required in all eight years 2018–2025: its WHO funding gap is zero **by construction**, not by observation. Fourteen of 106 countries with five or more years report this way; 44 report a gap every year. India's own accounts record ₹18,388 crore approved against ₹23,169 crore requested (shortfall 5.4–46.1% by year). The sources agree on execution (72% and 82% of budget spent) and on Global Fund support falling from 37% of expenditure to 1%. **No intervention of eleven has a budget line of its own.** Two have no line; three are named by WHO's collection form inside one line pooling fourteen activities; three cover the drug but not its delivery.
 
 **Conclusions.** A budget records what a programme buys, not what it does. Commodities have line items; services largely do not, so spending on an intervention without a line cannot be identified. For India, the indicator meant to signal shortfall structurally cannot. Neither finding concerns how much TB control receives, and both are correctable: publish unmet need as its own field, and tag expenditure to interventions rather than commodity classes.
 
@@ -26,7 +26,7 @@ Correspondence: hssling@yahoo.com · ORCID 0000-0002-4771-8285
 
 - WHO's tuberculosis funding gap is read as a measure of under-resourcing, but India reported expected funding exactly equal to budget required in all eight years from 2018 to 2025, so its published gap is zero by construction rather than by observation.
 - Fourteen of the 106 countries with five or more years of data report the same way, while India's own national accounts record an annual shortfall of 5.4% to 46.1% between funds requested and approved, which the indicator cannot show.
-- Six of eleven tuberculosis interventions have no budget line and three more map only to drugs-only lines, so spending on them cannot be identified in the published record. Both problems are correctable without new money: publish unmet need as a field in its own right, and tag expenditure to interventions rather than to commodity classes.
+- No tuberculosis intervention of the eleven examined has a budget line of its own: active case finding, airborne infection control and private-sector engagement are named by WHO's reporting form but pooled with eleven other activities in a single figure, so what any of them costs cannot be recovered from the published record. Both problems are correctable without new money: publish unmet need as a field in its own right, and tag expenditure to interventions rather than to commodity classes.
 
 ---
 
@@ -66,7 +66,11 @@ An earlier formulation compared year-on-year proportional change in each source,
 
 ### 2.3 Mapping interventions to budget lines
 
-Eleven tuberculosis interventions were mapped onto WHO budget line items by definition. Their ranking, and the definitions of the interventions themselves, are taken as given from a separate manuscript under review (Siddalingaiah 2026a), in which they are ordered by a priority score built from the favourability of coded literature, not from a formal evidence synthesis. The mapping to budget lines does not depend on that ranking (§5). Each mapping was classified as **full** (the line covers the intervention), **partial** (the line covers part of it), or **absent** (no line exists). Mapping is declared data and is published with the code.
+Eleven tuberculosis interventions were mapped onto WHO budget line items by definition. Their ranking, and the definitions of the interventions themselves, are taken as given from a separate manuscript under review (Siddalingaiah 2026a), in which they are ordered by a priority score built from the favourability of coded literature, not from a formal evidence synthesis. The mapping to budget lines does not depend on that ranking (§5).
+
+**Which definition governs.** Two WHO documents define these columns and they do not agree. The data dictionary distributed with the datasets gives `budget_prog` as *"Budget required for programme costs to treat drug-susceptible TB"*. The data collection form, the instrument countries actually complete, gives the same line as covering *"the management and supervision of the TB control programme, training, policy development, meetings, visits for supervision, purchase of office equipment/vehicles, construction of buildings for use by programme staff, routine surveillance, advocacy and communication, public-private mix activities, community engagement, active case-finding, infection control, management of TB drug procurement and distribution, and programme activities linked to contact investigation for TB preventive treatment"* (WHO 2026c). The dictionary's abbreviation excludes case-finding and infection control; the form includes them. **We map against the form**, because it is what determines what a country enters. An earlier version of this analysis mapped against the dictionary and reported three activities as having no budget line when the form names them; §4.1.1 reports that error, because it is the kind of error this paper is about.
+
+Each mapping was then classified as **no line** (no WHO line covers the activity), **pooled** (the form names the activity inside a line it shares with many others), **commodity-only** (the line covers the drug or one arm, not the delivery), or **dominant** (the line's scope is largely this activity, though still shared). Mapping is declared data and is published with the code.
 
 ### 2.4 Reproducibility
 
@@ -122,35 +126,43 @@ Global Fund support fell from **37% of actual TB expenditure in 2017 to 1% in 20
 
 This is the clearest signal in the dataset and it is monotone. It also changes what the funding-gap indicator would be *for*: on our reasoning, an indicator built to describe the external financing landscape has diminishing purchase on a programme financed almost entirely from domestic sources. We know of no study that tests this.
 
-### 3.5 Six of eleven interventions have no budget line at all
+### 3.5 No intervention has a budget line of its own
 
-**Table 2. Interventions, in the rank order of a literature-favourability score from a manuscript under review (Siddalingaiah 2026a), against the budget classification.**
+**Table 2. Interventions, in the rank order of a literature-favourability score from a manuscript under review (Siddalingaiah 2026a), against the budget classification. Coverage is judged against WHO's data collection form (WHO 2026c), not the data dictionary; §2.3 explains why they differ.**
 
 | Rank | Intervention | WHO budget line | Coverage |
 |---:|---|---|---|
-| 1 | Molecular diagnostic scale-up (Xpert MTB/RIF, MTB/XDR) | `budget_lab` | Full |
-| 2 | Airborne infection prevention and control | — | **Absent** |
-| 3 | TB preventive therapy | `budget_tpt` | Partial — *drugs only* |
-| 4 | Whole-genome sequencing for DST prediction | — | **Absent** |
-| 5 | Active case finding | — | **Absent** |
-| 6 | Shorter all-oral regimen rollout (BPaL/BPaL-M) | `budget_sld` | Partial — *drugs only* |
-| 7 | Bovine tuberculosis control | — | **Absent** |
-| 8 | Private-sector engagement | — | **Absent** |
-| 9 | Nutritional support | `budget_patsup` | Full |
-| 10 | Milk pasteurisation / dairy food chain | — | **Absent** |
-| 11 | Integrated TB-HIV-diabetes care | `budget_tbhiv` | Partial — *TB/HIV only* |
+| 1 | Molecular diagnostic scale-up (Xpert MTB/RIF, MTB/XDR) | `budget_lab` | Dominant — shared with all laboratory costs |
+| 2 | Airborne infection prevention and control | `budget_prog` | **Pooled** — one of fourteen activities |
+| 3 | TB preventive therapy | `budget_tpt` | Commodity only — *drugs* |
+| 4 | Whole-genome sequencing for DST prediction | `budget_lab` | Dominant — shared with all laboratory costs |
+| 5 | Active case finding | `budget_prog` | **Pooled** — one of fourteen activities |
+| 6 | Shorter all-oral regimen rollout (BPaL/BPaL-M) | `budget_sld` | Commodity only — *drugs* |
+| 7 | Bovine tuberculosis control | — | **No line** |
+| 8 | Private-sector engagement | `budget_prog` | **Pooled** — one of fourteen activities |
+| 9 | Nutritional support | `budget_patsup` | Dominant — shared with all patient support |
+| 10 | Milk pasteurisation / dairy food chain | — | **No line** |
+| 11 | Integrated TB-HIV-diabetes care | `budget_tbhiv` | Commodity only — *TB/HIV arms* |
 
-*Ranking and intervention definitions are taken as given from Siddalingaiah (2026a, under review) and were not re-derived here. The rank is a priority-action score built from vocabulary-coded abstracts, without human validation, and its order changes with the coding rule; it is not a formal evidence ranking.*
+*Ranking and intervention definitions are taken as given from Siddalingaiah (2026a, under review) and were not re-derived here. The rank is a priority-action score built from vocabulary-coded abstracts, without human validation, and its order changes with the coding rule; it is not a formal evidence ranking. Nothing in this section depends on the order.*
 
-**Six of eleven interventions are fiscally untraceable, and only two map fully.** This count does not depend on the ranking. As a secondary observation, three of the six (ranks 2, 4 and 5) fall in the top five of the literature-favourability score in Siddalingaiah (2026a); because that score is not human-validated and its order is sensitive to its coding rule, we report this as descriptive and do not rest an argument on it.
+**Two interventions have no WHO budget line, and nine share a line with activities that are not theirs.** Only bovine tuberculosis control and milk pasteurisation are wholly absent, and both sit outside the TB programme's budget by design: they are animal-health and food-safety activities. The finding is not absence. It is that **no intervention in the table has a line of its own**, so for none of them can a published figure answer the question "what did this cost?"
 
-The pattern is not about priority. It is about **procurement**. Every full or partial mapping corresponds to something a programme *buys*: drugs (`budget_tpt`, `budget_sld`), laboratory equipment and supplies (`budget_lab`), cash transfers to patients (`budget_patsup`). Every absent mapping corresponds to something a programme *does*: ventilation and triage in facilities, finding cases actively, engaging private providers, working across the animal-human interface.
+The nine fall into three conditions. Three are **pooled**: airborne infection control, active case finding and private-sector engagement are each named in the form's definition of `budget_prog`, a single figure that also absorbs management, supervision, training, policy development, meetings, office equipment, buildings, routine surveillance, advocacy, community engagement, drug-procurement management and contact investigation — fourteen activities in one number. The form acknowledges these interventions exist; the published data cannot say what any of them cost. Three are **commodity-only**: `budget_tpt` is defined as preventive-treatment *drugs*, so the contact tracing, counselling and adherence support that deliver them are not in it; the same holds for the shorter regimen, whose drug cost sits in `budget_sld` while its programme cost sits in `budget_mdrmgt`, which no intervention in the table maps to. Three are **dominant**: the line's scope is largely the intervention, but `budget_lab` still carries every laboratory cost from construction to specimen transport, and `budget_patsup` every form of patient support.
 
-Even where a line exists, the same division operates within it. `budget_tpt` is defined as *"TB preventive treatment: **drugs**"*. The drugs for preventive therapy are traceable; the contact tracing, counselling and adherence support that deliver them are not. The same holds for the shorter-regimen rollout, whose drug cost is in `budget_sld` while its programme cost sits in `budget_mdrmgt`, which maps to no intervention at all.
+The division that produces this is **procurement**, not priority. The lines that name a single thing name something a programme *buys*: drugs, laboratory equipment and supplies, cash and food for patients. The activities that get pooled are things a programme *does*: ventilating a facility, going out to find cases, working with private providers, visiting a district. A chart of accounts built for purchasing records purchases well and activity badly, and that is what these eleven rows show.
 
 ---
 
 ## 4. Discussion
+
+### 4.1.1 An error this paper made, and how it was found
+
+An earlier version of this analysis reported that six of the eleven interventions had **no budget line at all**, among them active case finding, airborne infection control and private-sector engagement. That was wrong, and it was wrong for the reason the paper is about.
+
+The mapping was judged against the data dictionary distributed with the datasets, which defines `budget_prog` as *"programme costs to treat drug-susceptible TB"*. Active case finding is not treatment, so it was recorded as having no line. The data collection form, which is the document countries actually complete, defines the same line as covering *"active case-finding"* and *"infection control"* and *"public-private mix activities"* by name (WHO 2026c). The dictionary is an abbreviation of the form, and the abbreviation changed the meaning.
+
+Two things follow. The first is the correction above: the count of interventions with no line falls from six to two, and the finding is restated as the absence of a *separable* line rather than of any line. The second is that an analyst working from the file that ships with the data, as we did, reaches a false conclusion about what the programme budgets for — and nothing in the data, the dictionary or the published figures would reveal it. The form is a separate document, is not distributed with the datasets, and was found only by going to the Global TB Programme's own report repository. That is the same failure the funding-gap result describes, in a different register: the published artefact is not self-describing, and the description that travels with it is not sufficient.
 
 ### 4.1 Two different failures of visibility
 
@@ -193,7 +205,7 @@ Table 3 sets out the three together: what was found, the mechanism that produces
 | Finding | Mechanism that produces it | Who can change it | Change | Evidence it worked |
 |---|---|---|---|---|
 | India's published funding gap is zero in all eight years; 14 of 106 countries report the same way | Expected funding is reported equal to budget required, so the derived gap is zero by construction and carries no information about shortfall | WHO Global TB Programme, which defines the reporting form | One additional field recording whether the expected-funding figure reflects assessed need or anticipated availability | The 14 countries become distinguishable from the 44 that report a gap every year, with no change to any existing field |
-| Six of eleven interventions have no budget line; three more map only to drugs-only lines | The budget is classified by commodity class, so the cost of delivering an activity cannot be attributed to that activity | WHO Global TB Programme (reporting form) and national programmes (chart of accounts) | Tag expenditure to interventions as well as to commodity classes, approximately or as a share | Spending on active case finding, airborne infection control and private-sector engagement becomes a reportable number instead of an absence |
+| No intervention of eleven has a line of its own; three service-delivery activities share one line with eleven others | The chart of accounts is organised by what is purchased, so the cost of doing something is pooled into a line named for managing the programme | WHO Global TB Programme (reporting form) and national programmes (chart of accounts) | Tag expenditure to interventions as well as to commodity classes, approximately or as a share | Spending on active case finding, airborne infection control and private-sector engagement becomes a reportable number instead of an absence |
 | Released and spent amounts do not reconcile on the published page | The reconciling mechanism -- re-appropriation, lapse, carry-forward -- is not stated, so an arithmetic difference cannot be distinguished from an error | Central TB Division, India | A footnote naming the mechanism wherever released and spent differ | An apparent inconsistency becomes interpretable without altering any underlying figure |
 
 The structure of that table -- finding, mechanism, accountable body, action, verification -- follows audit practice, in which a finding is not closed by a recommendation but by evidence that the recommendation changed something.
@@ -216,7 +228,7 @@ Finally, WHO's reported figures are revised as countries submit corrections, so 
 
 ## 6. Conclusions
 
-A budget records what a programme buys, not what it does. In India's tuberculosis response, that distinction leaves six of eleven interventions without any line item (three of them among the top five on a literature-favourability score whose order is coding-rule sensitive), and leaves the delivery cost of three more pooled into categories from which it cannot be recovered.
+A budget records what a programme buys, not what it does. In India's tuberculosis response, that distinction leaves no intervention of eleven with a line of its own: two fall outside the budget entirely, three are named by the reporting form but pooled with eleven other activities in one figure, three are visible only as a drug cost, and three sit inside a line far broader than themselves. In none of the eleven cases can the published record say what the intervention cost.
 
 Meanwhile the international indicator intended to signal resource shortfall reports zero for India in every year, because the two quantities behind it are not independently determined — while the national accounts, over the same years, record that a fifth of the requested budget was never approved and a third of it was never spent.
 
@@ -259,6 +271,8 @@ World Health Organization (WHO). 2025. *Global Tuberculosis Report 2025*. Geneva
 World Health Organization (WHO). 2026a. Global Tuberculosis Programme country data: TB budget, and TB expenditure and utilisation datasets. Geneva: World Health Organization. https://extranet.who.int/tme/, data files dated 25 August and 12 November 2026. This data-collection system no longer accepts updates; the archived input files are deposited with the analysis code.
 
 World Health Organization (WHO). 2026b. Global Tuberculosis Programme data dictionary (file TB_dictionary_2026-08-25.csv). Geneva: World Health Organization. Archived with the analysis code.
+
+World Health Organization (WHO). 2026c. *WHO TB data collection form 2026*, version 2026-03-25. Geneva: World Health Organization. Distributed in the Global TB Programme's report repository at https://github.com/GTB-TME/gtbreport2026 (doc/who_tb_dcf2026.pdf); not distributed with the datasets.
 
 ---
 

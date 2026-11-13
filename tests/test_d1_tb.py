@@ -264,9 +264,15 @@ def test_financing_audit_reproduces_the_recorded_findings():
 def test_invisibility_csv_matches_findings():
     rows = _csv("d1_invisibility.csv")
     assert len(rows) == 11
-    none = {int(r["evidence_rank"]) for r in rows if r["coverage"] == "none"}
-    assert none == {2, 4, 5, 7, 8, 10}
-    assert {int(r["evidence_rank"]) for r in rows if r["coverage"] == "partial"} == {3, 6, 11}
+    cov = lambda c: {int(r["evidence_rank"]) for r in rows if r["coverage"] == c}
+    # Only bovine TB and milk pasteurisation have no line, and both are outside
+    # the TB programme budget. The three in budget_prog are named by the data
+    # collection form, which the data dictionary abbreviates misleadingly.
+    assert cov("none") == {7, 10}
+    assert cov("pooled") == {2, 5, 8}
+    assert cov("commodity") == {3, 6, 11}
+    assert cov("dominant") == {1, 4, 9}
+    assert len(rows) == sum(len(cov(c)) for c in ("none","pooled","commodity","dominant"))
 
 
 # ---- Ruling GG: T4 subsumes T3 in the composite; both are still reported --------------------------
