@@ -207,3 +207,46 @@ Paper B
 4. Candidates seen in search results but not used: Chang 2019 and Lu 2010 (general health-financing estimates, weakly connected); Travasso, BMJ 2015, h4157 (news item on India AIDS spending, exists in Crossref but I did not read it); Roodman 2007 (aid absorptive capacity, not health); Weiss et al. on models of care (not found in Crossref, so not cited).
 
 Counts: 28 numbered items. 25 are Crossref-verified DOIs (refs 1-12 and 14-26), of which one is a working paper (ref 7). One non-DOI item (13) was verified by fetching the WHO page. Two are project-internal (27 JSSTD forthcoming, 28 IJTB under review).
+
+---
+
+## Full-text verification pass, 13 November 2026
+
+The file above records that Crossref confirms a record exists and what it is titled, not that the paper supports the
+claim. Seven references were therefore read against the exact sentence citing them. Sources reached: Reid 2019 (Erasmus
+repository PDF of the Lancet Commission), Su 2020 (Europe PMC PMC7649746), Bertone 2026 (Queen Margaret University
+repository PDF, CC BY, DOI-identical to the Wiley version, whose own page is bot-blocked), Maiga 2019 (PMC6768347),
+Lundin 2022 (PMC9031513), Bassili 2013 (PMC3741248), Ho 2017 (PMC5537756).
+
+| ref | paper | sentence it supports | verdict |
+|---|---|---|---|
+| Reid 2019 | A [2] | "Funding-need figures of this kind are used in TB investment cases and advocacy" | supports |
+| Su 2020 | A [15] | cited as a modelled external reconstruction of TB spending | supports |
+| Bertone 2026 | A [12] | "programme-based budgeting ... is reported to remain relatively superficial" | supports |
+| Maiga 2019 | B [3,4] | "The quality of routine health data has been assessed in other settings" | supports |
+| Lundin 2022 | B [3,4] | as above | supports |
+| Bassili 2013 | B [8,9] | "The effectiveness of the two approaches has been reviewed systematically" | supports |
+| Ho 2017 | B [8,9] | as above | supports |
+
+Points worth keeping:
+
+- **Reid 2019** uses the WHO funding-need framing the paper is about: need "defined in terms of the resources required
+  to reach global End TB targets", cited in the Commission to the WHO Global Tuberculosis Report. The citation is apt,
+  not merely adjacent.
+- **Su 2020** is a modelling study in its own words, estimating out-of-pocket and private prepaid spending and spending
+  on non-notified cases. It takes the WHO global TB database among its inputs, so it is not fully independent of the
+  reporting form — which strengthens rather than weakens the sentence it supports ("they do not replace the reporting
+  form stating the distinction itself").
+- **Bertone 2026** asserts the superficiality finding in its own voice in the abstract and reaches it in the Discussion,
+  while its Introduction also cites prior work for it. The manuscript's hedge "is reported to remain" is therefore
+  correct and should not be strengthened.
+- **Bertone 2026 citation.** Still online-only: Crossref, PubMed (PMID 42806765) and OpenAlex all have volume, issue and
+  pages null, and the PDF's own citation line carries Wiley's `00` placeholder. Published online 29 September 2026, 11
+  pages, CC BY 4.0. The reference now reads "2026 Sep 29 [online ahead of print]", which is submission-safe and will
+  not need revisiting.
+- **Bassili 2013.** DOI `10.4269/ajtmh.13-0004` re-confirmed as the TB review (PMID 23926140). The mistyped
+  `10.4269/ajtmh.13-0040`, which returns a mosquito-genetics paper, is not in either manuscript.
+
+Not re-read, and the reason: Herschel 2017 (B [12]) supports only the generic claim that provenance has "a substantial
+technical literature", which its title and venue establish. The WHO documents, the Global Fund board paper, Peng 2011,
+Wilkinson 2016, Gebru 2021 and the author's own papers were out of scope for this pass.

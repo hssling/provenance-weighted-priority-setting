@@ -36,6 +36,13 @@ def main() -> int:
     results = [run(m.name, [sys.executable, "-m", "pytest", str(m), "-q", "-p", "no:cacheprovider"])
                for m in modules]
     results.append(run("demos/d1_tb.py", [sys.executable, str(ROOT / "demos" / "d1_tb.py")]))
+    results.append(run("demos/d2_who_data_screen.py",
+                       [sys.executable, str(ROOT / "demos" / "d2_who_data_screen.py")]))
+    # Self-similarity gates on a factual condition (a long verbatim run), not a
+    # percentage, so it is safe in the suite. It skips cleanly if a comparison
+    # document is missing from this machine.
+    results.append(run("verification/check_self_similarity.py",
+                       [sys.executable, str(ROOT / "verification" / "check_self_similarity.py")]))
     failed = results.count(False)
     print(f"\n{len(results) - failed}/{len(results)} checks passed")
     return 1 if failed else 0
