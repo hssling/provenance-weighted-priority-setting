@@ -2,7 +2,7 @@
 
 **Running title:** Kind and vintage in WHO TB data
 
-**Word count:** 2,930 words (main text, excluding abstract, key messages, tables, figures, references and declarations)
+**Word count:** 2,935 words (main text, excluding abstract, key messages, tables, figures, references and declarations)
 
 ---
 
@@ -28,11 +28,11 @@
 
 ## 1. Background
 
-WHO's Global Tuberculosis Programme collects and republishes country-reported data on TB financing and service delivery [1,2]. They are used in investment cases, cross-country comparisons and modelling studies, and are distributed as flat annual tables carrying column names only, with definitions in a separate dictionary. In practice the variables are treated as equivalent — each a country's report for that year.
+WHO's Global Tuberculosis Programme collects and republishes country-reported data on TB financing and service delivery.^1,2^ They are used in investment cases, cross-country comparisons and modelling studies, and are distributed as flat annual tables carrying column names only, with definitions in a separate dictionary. In practice the variables are treated as equivalent — each a country's report for that year.
 
-This paper asks a prior question. A number in an annual return may be a measurement taken that year, or an estimate entered once and repeated because no one revised it. Only a value that is re-established each year supports inference about change over time. WHO's dictionary does say, for some variables, that the quantity is an estimate; for example the share of patients hospitalised is defined as an "Estimated percentage". Two things remain unsaid. The label is in a different file from the data. And it describes the kind of quantity, not the vintage of each value: whether this year's entry was revised from last year's, or simply restated. The term comes from economics, where a vintage is a series as published on a given date and results are tested for robustness to it [3].
+This paper asks a prior question. A number in an annual return may be a measurement taken that year, or an estimate entered once and repeated because no one revised it. Only a value that is re-established each year supports inference about change over time. WHO's dictionary does say, for some variables, that the quantity is an estimate; for example the share of patients hospitalised is defined as an "Estimated percentage". Two things remain unsaid. The label is in a different file from the data. And it describes the kind of quantity, not the vintage of each value: whether this year's entry was revised from last year's, or simply restated. The term comes from economics, where a vintage is a series as published on a given date and results are tested for robustness to it.^3^
 
-The quality of routine health data has been assessed in other settings [4,5], but, to our knowledge, not for vintage in these datasets. The question is tractable because signatures of restatement are computable from the published file alone. Comparing the screen's verdicts with the dictionary's labels gives it a partial external check.
+The quality of routine health data has been assessed in other settings,^4,5^ but, to our knowledge, not for vintage in these datasets. The question is tractable because signatures of restatement are computable from the published file alone. Comparing the screen's verdicts with the dictionary's labels gives it a partial external check.
 
 ---
 
@@ -40,19 +40,19 @@ The quality of routine health data has been assessed in other settings [4,5], bu
 
 ### 2.1 Data
 
-Six files from WHO's tuberculosis programme, retrieved in November 2026 and archived with the analysis code; file versions are WHO's own release dates, 12 November 2026 for the budget file and 25 August 2026 for the other five and the dictionary. Together they hold 25,181 country-year records for 217 countries and areas, 1980 to 2026; Supplementary S0 lists each file's rows, years and columns. The budget and expenditure files were screened first (77 variables) and the other four afterwards, as a replication.
+Six files from WHO's tuberculosis programme, retrieved in November 2026 and archived with the analysis code; file versions are WHO's own release dates, 12 November 2026 for the budget file and 25 August 2026 for the other five and the dictionary. Together they hold 25,181 country-year records for 217 countries and areas, 1980 to 2026; Supplementary Note 1 lists each file's rows, years and columns. The budget and expenditure files were screened first (77 variables) and the other four afterwards, as a replication.
 
-WHO's published data dictionary [6] supplied every variable definition and is the comparison standard in §3.4. Definitions are used rather than column names, because the two diverge: `budget_prog` reads as programme costs generally but is defined as *"programme costs to treat drug-susceptible TB"*.
+WHO's published data dictionary^6^ supplied every variable definition and is the comparison standard in §3.4. Definitions are used rather than column names, because the two diverge: `budget_prog` reads as programme costs generally but is defined as *"programme costs to treat drug-susceptible TB"*.
 
 ### 2.2 The screens
 
-Each screen is computable from the published file alone (Figure 1); the full specification, with the convention chosen for every threshold, is in Supplementary S1. **S0** sets aside as *categorical* any variable with five or fewer distinct values, because a status flag legitimately repeats, takes few values and sits on round numbers for reasons unrelated to estimation. **S0b** sets aside as *untestable* any continuous variable for which no country has an adjacent pair of observations, since a test that could not run is not evidence of cleanliness. The remaining continuous variables are assessed on four signatures: **repetition**, the share of consecutive country-year pairs holding an identical value; **granularity**, the distinct-value ratio, the share held by the single most common value, and the share falling on round numbers; **identity**, whether published components sum to their published total; and **bounds**, whether values respect a range implied by the definition. A variable is classified *measurement-like* (trips none or one), *mixed* (two) or *estimate-like* (three or four). No single screen condemns a variable: a small count is legitimately round and a stable quantity legitimately repeats. Thresholds are conventions, stated in the code. Finally, **S5** compares each verdict with the variable's dictionary definition, counting a variable as labelled if that definition contains "estimat" or "typical".
+Each screen is computable from the published file alone (Figure 1); the full specification, with the convention chosen for every threshold, is in Supplementary Note 2. **S0** sets aside as *categorical* any variable with five or fewer distinct values, because a status flag legitimately repeats, takes few values and sits on round numbers for reasons unrelated to estimation. **S0b** sets aside as *untestable* any continuous variable for which no country has an adjacent pair of observations, since a test that could not run is not evidence of cleanliness. The remaining continuous variables are assessed on four signatures: **repetition**, the share of consecutive country-year pairs holding an identical value; **granularity**, the distinct-value ratio, the share held by the single most common value, and the share falling on round numbers; **identity**, whether published components sum to their published total; and **bounds**, whether values respect a range implied by the definition. A variable is classified *measurement-like* (trips none or one), *mixed* (two) or *estimate-like* (three or four). No single screen condemns a variable: a small count is legitimately round and a stable quantity legitimately repeats. Thresholds are conventions, stated in the code. Finally, **S5** compares each verdict with the variable's dictionary definition, counting a variable as labelled if that definition contains "estimat" or "typical".
 
-These screens are our own operationalisation of non-measurement, justified by face validity; we know of no published validation of them for country-reported programme data. The nearest framework, WHO's data quality assurance toolkit [7], assesses completeness and internal and external consistency of facility data; our screens are of that general kind but were designed for published country returns and are not an implementation of it.
+These screens are our own operationalisation of non-measurement, justified by face validity; we know of no published validation of them for country-reported programme data. The nearest framework, WHO's data quality assurance toolkit,^7^ assesses completeness and internal and external consistency of facility data; our screens are of that general kind but were designed for published country returns and are not an implementation of it.
 
 ### 2.3 Reproducibility
 
-The screen is a single pure-Python script with no third-party dependency. It regenerates every number in this paper from the raw files in one command [8], including the counterfactual without rule S0 (Supplementary S1c), and writes a per-variable results table; the figures are drawn from those outputs separately. A large language model was used as a drafting and analysis assistant; every analytical decision, the code and its verification are the author's. Code, archived inputs and the results table: [repository URL withheld for blind review], [archive DOI withheld for blind review].
+The screen is a single pure-Python script with no third-party dependency. It regenerates every number in this paper from the raw files in one command,^8^ including the counterfactual without rule S0 (Supplementary Note 3), and writes a per-variable results table; the figures are drawn from those outputs separately. A large language model was used as a drafting and analysis assistant; every analytical decision, the code and its verification are the author's. Code, archived inputs and the results table: [repository URL withheld for blind review], [archive DOI withheld for blind review].
 
 ### 2.4 Ethics
 
@@ -92,7 +92,7 @@ This matters for interpretation. The financial variables are not merely more var
 
 `hospd_prct_mdr`, the share of drug-resistant TB patients hospitalised, illustrates the practical consequence. It covers **199 countries** and **1,421 country-years** — coverage that invites a cross-country or trend analysis.
 
-Hospitalised versus ambulatory or decentralised management is a substantive model-of-care choice, reviewed systematically [9,10] and addressed in WHO's current guidance [11].
+Hospitalised versus ambulatory or decentralised management is a substantive model-of-care choice, reviewed systematically^9,10^ and addressed in WHO's current guidance.^11^
 
 It has **81 distinct values**. **35.3%** of observations are exactly 100; **11.6%** are exactly 0; **70.5%** fall on multiples of ten. Among the 178 countries with four or more years of data, **42% report an identical value in their first and last year**.
 
@@ -140,7 +140,7 @@ The one financial variable the screen flags, `cf_tot_usaid`, is a different case
 
 **Cross-sectional comparison is weaker than it looks.** With 81 distinct values over 199 countries, much apparent between-country variation is variation between conventional answers.
 
-**Internal consistency is not validity.** The financial variables reconcile at 98.9-100% yet remain subject to definitional change and reporting convention; arithmetic cannot show that a line item means the same thing in two countries, a distinction WHO's data quality framework also draws [7].
+**Internal consistency is not validity.** The financial variables reconcile at 98.9-100% yet remain subject to definitional change and reporting convention; arithmetic cannot show that a line item means the same thing in two countries, a distinction WHO's data quality framework also draws.^7^
 
 **Programme evaluation inherits the same blind spot.** Strategic-plan reviews track laboratory capacity and models of care over time. An unchanged characterised variable may record an unchanged system or a figure nobody re-measured; only the reporting programme can say which, and an evaluation that does not ask will read restatement as stability.
 
@@ -148,17 +148,17 @@ The one financial variable the screen flags, `cf_tot_usaid`, is a different case
 
 ### 4.4 What would fix it
 
-**A vintage flag per value.** Because the kind of quantity is often already labelled (§4.1), the remedy is not to add a kind field. It is to record, for each variable-year, whether the value was newly established, re-confirmed or restated unchanged from the previous return, or the year in which it was last revised. Only the national programme completing the return knows which applies, and recording it costs nothing. Provenance metadata is a recognised element of data stewardship [12], with a substantial technical literature [13].
+**A vintage flag per value.** Because the kind of quantity is often already labelled (§4.1), the remedy is not to add a kind field. It is to record, for each variable-year, whether the value was newly established, re-confirmed or restated unchanged from the previous return, or the year in which it was last revised. Only the national programme completing the return knows which applies, and recording it costs nothing. Provenance metadata is a recognised element of data stewardship,^12^ with a substantial technical literature.^13^
 
 **Ship the labels with the data.** The dictionary's "Estimated" and "Typical" labels would reach analysts if carried in the data file or its column metadata, rather than in a separate download that a join on column names bypasses.
 
-**Publish the screen with the data.** The tests here are generic. Running them at release and shipping the results table would let every user see, before analysis, which variables carry annual information; until a vintage flag exists, this is a stand-in for it. Documentation shipped with a dataset has precedent in the datasheet proposal [14].
+**Publish the screen with the data.** The tests here are generic. Running them at release and shipping the results table would let every user see, before analysis, which variables carry annual information; until a vintage flag exists, this is a stand-in for it. Documentation shipped with a dataset has precedent in the datasheet proposal.^14^
 
 ---
 
 ## 5. Limitations
 
-The screens detect signatures consistent with non-measurement; they cannot prove any particular value was carried forward rather than re-measured and found unchanged. A genuinely stable quantity is indistinguishable, on internal evidence, from an unrevised one, which is precisely the ambiguity a provenance flag would remove. The thresholds are conventions chosen before the results were examined and stated in the code; the bimodality of the underlying distribution means moderate changes do not move variables between classes, but a reader preferring different cut-points can recompute. We screened six files from one programme at one point in time, and the counted/characterised division was found post hoc, so whether it generalises to other WHO disease programmes is an open and directly testable question. The 43 untestable variables are unclassified, not clean, and are concentrated in treatment outcomes and laboratory data. Supplementary S3 states these limitations in full, and Supplementary S1c and S2 demonstrate two failure modes the method itself exhibits on these data.
+The screens detect signatures consistent with non-measurement; they cannot prove any particular value was carried forward rather than re-measured and found unchanged. A genuinely stable quantity is indistinguishable, on internal evidence, from an unrevised one, which is precisely the ambiguity a provenance flag would remove. The thresholds are conventions chosen before the results were examined and stated in the code; the bimodality of the underlying distribution means moderate changes do not move variables between classes, but a reader preferring different cut-points can recompute. We screened six files from one programme at one point in time, and the counted/characterised division was found post hoc, so whether it generalises to other WHO disease programmes is an open and directly testable question. The 43 untestable variables are unclassified, not clean, and are concentrated in treatment outcomes and laboratory data. Supplementary Notes 3 and 4 demonstrate two failure modes the method itself exhibits on these data, and Supplementary Note 5 states these limitations in full.
 
 ## 6. Conclusions
 
@@ -212,7 +212,7 @@ Two changes would settle this at source: a vintage flag for each value, which th
 
 ## Declarations
 
-**Reporting.** This study is reported in accordance with the RECORD statement for studies using routinely collected health data [15]; the completed checklist accompanies this submission.
+**Reporting.** This study is reported in accordance with the RECORD statement for studies using routinely collected health data;^15^ the completed checklist accompanies this submission.
 
 **Contributors.** Sole author: conception, analysis, code, verification, manuscript.
 

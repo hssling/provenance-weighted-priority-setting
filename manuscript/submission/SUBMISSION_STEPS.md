@@ -98,7 +98,7 @@ Paper B's cover letter now says its companion goes to IJTB and that IJTB-S-26-01
 **Open the PDF the portal builds and read it.** Your IJTB-S-26-01305 portal PDF is where broken table
 columns were caught. Check specifically:
 
-- the reference list prints **[1] to [22]** in order. Word restarted a list-numbered reference list at 1 on
+- in-text citations are **superscript, after punctuation** (IJTB guide: "identify the reference numbers in the text in superscript"; your published IJTB article prints them so), and the reference list prints **[1] to [22]** in order. Word restarted a list-numbered reference list at 1 on
   the third entry, so the build now writes the numbers as text; confirm they survived;
 - tables have rules and no words broken mid-syllable; ₹, §, en-dashes and "Sempé" render;
 - the abstract pasted into the portal matches the document word for word;

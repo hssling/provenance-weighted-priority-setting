@@ -37,9 +37,20 @@ Notes on the pooled and commodity-only conditions, verbatim from the code:
 
 ---
 
-## S2. India's national programme accounts, year by year
+## S2. How countries report the two fields
 
-The series behind Figure 1, as published in the India TB Report 2024, Table 16.1 (p.174). Amounts are in INR crore. The shortfall column is (requested - approved) / requested. Two cells of the source table were damaged in text extraction and were restored digit by digit against the printed page. Released amounts are not printed for 2022 and 2023.
+Of the **106** countries with five or more years of both `budget_tot` and `cf_tot`, **14** report expected funding exactly equal to budget required in every year, so their published funding gap is zero by construction; **44** report a non-zero gap in every year. The remainder do both at different times.
+
+**Always equal (14):** ARG, BGR, BIH, BOL, CPV, FSM, IND, LBY, MEX, MYS, RUS, SLB, SLV, TLS.
+
+**Never equal (44):** BDI, BEN, BGD, BTN, BWA, CAF, CHN, CIV, COD, DOM, ETH, GEO, GHA, GNB, GUY, HTI, IDN, IRQ, JOR, KEN, KHM, LBN, LSO, MMR, MWI, NAM, NGA, PER, PHL, PNG, PRK, PRY, SEN, SLE, SUR, TCD, TJK, TZA, UGA, VEN, VNM, YEM, ZMB, ZWE.
+
+
+---
+
+## S3. India's national programme accounts, year by year
+
+The series behind Figure 1, as published in the India TB Report 2024, table 16.1 (p.174). Amounts are in INR crore. The shortfall column is (requested - approved) / requested. Two cells of the source table were damaged in text extraction and were restored digit by digit against the printed page. Released amounts are not printed for 2022 and 2023.
 
 | Fiscal year | Requested | Approved | Released | Spent | Shortfall |
 |---|---:|---:|---:|---:|---:|
@@ -51,14 +62,3 @@ The series behind Figure 1, as published in the India TB Report 2024, Table 16.1
 | 2022 | 3,088.87 | 1,666.33 | not published | 910.83 | 46.1% |
 | 2023 | 3,057.42 | 1,888.82 | not published | 840.49 | 38.2% |
 | **Total** | **23,169.14** | **18,388.23** | **3,825.31** | **15,063.46** | **20.6%** |
-
----
-
-## S3. How countries report the two fields
-
-Of the **106** countries with five or more years of both `budget_tot` and `cf_tot`, **14** report expected funding exactly equal to budget required in every year, so their published funding gap is zero by construction; **44** report a non-zero gap in every year. The remainder do both at different times.
-
-**Always equal (14):** ARG, BGR, BIH, BOL, CPV, FSM, IND, LBY, MEX, MYS, RUS, SLB, SLV, TLS.
-
-**Never equal (44):** BDI, BEN, BGD, BTN, BWA, CAF, CHN, CIV, COD, DOM, ETH, GEO, GHA, GNB, GUY, HTI, IDN, IRQ, JOR, KEN, KHM, LBN, LSO, MMR, MWI, NAM, NGA, PER, PHL, PNG, PRK, PRY, SEN, SLE, SUR, TCD, TJK, TZA, UGA, VEN, VNM, YEM, ZMB, ZWE.
-

@@ -27,9 +27,9 @@ The *Indian Journal of Tuberculosis* names no reporting guideline for this desig
 | **STROBE 9** | Bias | The classification depends on which WHO document defines a budget line; both are reported and the size of the difference is quantified | §3.5; Supplementary S1 |
 | **STROBE 10** | Study size | 215 countries, 2017–2025; the whole reported population, not a sample | §2.1 |
 | **STROBE 11** | Quantitative variables handling | Comparison uses dimensionless internal ratios, so no currency conversion or deflation is applied; the reason is stated | §2.2 |
-| **STROBE 12a–e** | Statistical methods, subgroups, missing data, sensitivity | Descriptive accounting comparison; no model is fitted and no p-value is reported. Two cells damaged in text extraction from the national table are reported, with their restoration against the printed page | §2.2; Supplementary S2 |
+| **STROBE 12a–e** | Statistical methods, subgroups, missing data, sensitivity | Descriptive accounting comparison; no model is fitted and no p-value is reported. Two cells damaged in text extraction from the national table are reported, with their restoration against the printed page | §2.2; Supplementary S3 |
 | **RECORD 12.1** | Extent of access to the database population | Complete. Both sources are public and are archived with the analysis | §2.4; Data availability |
-| **RECORD 12.2** | Describe data cleaning | **None, with one documented exception.** Values are used as published; two cells damaged in text extraction from the India TB Report were restored digit by digit against the printed page and confirmed against the published column totals | Supplementary S2 |
+| **RECORD 12.2** | Describe data cleaning | **None, with one documented exception.** Values are used as published; two cells damaged in text extraction from the India TB Report were restored digit by digit against the printed page and confirmed against the published column totals | Supplementary S3 |
 | **RECORD 12.3** | Linkage and linkage quality | **Not applicable.** No linkage | §2.2 |
 | **STROBE 13 / RECORD 13.1** | Selection, including filtering on data quality and availability | Country-years, not persons. Where a subset is used (106 countries with ≥5 years) the rule and the count are stated | §3.1 |
 | **STROBE 14** | Descriptive data | Tables 1–2, Figures 1–2 | §3 |

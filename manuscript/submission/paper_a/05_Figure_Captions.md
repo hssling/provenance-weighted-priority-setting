@@ -8,7 +8,7 @@ Figures are supplied separately as 600 dpi TIFF files for production; PNG previe
 
 ![](92_Figure_1_preview.png){width=6.3in}
 
-**Figure 1. Two accounts of the same years.** India's funding gap as reported to WHO, against the shortfall recorded in India's own programme accounts, 2018–2023. The WHO-reported gap is zero in every year because expected funding is reported equal to budget required; over the same years the national accounts record approvals falling short of requests by 5.4% to 46.1%. Values are percentages of the amount required (WHO) or requested (national accounts). National years are the first year of India's April–March fiscal year (2018 denotes 2018–19); the WHO series is plotted by reporting year. Sources: WHO TB budget dataset [7] and India TB Report 2024, Table 16.1 [2].
+**Figure 1. Two accounts of the same years.** India's funding gap as reported to WHO, against the shortfall recorded in India's own programme accounts, 2018–2023. The WHO-reported gap is zero in every year because expected funding is reported equal to budget required; over the same years the national accounts record approvals falling short of requests by 5.4% to 46.1%. Values are percentages of the amount required (WHO) or requested (national accounts). National years are the first year of India's April–March fiscal year (2018 denotes 2018–19); the WHO series is plotted by reporting year. Sources: WHO TB budget dataset [7] and India TB Report 2024, report table 16.1 [2].
 
 ## Figure 2
 

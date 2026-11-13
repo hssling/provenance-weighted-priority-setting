@@ -17,17 +17,17 @@ The *International Journal of Epidemiology* requires RECORD for studies using ro
 | **STROBE 2** | Background and rationale | §1 | §1 |
 | **STROBE 3** | Objectives | §1, final paragraph | §1 |
 | **STROBE 4** | Study design | Cross-sectional screen of every numeric variable in six published datasets | §2.2, Figure 1 |
-| **STROBE 5** | Setting, locations, periods | §2.1 and Supplementary S0 give each file's rows, years and columns | §2.1; Supplementary S0 |
+| **STROBE 5** | Setting, locations, periods | §2.1 and Supplementary Note 1 give each file's rows, years and columns | §2.1; Supplementary Note 1 |
 | **STROBE 6a / RECORD 6.1** | Eligibility criteria and selection methods | Every numeric variable with ≥100 non-missing values; the two rules that set variables aside (S0, S0b) are stated with their counts | §2.2; Figure 1 |
 | **RECORD 6.2** | Reference any validation of the codes or algorithms used for selection | **None exists.** We know of no published validation of these screens for country-reported programme data, and we say so rather than implying one | §2.2; §5 |
 | **RECORD 6.3** | If validation was done for this study, give methods and results | The screen's verdicts are compared against WHO's own dictionary labels as an external standard (§3.4); agreement is reported with its chance probability | §3.4 |
 | **RECORD 6.4** | Consider a flow diagram for the data linkage process | No linkage; a flow diagram is nonetheless provided for variable selection and classification | Figure 1 |
-| **STROBE 7 / RECORD 7.1** | Define all variables; give the complete list of codes and algorithms | Every screen is defined in §2.2 and specified in full in Supplementary S1; the code that computes them is deposited, and the per-variable results table is published | §2.2; Supplementary S1; data availability |
+| **STROBE 7 / RECORD 7.1** | Define all variables; give the complete list of codes and algorithms | Every screen is defined in §2.2 and specified in full in Supplementary Note 2; the code that computes them is deposited, and the per-variable results table is published | §2.2; Supplementary Note 2; data availability |
 | **STROBE 8** | Data sources and measurement | §2.1; all six input files are archived and hashed | §2.1; `data/raw_file_manifest.csv` |
-| **STROBE 9** | Bias | Two failure modes of the method itself are demonstrated on these data and reported, not removed | §5; Supplementary S1c, S2 |
+| **STROBE 9** | Bias | Two failure modes of the method itself are demonstrated on these data and reported, not removed | §5; Supplementary Notes 3–4 |
 | **STROBE 10** | Study size | 443 variables, 25,181 country-year records; no sample-size calculation applies as the entire population of variables is screened | Abstract; §2.1 |
-| **STROBE 11** | Quantitative variables handling | Thresholds for every screen were fixed before results were examined and are stated in the code | §2.2; Supplementary S1 |
-| **STROBE 12a–e** | Statistical methods, subgroups, missing data, loss to follow-up, sensitivity | Descriptive throughout; missing values are excluded per variable; the zero-exclusion sensitivity and the S0b sensitivity are both reported | §3.1, Table 2; Supplementary S1a |
+| **STROBE 11** | Quantitative variables handling | Thresholds for every screen were fixed before results were examined and are stated in the code | §2.2; Supplementary Note 2 |
+| **STROBE 12a–e** | Statistical methods, subgroups, missing data, loss to follow-up, sensitivity | Descriptive throughout; missing values are excluded per variable; the zero-exclusion sensitivity and the S0b sensitivity are both reported | §3.1, Table 2; Supplementary Note 2 |
 | **RECORD 12.1** | Describe the extent of access to the database population | Complete. All six files are public, were downloaded in full, and are archived with the analysis | §2.1; data availability |
 | **RECORD 12.2** | Describe data cleaning | **None was performed.** The files are screened exactly as published; no value was recoded, imputed or removed. This is a deliberate condition of the study, since cleaning would destroy the signal being measured | §2.1; §2.2 |
 | **RECORD 12.3** | State whether data were linked and how linkage quality was assessed | **Not applicable.** No linkage | §2.1 |
@@ -37,7 +37,7 @@ The *International Journal of Epidemiology* requires RECORD for studies using ro
 | **STROBE 16** | Main results with estimates and precision | Repetition by dataset and by variable, with medians and full distributions; no confidence intervals are reported because every variable in the population is screened rather than sampled | §3.1, Tables 1–2, Figure 2 |
 | **STROBE 17** | Other analyses | Comparison against dictionary labels; zero-exclusion sensitivity | §3.1, §3.4 |
 | **STROBE 18** | Key results | §6 | §6 |
-| **STROBE 19 / RECORD 19.1** | Limitations, including the implications of using data not created to answer this question | The data were created for programme monitoring, not for provenance research; what the screen cannot establish is stated first, and the method's own failure modes are reported | §5; Supplementary S3 |
+| **STROBE 19 / RECORD 19.1** | Limitations, including the implications of using data not created to answer this question | The data were created for programme monitoring, not for provenance research; what the screen cannot establish is stated first, and the method's own failure modes are reported | §5; Supplementary Note 5 |
 | **STROBE 20** | Interpretation | §4, §6 | §4, §6 |
 | **STROBE 21** | Generalisability | Six files, one programme, one time point; generalisation beyond TB is stated as open and directly testable | §5 |
 | **STROBE 22** | Funding | None | Declarations |

@@ -84,13 +84,41 @@ def main() -> int:
     for key, note in {**TB_BUDGET_POOLED, **TB_BUDGET_COMMODITY_ONLY}.items():
         L.append(f"- **{NODE_LABELS[key]}** — {note}")
 
-    # ---- S2: the national financial series behind Figure 1 -------------------
+    # Sections follow the order of first citation in the main text: S2 is
+    # cited in §3.1, S3 in §3.2.
+    # ---- S2: how every country reports the two fields ------------------------
+    brows = list(csv.DictReader(
+        (ROOT / "data" / "TB_budget_2026-11-12.csv").open(encoding="utf-8-sig")))
+    by = defaultdict(list)
+    for r in brows:
+        try:
+            b, c = float(r["budget_tot"]), float(r["cf_tot"])
+        except (ValueError, KeyError):
+            continue
+        by[r["iso3"]].append(b == c)
+    eligible = {k: v for k, v in by.items() if len(v) >= 5}
+    always = sorted(k for k, v in eligible.items() if all(v))
+    never = sorted(k for k, v in eligible.items() if not any(v))
+    L += ["", "---", "", "## S2. How countries report the two fields",
+          "",
+          f"Of the **{len(eligible)}** countries with five or more years of both "
+          f"`budget_tot` and `cf_tot`, **{len(always)}** report expected funding exactly "
+          f"equal to budget required in every year, so their published funding gap is "
+          f"zero by construction; **{len(never)}** report a non-zero gap in every year. "
+          "The remainder do both at different times.",
+          "",
+          f"**Always equal ({len(always)}):** " + ", ".join(always) + ".",
+          "",
+          f"**Never equal ({len(never)}):** " + ", ".join(never) + ".",
+          ""]
+
+    # ---- S3: the national financial series behind Figure 1 -------------------
     rows = list(csv.DictReader(
         (ROOT / "data" / "india_tb_report_table16_1.csv").open(encoding="utf-8-sig")))
-    L += ["", "---", "", "## S2. India's national programme accounts, year by year",
+    L += ["", "---", "", "## S3. India's national programme accounts, year by year",
           "",
           "The series behind Figure 1, as published in the India TB Report 2024, "
-          "Table 16.1 (p.174). Amounts are in INR crore. The shortfall column is "
+          "table 16.1 (p.174). Amounts are in INR crore. The shortfall column is "
           "(requested - approved) / requested. Two cells of the source table were "
           "damaged in text extraction and were restored digit by digit against the "
           "printed page. Released amounts are not printed for 2022 and 2023.",
@@ -110,32 +138,6 @@ def main() -> int:
     L.append(f"| **Total** | **{tot['requested']:,.2f}** | **{tot['approved']:,.2f}** | "
              f"**{tot['released']:,.2f}** | **{tot['spent']:,.2f}** | "
              f"**{100 * (tot['requested'] - tot['approved']) / tot['requested']:.1f}%** |")
-
-    # ---- S3: how every country reports the two fields ------------------------
-    brows = list(csv.DictReader(
-        (ROOT / "data" / "TB_budget_2026-11-12.csv").open(encoding="utf-8-sig")))
-    by = defaultdict(list)
-    for r in brows:
-        try:
-            b, c = float(r["budget_tot"]), float(r["cf_tot"])
-        except (ValueError, KeyError):
-            continue
-        by[r["iso3"]].append(b == c)
-    eligible = {k: v for k, v in by.items() if len(v) >= 5}
-    always = sorted(k for k, v in eligible.items() if all(v))
-    never = sorted(k for k, v in eligible.items() if not any(v))
-    L += ["", "---", "", "## S3. How countries report the two fields",
-          "",
-          f"Of the **{len(eligible)}** countries with five or more years of both "
-          f"`budget_tot` and `cf_tot`, **{len(always)}** report expected funding exactly "
-          f"equal to budget required in every year, so their published funding gap is "
-          f"zero by construction; **{len(never)}** report a non-zero gap in every year. "
-          "The remainder do both at different times.",
-          "",
-          f"**Always equal ({len(always)}):** " + ", ".join(always) + ".",
-          "",
-          f"**Never equal ({len(never)}):** " + ", ".join(never) + ".",
-          ""]
 
     OUT.write_text("\n".join(L).replace("SS", chr(0xA7)) + "\n", encoding="utf-8")
     print(f"wrote {OUT.relative_to(ROOT)}: {len(NODE_LABELS)} interventions, "

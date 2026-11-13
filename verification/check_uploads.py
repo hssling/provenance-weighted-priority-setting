@@ -64,6 +64,23 @@ def main() -> int:
         if f.stem in names and not re.search(
                 r"Word count:\s*\*?\*?\s*[\d,]+ words", t):
             errs.append(f"  {f.relative_to(S)}: no word count on the title section")
+    # Both journals set citations as superscript numerals; the build converts
+    # the source's "[n]". A bracketed citation left in an uploaded manuscript,
+    # outside its reference list, means the conversion missed one.
+    for key, lay in LAYOUT.items():
+        for role in ("manuscript", "blinded"):
+            f = S / key / lay[role]
+            if not f.exists():
+                continue
+            t = f.read_text(encoding="utf-8")
+            i = t.find("## References")
+            j = t.find("\n## ", i + 5)
+            rest = t[:i] + (t[j:] if j != -1 else "")
+            left = re.findall(r"\[\d+(?:\s*[,–-]\s*\d+)*\]", rest)
+            if left:
+                errs.append(f"  {f.relative_to(S)}: citations not superscripted: {left[:5]}")
+            if not re.search(r"\^\d[\d,–-]*\^", t):
+                errs.append(f"  {f.relative_to(S)}: no superscript citation at all")
     # A captions file is where a reviewer sees each figure beside its caption.
     # Paper A's was first built with the captions alone and no images, unlike
     # the author's IJTB-S-26-01305 file, which embedded every preview.

@@ -149,8 +149,8 @@ def main() -> int:
             (d / lay["tables_file"]).write_text(
                 "# Tables\n\n" + "\n\n---\n\n".join(table_blocks) + "\n", encoding="utf-8")
         bracket = lay["tables_in_manuscript"]          # IJTB prints "[1]"
-        blinded_body = literal_reference_numbers(blinded_body, bracket)
-        unblinded_body = literal_reference_numbers(unblinded_body, bracket)
+        blinded_body = literal_reference_numbers(superscript_citations(blinded_body), bracket)
+        unblinded_body = literal_reference_numbers(superscript_citations(unblinded_body), bracket)
         (d / lay["blinded"]).write_text(blinded_body, encoding="utf-8")
         # The unblinded source goes in too: a single-anonymized journal wants
         # that one, and having both means the choice is made at upload, not here.
@@ -189,6 +189,30 @@ def copy_figures(key: str, d: Path, lay: dict, figures: int) -> None:
         if "preview" in lay:
             shutil.copyfile(fig.with_suffix(".png"),
                             d / lay["preview"].format(n=91 + k, k=k))
+
+
+CITATION = re.compile(r"[ \t]*\[(\d+(?:\s*[,–-]\s*\d+)*)\]([.,;:])?")
+
+
+def superscript_citations(text: str) -> str:
+    """Turn every in-text "[n]" into a superscript placed after punctuation.
+
+    IJTB's guide: "identify the reference numbers in the text in superscript",
+    and the author's published IJTB article prints them after the full stop or
+    comma with no space before ("notified.^1^", "disengage,^2^"). IJE follows
+    Oxford SCIMED, which also uses superscript numerals. The source keeps
+    "[n]" because every reference check parses it; only the uploads change.
+    The reference list itself is left alone."""
+    i = text.find("## References")
+    j = text.find("\n## ", i + 5) if i != -1 else -1
+    head, refs, tail = ((text[:i], text[i:j], text[j:]) if j != -1 else
+                        (text[:i], text[i:], "") if i != -1 else (text, "", ""))
+
+    def sup(m: re.Match) -> str:
+        nums = re.sub(r"\s+", "", m.group(1))
+        return (m.group(2) or "") + "^" + nums + "^"
+
+    return CITATION.sub(sup, head) + refs + CITATION.sub(sup, tail)
 
 
 def literal_reference_numbers(text: str, bracket: bool) -> str:

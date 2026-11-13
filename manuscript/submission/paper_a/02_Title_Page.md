@@ -15,7 +15,7 @@
 | item | count |
 |---|---:|
 | Abstract (structured) | 249 words |
-| Main text, Introduction to Conclusions, excluding tables and references | 2,573 words |
+| Main text, Introduction to Conclusions, excluding tables and references | 2,576 words |
 | Tables | 3 |
 | Figures | 2 |
 | References | 22 |

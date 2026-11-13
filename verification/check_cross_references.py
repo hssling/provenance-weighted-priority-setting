@@ -53,19 +53,51 @@ def section_numbers(text: str) -> set[str]:
     return found
 
 
+def supplement_order(text: str) -> list[str]:
+    """Supplementary section identifiers in the order the file presents them.
+    Paper A labels them S1, S2...; paper B labels them "Supplementary Note 1"...,
+    because its screening rules are already called S0 to S5."""
+    out = []
+    for m in re.finditer(r"(?m)^## (?:(S\d+[a-z]?)|Supplementary (Note \d+))\.", text):
+        out.append(m.group(1) or m.group(2))
+    return out
+
+
 def supplement_sections(text: str) -> set[str]:
-    return set(re.findall(r"(?m)^## (S\d+[a-z]?)\.", text))
+    return set(supplement_order(text))
 
 
-# "Supplementary S1c and S2" and "Supplementary S1, S2" are ordinary prose, so
-# every identifier in an enumerated list counts, not only the first one.
-SUPP_LIST = re.compile(r"Supplementary\s+(S\d+[a-z]?(?:(?:\s*,\s*|\s+and\s+|\s*[-–]\s*)S\d+[a-z]?)*)")
+# "Supplementary S1c and S2", "Supplementary S1, S2" and "Supplementary Notes
+# 3 and 4" are ordinary prose, so every identifier in an enumerated list
+# counts, and a range such as "Notes 3–4" counts every note it spans.
+ITEM = r"(?:S\d+[a-z]?|\d+)"
+SUPP_LIST = re.compile(rf"Supplementary\s+(Notes?\s+)?({ITEM}(?:(?:\s*,\s*|\s+and\s+|\s*[-–]\s*){ITEM})*)")
 
 
 def supplementary_refs(text: str) -> list[str]:
+    """Every supplementary item cited, in order of appearance."""
     refs: list[str] = []
     for m in SUPP_LIST.finditer(text):
-        refs += re.findall(r"S\d+[a-z]?", m.group(1))
+        note, items = m.group(1), m.group(2)
+        if note:
+            parts = re.split(r"(\s*[-–]\s*)", items)
+            nums: list[int] = []
+            k = 0
+            while k < len(parts):
+                chunk = parts[k]
+                if k + 2 < len(parts) and re.fullmatch(r"\s*[-–]\s*", parts[k + 1]):
+                    lo = int(re.findall(r"\d+", chunk)[-1])
+                    hi = int(re.findall(r"\d+", parts[k + 2])[0])
+                    nums += [int(x) for x in re.findall(r"\d+", chunk)[:-1]]
+                    nums += list(range(lo, hi + 1))
+                    nums += [int(x) for x in re.findall(r"\d+", parts[k + 2])[1:]]
+                    k += 3
+                else:
+                    nums += [int(x) for x in re.findall(r"\d+", chunk)]
+                    k += 1
+            refs += [f"Note {n}" for n in nums]
+        else:
+            refs += re.findall(r"S\d+[a-z]?", items)
     return refs
 
 
@@ -114,6 +146,23 @@ def main() -> int:
             if sec not in cited and re.sub(r"[a-z]$", "", sec) not in cited:
                 errors.append(f"  {name}: Supplementary {sec} exists but is never "
                               f"cited in the main text")
+
+        # Supplementary items, like tables and figures, must be first cited in
+        # the order they are numbered and presented. Paper A's text cited S1,
+        # S3, S2; paper B's file ran S1, S0, S1a, S1c, S1b while its text cited
+        # S0 first. Neither was caught until this was checked.
+        parent = lambda x: re.sub(r"[a-z]$", "", x)            # S1c -> S1
+        first: list[str] = []
+        for r in supplementary_refs(text):
+            if parent(r) not in first:
+                first.append(parent(r))
+        presented: list[str] = []
+        for x in supplement_order(sup_text):
+            if parent(x) not in presented:
+                presented.append(parent(x))
+        if first and first != presented:
+            errors.append(f"  {name}: supplementary items are first cited in the order "
+                          f"{first}, but the supplement presents them as {presented}")
 
         for label, body in ((paper.name, text), (supp.name, sup_text)):
             for pat in PLACEHOLDERS:

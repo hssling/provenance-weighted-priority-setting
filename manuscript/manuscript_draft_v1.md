@@ -46,7 +46,7 @@ This paper asks three questions of direct relevance to NTEP and the Central TB D
 
 ### 2.1 Data sources
 
-Three public sources were used. The WHO TB budget dataset (release of 12 November 2026; 1,720 rows, 215 countries, 2018–2025) gives budget required and funding expected, each disaggregated into eleven line items and by source [7]. The WHO TB expenditure and utilisation dataset (release of 25 August 2026; 2017–2026) gives actual expenditure on the same line items [7]. The India TB Report 2024, Table 16.1, gives the budget requested, approved, released and spent for fiscal years 2017–18 to 2023–24, in ₹ crore [2]. What each WHO variable covers was established from the WHO data dictionary [8] and the WHO TB data collection form [9].
+Three public sources were used. The WHO TB budget dataset (release of 12 November 2026; 1,720 rows, 215 countries, 2018–2025) gives budget required and funding expected, each disaggregated into eleven line items and by source [7]. The WHO TB expenditure and utilisation dataset (release of 25 August 2026; 2017–2026) gives actual expenditure on the same line items [7]. The India TB Report 2024, in its table 16.1, gives the budget requested, approved, released and spent for fiscal years 2017–18 to 2023–24, in ₹ crore [2]. What each WHO variable covers was established from the WHO data dictionary [8] and the WHO TB data collection form [9].
 
 ### 2.2 Comparing sources without currency conversion
 
@@ -70,11 +70,11 @@ The analysis is descriptive. Among countries with at least five years of data, e
 
 In all eight years 2018–2025, India reported total expected funding exactly equal to total budget required, so its published gap is zero in every year (Table 1). Neither field's definition states that the two should be equal [8]; the equality is a reporting convention visible only in the data.
 
-It is not universal practice. Of 106 countries with at least five years of data, 14 reported the two as equal in every year and 44 reported a non-zero gap in every year (Supplementary S3), including Vietnam (mean gap about 72%), Nigeria (about 69%), Indonesia (about 59%) and China (about 10%). Pakistan reported gaps of 43–66% for 2018–2023 and exactly zero in 2024 and 2025. No field distinguishes a country reporting need from one reporting availability.
+It is not universal practice. Of 106 countries with at least five years of data, 14 reported the two as equal in every year and 44 reported a non-zero gap in every year (Supplementary S2), including Vietnam (mean gap about 72%), Nigeria (about 69%), Indonesia (about 59%) and China (about 10%). Pakistan reported gaps of 43–66% for 2018–2023 and exactly zero in 2024 and 2025. No field distinguishes a country reporting need from one reporting availability.
 
 ### 3.2 India's own accounts record a substantial shortfall
 
-Over 2017–18 to 2023–24 the programme requested ₹23,169.14 crore and was approved ₹18,388.23 crore, 79.4% of the request. The annual shortfall ranged from 5.4% to 46.1% (Table 1, Figure 1; Supplementary S2). The two sources disagree in every overlapping year at any tolerance below 5 percentage points, and in three of six years at a tolerance of 15 points.
+Over 2017–18 to 2023–24 the programme requested ₹23,169.14 crore and was approved ₹18,388.23 crore, 79.4% of the request. The annual shortfall ranged from 5.4% to 46.1% (Table 1, Figure 1; Supplementary S3). The two sources disagree in every overlapping year at any tolerance below 5 percentage points, and in three of six years at a tolerance of 15 points.
 
 **Table 1. Two sources, one programme: India's TB financing as reported to WHO and in the national accounts, 2017–2025.**
 
@@ -98,7 +98,7 @@ The sources agree on execution. WHO data give expenditure as 72% of budget requi
 
 Global Fund support fell from 37% of actual TB expenditure in 2017 to 1% in 2025, and domestic financing rose from 62% to 96%. Earlier analyses of TB financing end in 2011 [14] and 2017 [15].
 
-Table 16.1 of the national report does not reconcile across its rows. Over 2017–2021, the only years for which releases are printed, releases sum to ₹3,825.31 crore while expenditure sums to ₹13,312.14 crore, and 2017 expenditure is 150% of the approved amount. Expenditure can exceed release where states spend carried-over or own funds, but the table does not say so. The ratios above do not use the released column.
+The national report's table 16.1 does not reconcile across its rows. Over 2017–2021, the only years for which releases are printed, releases sum to ₹3,825.31 crore while expenditure sums to ₹13,312.14 crore, and 2017 expenditure is 150% of the approved amount. Expenditure can exceed release where states spend carried-over or own funds, but the table does not say so. The ratios above do not use the released column.
 
 ### 3.4 No intervention has a budget line of its own
 
@@ -152,7 +152,7 @@ Four changes follow, in increasing order of effort, and none requires new money 
 
 **Sub-codes beneath budget_prog, in the next National Strategic Plan.** Nothing in the WHO form prevents a national programme from carrying its own sub-codes beneath a pooled line. Tagging spending on active case finding, airborne infection control and private-sector engagement, even approximately or as shares, would make cost per additional case found reportable and those activities defensible at budget time. Restricting this second dimension to the six to eight activities contested at budget time keeps it proportionate; programme-wide activity-based costing is not needed.
 
-**A footnote where the national table does not reconcile.** One sentence naming the mechanism — re-appropriation, lapse, carry-forward or state funds — wherever released and spent differ would make Table 16.1 interpretable.
+**A footnote where the national table does not reconcile.** One sentence naming the mechanism — re-appropriation, lapse, carry-forward or state funds — wherever released and spent differ would make the report's table 16.1 interpretable.
 
 **A pre-submission check.** Before the annual WHO return is filed, three questions can be asked of it: does expected funding equal requirement, and is that intended; do the components sum to each total; and is any value identical to last year's, and was it re-estimated or carried forward? The code accompanying this paper performs all three on a country-year table.
 
@@ -235,7 +235,7 @@ All inputs are publicly available: the WHO TB budget and expenditure datasets an
 
 ## Figure captions
 
-**Figure 1. Two accounts of the same years.** India's funding gap as reported to WHO, against the shortfall recorded in India's own programme accounts, 2018–2023. The WHO-reported gap is zero in every year because expected funding is reported equal to budget required; over the same years the national accounts record approvals falling short of requests by 5.4% to 46.1%. Values are percentages of the amount required (WHO) or requested (national accounts). National years are the first year of India's April–March fiscal year (2018 denotes 2018–19); the WHO series is plotted by reporting year. Sources: WHO TB budget dataset [7] and India TB Report 2024, Table 16.1 [2].
+**Figure 1. Two accounts of the same years.** India's funding gap as reported to WHO, against the shortfall recorded in India's own programme accounts, 2018–2023. The WHO-reported gap is zero in every year because expected funding is reported equal to budget required; over the same years the national accounts record approvals falling short of requests by 5.4% to 46.1%. Values are percentages of the amount required (WHO) or requested (national accounts). National years are the first year of India's April–March fiscal year (2018 denotes 2018–19); the WHO series is plotted by reporting year. Sources: WHO TB budget dataset [7] and India TB Report 2024, report table 16.1 [2].
 
 **Figure 2. Where each intervention falls in WHO's budget classification.** Eleven TB interventions, in the order of Table 2, joined to the WHO budget line that covers them as judged against the data collection form [9]. Line style marks the condition of that coverage: pooled, where the form names the activity inside a line shared with many others; commodity only, where the line covers the drug or one arm but not the delivery; dominant, where the line is largely the activity though still shared; and no line. Three interventions converge on budget_prog, one figure pooling fifteen activities. No arrow ends at a line specific to its own intervention.
 
