@@ -151,9 +151,13 @@ A "global trend in DR-TB hospitalisation, 2017–2025" computed from this variab
 
 ### 3.4 A second failure mode: two plausible denominators, one correct
 
-The files publish both `exp_tot` (expenditure) and `rcvd_tot` (funds received). Computing the Global Fund share of financing against the first — the intuitive choice, since expenditure is what a programme did — produces shares exceeding 100% in **14.5%** of country-years, reaching 687%. Against `rcvd_tot`, no country-year exceeds 100% in **842** observations.
+The files publish both `exp_tot` (expenditure) and `rcvd_tot` (funds received). Computing the Global Fund share of financing against the first — the intuitive choice, since expenditure is what a programme did — produces shares exceeding 100% in **14.5%** of 841 country-years. Against `rcvd_tot`, **no country-year exceeds 100% in 842 observations**.
 
-Receipts and expenditure differ because money received in one year may be spent in another. Both columns are correct; only one is the right denominator for a funding share, and nothing in the file names the pairing. We report this because we made the error ourselves and found it only when an implausible value forced a check.
+Receipts and expenditure differ because money received in one year may be spent in another. Both columns are correct; only one is the right denominator for a funding share, and nothing in the file names the pairing.
+
+The extreme case is instructive beyond the pairing. The maximum ratio is **28,417%** (Chad, 2019): US$1,989,218 reported as received from the Global Fund against a reported total TB expenditure of **US$7,000** for the year. A national programme expenditure of seven thousand dollars is not plausible, so the implausibility that the wrong denominator exposes is not only in the ratio — it is in the denominator itself. A screen applied to a derived quantity can therefore surface a problem in a variable that passes every screen applied to it directly: `exp_tot` is measurement-like on all four tests.
+
+We report this failure mode because we committed it ourselves. We also mis-reported its magnitude: an earlier draft gave the maximum as 687%, which was the largest value in a filtered subset we happened to be examining rather than the maximum in the data. Both errors were found the same way — by a value that looked wrong forcing a check — and neither would have been caught by the screens in §2.2.
 
 ---
 
