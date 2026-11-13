@@ -57,12 +57,12 @@ Domestic share 62% → 96%. Monotone and large.
 
 ### 1.4 Fiscal invisibility
 
-**Six** of eleven evidence-ranked TB interventions have **no budget line at all**:
+**Six** of eleven TB interventions (ranked by a published literature-favourability score) have **no budget line at all**:
 airborne infection prevention and control (rank 2), whole-genome sequencing (4),
 **active case finding (5)**, bovine TB control (7), private-sector engagement (8),
 milk pasteurisation (10).
 
-Three of the top five evidence-ranked interventions are fiscally untraceable.
+Three of the six are in the top five of that score. The six-of-eleven count does not depend on the ranking; the top-five observation does, and the score is a priority-action score built from vocabulary-coded abstracts, without human validation, whose order changes with the coding rule. It is descriptive only.
 
 Active case finding was initially mapped to `budget_prog`. That is wrong, and
 WHO's own data dictionary settles it: `budget_prog` is *"Budget required for
@@ -70,7 +70,7 @@ programme costs to **treat** drug-susceptible TB"*. Case **finding** is not
 treatment. The mapping was corrected after the implementer challenged it.
 
 **Three mappings are partial rather than absent**, and this materially limits
-any "evidence rank versus budget share" comparison:
+any "rank versus budget share" comparison:
 
 | node | line | what the definition actually covers |
 |---|---|---|
@@ -191,6 +191,38 @@ stands on the independent timing argument: **87% of the decline pre-dates BPaLM*
 recommended in December 2022 and India rolled out from 2024.
 
 ---
+
+### 2.3 "Nothing in the files distinguishes measurements from estimates" was wrong, and the replacement example was weaker than first reported
+
+**The old sentence.** Paper B's abstract and §4.1 said that nothing in the published files distinguishes a
+measured value from an estimate, and used five variables as the headline example.
+
+**Why it was wrong.** WHO's data dictionary (`TB_dictionary_2026-08-25.csv`) already says so for four of the five:
+`hospd_prct_dstb`, `hospd_prct_mdr`, `hospd_dur_dstb`, `hospd_dur_mdr` are defined as "Estimated ..." and
+`hcfvisit_dstb`, `hcfvisit_mdr` as "Typical ...". The claim was an unchecked inference from the data files, which do carry
+only bare column names, and it was never reconciled with the dictionary (the author notes had flagged the gap).
+
+**What survives.** (a) The label is in a different file from the data. (b) It describes the kind of quantity, not the
+vintage of each value: 69.6% of consecutive country-year pairs of `hospd_prct_mdr` are identical and 42% of the 178
+countries with four or more years never change their entry, and no field in any file says so. The paper is rebuilt
+around (b). (c) The screen's verdicts can be compared with the dictionary's labels.
+
+**What the comparison actually found (`verification/dictionary_vs_screen.py`).** A variable is "labelled" if its definition
+contains "estimat" or "typical". Six of 443 are, all in the expenditure file. The screen puts none of them in the
+measurement-like class (4 estimate-like, 2 mixed); chance probability 0.0055 (152 of 358 continuous variables are
+non-measurement-like). That is agreement, though on six related variables. The disagreement is less useful than it was
+first framed: the screen flags 80 unlabelled estimate-like variables, and **70 of them have zero as their most common
+value** (71 of all 84; 21 of the 31 laboratory ones). The one financial case, `cf_tot_usaid`, was proposed as a variable
+WHO does not label that the screen nonetheless catches. It is defined as "Expected funding from USAID", unlabelled, and
+screens estimate-like (64.4% repetition), but its modal value, held by 64.3% of observations, is **zero** (no USAID
+funding). Over consecutive-year pairs with either value non-zero only 12.6% are identical (191 pairs), against 2.5% (Global
+Fund), 3.4% (other grants) and 6.8% (domestic). So it is a real difference between USAID and the other sources, but not an
+unlabelled estimate, and the earlier §4.2 sentence calling it "a fixed external commitment, restated unchanged until it
+changes" is withdrawn. The screen cannot tell a repeated zero from a repeated estimate. No reported screen number
+changed; this is a limitation that was previously unstated (it bears on the laboratory median of 63.0%).
+
+**Paper A, same pass.** "Evidence-ranked" for the eleven interventions overstated the source ranking (see §1.4); the
+six-of-eleven count is independent of it, the three-of-top-five observation is not.
 
 ## 3. Data provenance
 
