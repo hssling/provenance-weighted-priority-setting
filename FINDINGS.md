@@ -225,6 +225,33 @@ explains the per-file division is a separate question, and §2.4 answers it.
 **Paper A, same pass.** "Evidence-ranked" for the eleven interventions overstated the source ranking (see §1.4); the
 six-of-eleven count is independent of it, the three-of-top-five observation is not.
 
+### 2.3.1 "Unexamined" was too strong, and a pre-registered search found why
+
+Both papers asserted novelty from memory. A documented search (`manuscript/novelty_search.md`) tested the two claims,
+with the protocol written and committed to git **before** any query ran, so the inclusion criteria could not be shaped
+by the results.
+
+**Paper B's claim stands.** Nothing in the TB data-quality literature screens for vintage. What was retrieved
+(Philippines, SEAR, Zambia, Senegal, Botswana, São Paulo, South Africa, California) assesses completeness, accuracy
+against source records, timeliness and under-notification -- never revision across reporting years. "Data vintage" is
+a real term with 218 records, all in macroeconomics (the Croushore and Stark real-time-dataset literature); none
+applies it to a country-reported health dataset. Decisive null searches are recorded, including
+`"hospd_prct" OR "budget_tot" OR "cf_tot"` returning **0** hits anywhere.
+
+**Paper A's claim needed narrowing.** Floyd K, Pantoja A, Dye C. 2007 (*Bull World Health Organ* **85**: 334-40) is a
+paper by WHO's own Stop TB Department describing the global financial monitoring system that produces `budget_tot`
+and `cf_tot` -- the direct ancestor of the files Paper A analyses -- and it carries a "System limitations" section.
+Paper A said the indicator "is unexamined" and that "no study has examined the validity of the WHO funding-gap
+indicator". A TB-financing reviewer could have cited Floyd against those sentences without touching the finding,
+because Floyd never asks whether the two quantities are independently determined, never counts countries reporting
+them equal, and never discusses a zero gap. The abstract and §1 now claim the narrower thing, which is both true and
+harder to attack.
+
+**A rule had to change too.** Crossref's record for `10.2471/BLT.06.034942` gives the title as "*Financial*
+tuberculosis control..." with one author; the article, PubMed and PMC give "*Financing*..." with three. The project
+rule "verify the DOI at Crossref and record the returned title" would have written a wrong title into the paper. See
+the amendment at the top of `manuscript/references_verified.md`.
+
 ### 2.4 Repeated zeros do not produce the counted/characterised division
 
 §2.3 established that the repetition statistic cannot, on a single variable, separate a carried-forward estimate from a

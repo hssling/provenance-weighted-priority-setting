@@ -16,11 +16,11 @@ ORCID 0000-0002-4771-8285
 
 | item | count |
 |---|---:|
-| Abstract (structured) | 249 words |
-| Main text, Introduction to Conclusions, excluding tables and references | 3,063 words |
+| Abstract (structured) | 273 words |
+| Main text, Introduction to Conclusions, excluding tables and references | 3,121 words |
 | Tables | 3 |
 | Figures | 0 |
-| References | 16 |
+| References | 17 |
 
 **Keywords.** Antitubercular Agents; Costs and Cost Analysis; Financing, Government; Health Expenditures; Health Priorities; Healthcare Financing; India; Program Evaluation; Tuberculosis
 

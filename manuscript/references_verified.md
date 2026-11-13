@@ -1,5 +1,14 @@
 # Verified references for papers A and B
 
+> **Amendment, 13 November 2026 — Crossref is not sufficient on its own.** This file's rule was to look a DOI up at
+> `api.crossref.org/works/{DOI}` and record the title it returns. For `10.2471/BLT.06.034942` Crossref returns the
+> title "**Financial** tuberculosis control..." and lists a single author. The article, PubMed (PMID 17639216) and PMC
+> all give "**Financing** tuberculosis control..." with three authors, Floyd K, Pantoja A and Dye C. Following the
+> rule as written would have put a wrong title and a wrong author list into the paper, and a reference manager
+> importing the DOI will import the same error. The rule is therefore: Crossref confirms that a record exists; where
+> its fields look irregular -- a title that does not parse, a single author on a multi-author paper -- cross-check
+> PubMed or the publisher before citing. That is how this one was caught.
+
 Verification date: 2026-11-13. Every DOI below was queried at `https://api.crossref.org/works/{DOI}` and returned HTTP 200. "Crossref title" is the string Crossref returned. Candidates were first found with Crossref's search endpoint, then re-verified by direct DOI lookup. Crossref confirms that a record exists and what it is titled; it does not confirm that the paper supports your claim. Crossref returned abstracts for only a few records, so "where it belongs" lines for the rest rest on the titles and on my reading of the field. Read each paper before citing it for a specific number.
 
 Caught by the verification rule (see Dropped, at the end): two DOIs I produced from memory were wrong.

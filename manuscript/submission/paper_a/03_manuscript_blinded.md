@@ -6,7 +6,7 @@
 
 ## Abstract
 
-**Background.** WHO's tuberculosis (TB) funding gap — budget required minus funding expected — is published annually for high-burden countries and read as a measure of under-resourcing. Whether it does so for any given country is unexamined.
+**Background.** WHO's tuberculosis (TB) funding gap — budget required minus funding expected — is published annually for high-burden countries and read as a measure of under-resourcing. The system that produces it has been described and its limitations set out by its custodians, but whether the two quantities behind it are independently determined for a given country has not been examined.
 
 **Methods.** We compared WHO's reported TB budget and expenditure data for 215 countries (2017–2025) with India's national programme accounts, using dimensionless internal ratios (no currency conversion), and mapped eleven TB interventions onto WHO budget lines by definition, not name.
 
@@ -30,7 +30,7 @@ Tuberculosis control is planned against money. National strategic plans cost the
 
 We should be precise about what the indicator is and is not used for, because our argument does not depend on overstating it. The Global Fund's published allocation methodology takes disease burden and economic capacity as the inputs to its allocation formula, followed by a qualitative adjustment (Global Fund 2024); it does **not** list the WHO reported funding gap among them. The gap's influence is of a different kind — it is the figure published, quoted and compared when a programme's resourcing is discussed. An indicator need not enter a formula to shape a judgement.
 
-An indicator used that way carries an implicit claim: that the two numbers behind it are independently determined, so their difference is informative. This paper asks whether that claim holds, and finds that for India it does not. To our knowledge, no study has examined the validity of the WHO funding-gap indicator, or the cross-country comparability of health-financing indicators of this kind.
+An indicator used that way carries an implicit claim: that the two numbers behind it are independently determined, so their difference is informative. This paper asks whether that claim holds, and finds that for India it does not. The global financial monitoring system that produces these figures has been described by its custodians, who set out its limitations: its restriction to public-sector provider costs, the difficulty of obtaining aggregated data from decentralized systems, and the limited opportunities to validate what countries report (Floyd et al. 2007). To our knowledge, however, no study has asked whether the two quantities behind the reported gap are independently determined for a given country, or examined the cross-country comparability of health-financing indicators of this kind.
 
 The question matters beyond measurement. India notifies more tuberculosis than any other country and now finances almost all of its response domestically. If the indicator that would signal a shortfall cannot register one, neither the national programme nor its partners have an external instrument that would show strain before it appeared in outcomes.
 
@@ -225,6 +225,8 @@ Bertone MP, Barroy H, Sparkes S et al. 2026. Political economy of budgeting refo
 Central TB Division, Ministry of Health and Family Welfare, Government of India. 2024. *India TB Report 2024: National TB Elimination Programme Annual Report*. New Delhi: Ministry of Health and Family Welfare.
 
 Floyd K, Fitzpatrick C, Pantoja A et al. 2013. Domestic and donor financing for tuberculosis care and control in low-income and middle-income countries: an analysis of trends, 2002-11, and requirements to meet 2015 targets. *The Lancet Global Health* **1**: e105-15.
+
+Floyd K, Pantoja A, Dye C. 2007. Financing tuberculosis control: the role of a global financial monitoring system. *Bulletin of the World Health Organization* **85**: 334-40. doi: 10.2471/BLT.06.034942
 
 Global Fund to Fight AIDS, Tuberculosis and Malaria. 2024. *Allocation Methodology for Grant Cycle 8 (2026-2028 Allocation Period)*. Board paper GF/B52/08B, 52nd Board Meeting, 20-22 November 2024. Geneva: The Global Fund. https://archive.theglobalfund.org/media/15310/archive_bm52-08b-allocation-methodology-gc8_report_en.pdf, accessed 13 November 2026.
 
