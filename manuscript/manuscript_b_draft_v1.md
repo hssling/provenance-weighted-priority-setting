@@ -26,11 +26,11 @@ Correspondence: hssling@yahoo.com · ORCID 0000-0002-4771-8285
 
 ## 1. Background
 
-WHO's Global Tuberculosis Programme collects and republishes country-reported data on TB financing and service delivery. The files are widely used: for investment cases, for cross-country comparison of cost and delivery models, and as covariates in modelling studies. They are distributed as flat annual tables with a shared data dictionary, and their variables are, in practice, treated as equivalent — each a country's report for that year.
+WHO's Global Tuberculosis Programme collects and republishes country-reported data on TB financing and service delivery [1,2]. The files are widely used: for investment cases, for cross-country comparison of cost and delivery models, and as covariates in modelling studies. They are distributed as flat annual tables with a shared data dictionary, and their variables are, in practice, treated as equivalent — each a country's report for that year.
 
 This paper asks a prior question. A number in an annual return may be a measurement taken that year; it may be an estimate entered once and repeated because no one revised it; or it may be a convention. These are different kinds of object, and only the first supports inference about change over time. Nothing in the published files says which is which.
 
-We are not aware of prior work screening these datasets for that distinction. The question is tractable because several signatures of non-measurement are computable from the published file alone, without reference to any external source.
+The quality of routine health data has been assessed in other settings [3,4]. To our knowledge, there is no prior work screening these datasets for that distinction. The question is tractable because several signatures of non-measurement are computable from the published file alone, without reference to any external source.
 
 ---
 
@@ -49,19 +49,19 @@ Six files from WHO's TB programme, retrieved August to November 2026 and archive
 
 The first two were screened first (77 variables); the other four were added as a replication after the first analysis was complete, and the replication overturned two of the first analysis's conclusions (§3.1, §4.1).
 
-WHO's published data dictionary supplied every variable definition. The dictionary is used, not the column names: definitions and names diverge in ways that matter, as in `budget_prog`, defined as *"programme costs to treat drug-susceptible TB"* rather than programme costs generally.
+WHO's published data dictionary [5] supplied every variable definition. The dictionary is used, not the column names: definitions and names diverge in ways that matter, as in `budget_prog`, defined as *"programme costs to treat drug-susceptible TB"* rather than programme costs generally.
 
 ### 2.2 The screens
 
-Each is computable from the published file. For each variable with at least 100 non-missing values:
+Each is computable from the published file. These screens are our own operationalisation of non-measurement, justified by face validity; we know of no published validation of them for country-reported programme data. The nearest framework we can cite, WHO's data quality assurance toolkit [6], assesses completeness and internal and external consistency of facility data. Our screens are of that general kind but were designed for published country returns and are not an implementation of it. For each variable with at least 100 non-missing values:
 
 **S0 Categorical.** Runs first. A variable with five or fewer distinct values is classified *categorical* and excluded from the measurement/mixed/estimate classification entirely; it is reported separately and never counted as estimate-like. The rationale: a binary or categorical status flag (is the national reference laboratory accredited? is data available?) legitimately repeats year after year, takes few values and sits on round numbers, so it trips the repetition, granularity and modal-share tests for reasons that have nothing to do with carried-forward estimation. "Five or fewer" is a convention, not a derived quantity.
 
 **S0b Untestable.** A continuous variable for which no country has an adjacent pair of observations (each country reports at most once) cannot be screened for repetition. It is classified *untestable* on S1, reported separately, and never counted as measurement-like: a test that could not run is not evidence of cleanliness. This rule was adopted after a discrepancy was found. An exploratory pass had silently dropped such variables through a division-by-zero guard, producing figures that matched no stated rule; reconciling the discrepancy exposed it, and the class was then made explicit. The rule raises the median repetition of two datasets (laboratory and outcomes), which favours the paper's argument, so we justify it on principle alone and report the results under both rules (§3.1). It does not touch the first two files, in which no variable is untestable.
 
-**S1 Repetition.** The share of consecutive country-year pairs holding an identical value. A genuinely stable quantity repeats; a quantity that repeats in most countries in most years is not being re-measured.
+**S1 Repetition.** The share of consecutive country-year pairs holding an identical value. A genuinely stable quantity repeats; we take a quantity that repeats in most countries in most years to be one that is not being re-measured.
 
-**S2 Granularity.** Distinct values divided by observations; the share held by the single most common value; and the share falling on round numbers (multiples of ten, or of a thousand for monetary variables). Estimates cluster on round numbers and on a small number of conventional values.
+**S2 Granularity.** Distinct values divided by observations; the share held by the single most common value; and the share falling on round numbers (multiples of ten, or of a thousand for monetary variables). We assume that estimates cluster on round numbers and on a small number of conventional values; this premise has not been validated against reported values of known provenance.
 
 **S3 Identity.** Where a total and its components are both published, do the components sum to the total within 1%? This tests internal consistency rather than external validity, and a variable can be internally perfect while being an estimate.
 
@@ -71,7 +71,7 @@ Each is computable from the published file. For each variable with at least 100 
 
 ### 2.3 Reproducibility
 
-The screen is a single pure-Python script with no third-party dependency. It regenerates every figure in this paper from the raw files in one command (including the pre-S0 counterfactual of §3.1) and writes a per-variable results table. Code, archived inputs and the results table: [repository URL and DOI to be inserted at acceptance].
+The screen is a single pure-Python script with no third-party dependency. It regenerates every figure in this paper from the raw files in one command [7] (including the pre-S0 counterfactual of §3.1) and writes a per-variable results table. Code, archived inputs and the results table: [repository URL and DOI to be inserted at acceptance].
 
 ### 2.4 Ethics
 
@@ -145,6 +145,8 @@ This matters for interpretation. The financial variables are not merely more var
 
 `hospd_prct_mdr`, the share of drug-resistant TB patients hospitalised, illustrates the practical consequence. It covers **199 countries** and **1,421 country-years** — coverage that invites a cross-country or trend analysis.
 
+Whether patients with drug-resistant TB are hospitalised or managed in ambulatory or decentralised settings is a substantive model-of-care choice. The effectiveness of the two approaches has been reviewed systematically [8,9], and WHO's current treatment guidance addresses models of care [10].
+
 It has **81 distinct values**. **35.3%** of observations are exactly 100; **11.6%** are exactly 0; **70.5%** fall on multiples of ten. Among the 178 countries with four or more years of data, **42% report an identical value in their first and last year**.
 
 A "global trend in DR-TB hospitalisation, 2017–2025" computed from this variable would be driven by whichever minority of countries revised their entry, and by when they did so. It would describe revision behaviour, not clinical practice. The same applies to duration of hospitalisation (66.5% repetition) and facility visits per patient (61.6%).
@@ -153,7 +155,7 @@ A "global trend in DR-TB hospitalisation, 2017–2025" computed from this variab
 
 The files publish both `exp_tot` (expenditure) and `rcvd_tot` (funds received). Computing the Global Fund share of financing against the first — the intuitive choice, since expenditure is what a programme did — produces shares exceeding 100% in **14.5%** of 841 country-years. Against `rcvd_tot`, **no country-year exceeds 100% in 842 observations**.
 
-Receipts and expenditure differ because money received in one year may be spent in another. Both columns are correct; only one is the right denominator for a funding share, and nothing in the file names the pairing.
+The dictionary defines `exp_tot` as "Total actual expenditure (US Dollars)" and `rcvd_tot` as "Total funding received for all budget line items (US Dollars)" [5]. We read the difference as one of timing: money received in one year may be spent in another. The dictionary does not state this. Both columns are correct; only one is the right denominator for a funding share, and nothing in the file names the pairing.
 
 The extreme case is instructive beyond the pairing. The maximum ratio is **28,417%** (Chad, 2019): US$1,989,218 reported as received from the Global Fund against a reported total TB expenditure of **US$7,000** for the year. A national programme expenditure of seven thousand dollars is not plausible, so the implausibility that the wrong denominator exposes is not only in the ratio — it is in the denominator itself. A screen applied to a derived quantity can therefore surface a problem in a variable that passes every screen applied to it directly: `exp_tot` is measurement-like on all four tests.
 
@@ -173,7 +175,7 @@ Distributing both kinds under one schema, one dictionary and no provenance field
 
 ### 4.2 Why the characterised variables are probably not errors
 
-We do not read the repetition as carelessness, and the replication strengthens the benign reading. A programme asked every year for its laboratory configuration will reasonably restate its standing answer; a hospitalisation share and average stay are properties of a service-delivery model that does not change annually. The reporting behaviour is sensible; what is missing is the flag that would let an analyst see it.
+We do not read the repetition as carelessness, and the replication strengthens the benign reading. A programme asked every year for its laboratory configuration will reasonably restate its standing answer; a hospitalisation share and average stay are properties of a service-delivery model that does not change annually. The reporting behaviour is sensible; what is missing is the flag that would let an analyst see it. This is inference from the shape of the data, not from any account of how countries completed the return (§5).
 
 The one financial variable in this range, `cf_tot_usaid`, points the same way: a fixed external commitment, restated unchanged until it changes. Repetition here is a feature of the quantity, not a defect in the reporting.
 
@@ -183,17 +185,17 @@ The one financial variable in this range, `cf_tot_usaid`, points the same way: a
 
 **Cross-sectional comparison is weaker than it looks.** With 81 distinct values over 199 countries, much apparent between-country variation is variation between conventional answers.
 
-**Internal consistency is not validity.** The financial variables reconcile perfectly and are still subject to definitional change, pooling and reporting convention; perfect arithmetic says nothing about whether a line item means the same thing in two countries.
+**Internal consistency is not validity.** The financial variables reconcile perfectly and are still subject to definitional change, pooling and reporting convention; perfect arithmetic says nothing about whether a line item means the same thing in two countries. WHO's data quality framework likewise separates internal from external consistency [6].
 
 **Published coverage is not evidential weight.** 1,421 observations across 199 countries reads as a strong dataset; after accounting for repetition the independent information is a small fraction of that.
 
 ### 4.4 What would fix it
 
-**A provenance flag per variable-year.** Three values — *measured*, *estimated*, *carried forward* — would make every analysis in this paper unnecessary and every downstream analysis sounder. Countries already know which applies when they complete the return.
+**A provenance flag per variable-year.** Three values — *measured*, *estimated*, *carried forward* — would make every analysis in this paper unnecessary and every downstream analysis sounder. Countries presumably know which applies when they complete the return, though we cannot observe that process (§5). Provenance metadata is a recognised element of data stewardship [11], with a substantial technical literature [12].
 
 **A stated denominator pairing.** Where a file publishes two plausible denominators, the dictionary should say which belongs with which numerator.
 
-**Publish the screen with the data.** The tests here are generic. Running them at release and shipping the results table would let every user see, before analysis, which variables carry annual information.
+**Publish the screen with the data.** The tests here are generic. Running them at release and shipping the results table would let every user see, before analysis, which variables carry annual information. Documentation shipped with a dataset has precedent in the datasheet proposal [13].
 
 ---
 
@@ -219,7 +221,25 @@ Finally, we cannot observe the national reporting process, so §4.2's benign int
 
 Across six WHO TB datasets, variables a programme counts from its own records (expenditure, notifications, contacts screened) behave like annual measurements, repeating 15.6% of the time or less, and the financial ones are arithmetically immaculate. Variables that describe the system's standing configuration (laboratory capacity, hospitalisation share and stay, visits per patient) behave like standing estimates, repeating 53.5-69.6% of the time. Of the 77 variables first screened, five are estimate-like, not six: `hosp_type_mdr` is a categorical code. Our first reading of the division as financial versus utilisation was wrong, and our own replication showed it. Both kinds are published under one name with nothing to tell them apart.
 
-The remedy is a single flag the reporting country is already in a position to supply. Until it exists, the screen presented here is a few seconds of work that tells an analyst which of these widely used numbers can support the question being asked.
+The remedy is a single flag the reporting country is presumably already in a position to supply. Until it exists, the screen presented here is a few seconds of work that tells an analyst which of these widely used numbers can support the question being asked.
+
+---
+
+## References
+
+1. World Health Organization. Global Tuberculosis Programme country data: budget, expenditure and utilisation, notifications, treatment outcomes, laboratory diagnostic services, and contact tracing and preventive treatment datasets. Geneva: World Health Organization; 2026. Available from: https://extranet.who.int/tme/ [data files dated 25 August and 12 November 2026]. This data-collection system no longer accepts updates; the archived input files are deposited with the analysis code.
+2. World Health Organization. Global tuberculosis report 2025. Geneva: World Health Organization; 2025.
+3. Maiga A, Jiwani SS, Mutua MK, Porth TA, Taylor CM, Asiki G, et al. Generating statistics from health facility data: the state of routine health information systems in Eastern and Southern Africa. BMJ Glob Health. 2019;4(5):e001849. doi:10.1136/bmjgh-2019-001849
+4. Lundin R, Mariani I, Peven K, Day LT, Lazzerini M. Quality of routine health facility data used for newborn indicators in low- and middle-income countries: a systematic review. J Glob Health. 2022;12:04019. doi:10.7189/jogh.12.04019
+5. World Health Organization. Global Tuberculosis Programme data dictionary [file TB_dictionary_2026-08-25.csv]. Geneva: World Health Organization; 2026. Archived with the analysis code.
+6. World Health Organization. Data quality assurance: module 1: framework and metrics. Geneva: World Health Organization; 2023. ISBN 978-92-4-004735-8. Available from: https://www.who.int/publications/i/item/9789240047365
+7. Peng RD. Reproducible research in computational science. Science. 2011;334(6060):1226-7. doi:10.1126/science.1213847
+8. Bassili A, Fitzpatrick C, Qadeer E, Fatima R, Floyd K, Jaramillo E. A systematic review of the effectiveness of hospital- and ambulatory-based management of multidrug-resistant tuberculosis. Am J Trop Med Hyg. 2013;89(2):271-80. doi:10.4269/ajtmh.13-0004
+9. Ho J, Byrne AL, Linh NN, Jaramillo E, Fox GJ. Decentralized care for multidrug-resistant tuberculosis: a systematic review and meta-analysis. Bull World Health Organ. 2017;95(8):584-93. doi:10.2471/BLT.17.193375
+10. World Health Organization. WHO consolidated guidelines on tuberculosis. Module 4: treatment and care. 2nd ed. Geneva: World Health Organization; 2026. ISBN 978-92-4-012512-4.
+11. Wilkinson MD, Dumontier M, Aalbersberg IJ, Appleton G, Axton M, Baak A, et al. The FAIR Guiding Principles for scientific data management and stewardship. Sci Data. 2016;3:160018. doi:10.1038/sdata.2016.18
+12. Herschel M, Diestelkamper R, Ben Lahmar H. A survey on provenance: what for? What form? What from? VLDB J. 2017;26(6):881-906. doi:10.1007/s00778-017-0486-1
+13. Gebru T, Morgenstern J, Vecchione B, Vaughan JW, Wallach H, Daume H 3rd, et al. Datasheets for datasets. Commun ACM. 2021;64(12):86-92. doi:10.1145/3458723
 
 ---
 
@@ -237,7 +257,7 @@ The remedy is a single flag the reporting country is already in a position to su
 
 ## Notes for the author — not for submission
 
-1. **References not yet written.** Needed: WHO Global TB Report 2025; the WHO TB data dictionary; 3–4 on secondary analysis of routine health data quality; 1–2 on TB service-delivery models / ambulatory DR-TB care (to motivate §3.3); 1–2 on data provenance or FAIR metadata standards for §4.4.
+1. **References placed (13, Vancouver, numbered by first appearance).** Still outstanding: (a) refs were verified by Crossref record or WHO page, not read in full -- re-read Maiga 2019 (3), Lundin 2022 (4), Bassili 2013 (8), Ho 2017 (9) and Herschel 2017 (12) against the sentences they support; (b) the WHO Module 4 (ref 10) was confirmed to cover models of care but its specific wording on hospitalisation was not checked -- read the relevant section; (c) the dictionary defines `hospd_prct_mdr`, `hospd_dur_mdr` and related fields as "Estimated ..."; the abstract's "Nothing in the files says which is which" and §1 should be reconciled with this before submission; (d) the screens have no external validation or citable precedent for country-reported programme data (see §2.2); (e) RECORD, Munafo, Kenett and Loveday were considered and left out as not supporting a specific sentence.
 2. **Companion paper.** The India financing analysis (`manuscript_draft_v1.md`) shares §3.4's dataset and the general theme. They must cite each other and be written independently — run `check_self_similarity.py` across both before submitting either.
 3. **Possible strengthening:** repeat the screen on one other WHO programme dataset (HIV or malaria financing) to test whether the counted/characterised division generalises beyond TB. Same code.
 4. **Honest framing to preserve:** §3.4 discloses an error we made. Keep it. A methods paper about data traps that conceals its author's own is worth less.
