@@ -12,13 +12,13 @@ Correspondence: hssling@yahoo.com · ORCID 0000-0002-4771-8285
 
 ## Abstract
 
-**Background.** WHO publishes country-reported tuberculosis data as annual country-by-year tables, with variable definitions in a separate dictionary. The dictionary labels some quantities as estimates, but a label describes the kind of quantity, not the vintage of each value, and it is not in the data file. Analysts who join on column names never meet it.
+**Background.** WHO publishes country-reported tuberculosis data as annual country-by-year tables, with variable definitions in a separate dictionary. The dictionary labels some quantities as estimates, but a label describes the kind of quantity, not the vintage of each value, and it is not in the data file, so analysts joining on column names never meet it.
 
-**Methods.** We screened all 443 numeric variables with at least 100 observations across six WHO TB datasets (budget, expenditure and utilisation, notifications, treatment outcomes, laboratory diagnostic services, contact tracing). Using the published files alone, variables with five or fewer distinct values were set aside as categorical; the rest were assessed on **repetition** (share of consecutive country-year pairs holding an identical value), **granularity**, **internal identity** and **bounds**. The verdicts were then compared with the dictionary's labels.
+**Methods.** We screened all 443 numeric variables with at least 100 observations across six WHO TB datasets (budget, expenditure, notifications, treatment outcomes, laboratory services, contact tracing). From the published files alone, variables with five or fewer distinct values were set aside as categorical; the rest were assessed on **repetition** (share of consecutive country-year pairs holding an identical value), granularity, internal identity and bounds, and the verdicts compared with the dictionary's labels.
 
-**Results.** Of 358 continuous variables, 206 screened as measurement-like, 68 mixed and 84 estimate-like, and the proportion differs by dataset: median repetition was 13.0% for budget, 15.4% for expenditure, 15.6% for notifications and 3.5% for contact tracing, against **63.0% for laboratory diagnostic services**. The dictionary labels six variables as estimated or typical, all in the expenditure file; the screen places none of them in the measurement-like class (four estimate-like, two mixed; chance probability 0.006). For one of them, `hospd_prct_mdr` (share of drug-resistant TB patients hospitalised), 69.6% of consecutive country-year pairs are identical and 42% of the 178 countries with four or more years never change their entry. The label does not say this, and no field in any file does. The screen also flags 80 variables the dictionary does not label, but 70 of these are dominated by repeated zeros, including the one financial example, `cf_tot_usaid`; the screen cannot separate a repeated zero from a repeated estimate.
+**Results.** Of 358 continuous variables, 206 screened as measurement-like, 68 mixed and 84 estimate-like. Median repetition was 13.0-15.6% for budget, expenditure and notifications, and 3.5% for contact tracing, against **63.0% for laboratory diagnostic services**. The dictionary labels six variables as estimated or typical, all in the expenditure file; the screen places none in the measurement-like class (P = 0.006). For `hospd_prct_mdr` (share of drug-resistant patients hospitalised), 69.6% of consecutive pairs are identical and 42% of 178 countries with four or more years never change their entry; no field in any file says so. Seventy of the 80 variables flagged but unlabelled have zero as their most common value; a repeated zero is an absence, not a restated estimate. Excluding zero-to-zero pairs, median repetition falls to 5.2-9.2% in the three large counted files but only to **48.0%** in laboratory services, which has the fewest such variables (24 of 41, against 65 of 66 in treatment outcomes). The division is not an artefact of zero-reporting.
 
-**Conclusions.** A trend analysis needs to know whether a value was revised, not only what kind of quantity it is. WHO's labels settle the second and are silent on the first. A per-value vintage flag in the data file would settle it. An earlier version of this paper claimed that nothing in the files distinguishes measurements from estimates; that was wrong for the hospitalisation and visit variables and is retracted (§4.1).
+**Conclusions.** A trend analysis needs to know whether a value was revised, not only what kind of quantity it is. WHO's labels settle the second and are silent on the first; a per-value vintage flag in the data file would settle both.
 
 **Keywords:** Data Accuracy; Datasets as Topic; Health Services Research; Reproducibility of Results; Tuberculosis; World Health Organization
 
@@ -87,6 +87,8 @@ Not required: aggregated, publicly available programme data with no individual-l
 
 Of 443 variables meeting the inclusion threshold across the six files, **42 are categorical (S0)** and **43 are untestable on repetition**. Of the remaining 358 continuous variables, **206 screen as measurement-like, 68 as mixed and 84 as estimate-like.**
 
+**Table 1. Screen results by dataset.**
+
 | Dataset | Continuous | Categorical | Untestable | Median repetition | Measurement | Mixed | Estimate | Median if untestable scored 0% |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|
 | Budget | 37 | 0 | 0 | 13.0% | 35 | 1 | 1 | 13.0% |
@@ -98,15 +100,28 @@ Of 443 variables meeting the inclusion threshold across the six files, **42 are 
 
 The last column is a sensitivity analysis on the S0b rule (§2.2). Excluding untestable variables, laboratory repetition is 63.0% against 13.0-15.6% for the budget, expenditure and notification files, 4.0 to 4.8 times as high; scoring them as zero, it is 53.5%, 3.4 to 4.1 times as high. The division holds under either rule; it does not depend on the rule that favours it.
 
+**Repeated zeros do not produce the division.** A repeated zero is a stable absence of events, not a carried-forward estimate, and most variables in these files are zero-dominated (§3.5). Repetition was therefore recomputed over the subset of adjacent pairs in which at least one of the two values is non-zero (Table 2). Every file falls, but not equally: the three large counted files converge on 5.2-9.2% while laboratory diagnostic services remains at 48.0%, a 5.2 to 9.2-fold gap, wider in relative terms than the unrestricted 4.0 to 4.8-fold one. The potential confound also runs the wrong way to explain the finding. Laboratory diagnostic services has the **lowest** share of zero-dominated variables of any file (24 of 41, 59%) and the highest repetition; treatment outcomes has the highest share (65 of 66, 98%) and, once zero-to-zero pairs are removed, ordinary repetition. The restricted statistic is reported only; it does not feed the classification in Table 1, which stands as specified.
+
+**Table 2. Repetition excluding adjacent pairs in which both values are zero.** Restricted to variables with at least 20 such pairs.
+
+| Dataset | Median repetition | Excluding zero-to-zero pairs | Zero as modal value |
+|---|---:|---:|---:|
+| Budget | 13.0% | 9.2% | 30 / 37 |
+| Expenditure and utilisation | 15.4% | 7.3% | 32 / 39 |
+| Notifications | 15.6% | 5.2% | 129 / 166 |
+| Treatment outcomes | 33.0% | 6.5% | 65 / 66 |
+| Laboratory diagnostic services | **63.0%** | **48.0%** | **24 / 41** |
+| Contact tracing / TPT | 3.5% | 1.9% | 8 / 9 |
+
 **The division is not financial versus utilisation.** Notifications (15.6%) and contact tracing (3.5%) are service-delivery data, yet they repeat as rarely as the financial files. Laboratory diagnostic services repeats at 63.0%. The first two files alone had suggested a financial/utilisation split because their high-repetition variables were all utilisation variables; the replication shows that was a confound, not the principle (§4.1). What the high-repetition variables share is that they *characterise* the system (laboratory capacity and status, typical hospitalisation share and duration, facility visits per patient), whereas the low-repetition ones are *counted* from the programme's own records (money spent, cases notified, contacts screened).
 
-**Treatment outcomes sit in between (33.0%, or 20.5% under the inclusive rule) and we do not explain it.** It also has the highest proportion of untestable variables: 24 of its 91 variables have no country with an adjacent pair, which suggests that some cohort outcome data is reported in a way that yields a single observation per country. We note this and do not rely on it.
+**Treatment outcomes appear intermediate (33.0%, or 20.5% under the inclusive rule), but the appearance is repeated zeros.** Sixty-five of its 66 continuous variables have zero as their most common value -- they are counts of rare outcomes in disaggregated categories, mostly zero in most countries -- and excluding zero-to-zero pairs the file falls to 6.5%, the lowest of the three large files (Table 2). It is a counted file whose counts are usually zero, not a third kind. It also has the highest proportion of untestable variables: 24 of its 91 variables have no country with an adjacent pair, which suggests that some cohort outcome data is reported in a way that yields a single observation per country. We note this and do not rely on it.
 
 **The screen's own false positive.** Before S0 existed, the contact-tracing dataset looked estimate-like. Its 12 categorical flags (`prevtx_data_available`, `tpt_3hp` and similar) repeat and sit on round numbers by nature. Scored without S0, the dataset had 20 testable variables, a median repetition of 63.8% (59.7% with its one untestable variable scored as zero) and 11 estimate-like variables. With S0 it has a median of 3.5% and none. Its apparent unreliability was entirely an artefact of the screen, and we found it only by replicating on a further dataset (§5).
 
 **In the two files first screened (77 variables)**, one variable is categorical, **`hosp_type_mdr`** (4 distinct values: 2, 140, 141, 142; a code, not a measure), and none is untestable, so the S0b rule leaves them unaffected. Of the 76 continuous variables, **63 are measurement-like, 8 mixed and 5 estimate-like.** An earlier version of this paper reported six estimate-like variables and listed `hosp_type_mdr` among them; that was the S0 error, corrected here.
 
-**Table 1. The five estimate-like variables in the budget and expenditure files.**
+**Table 3. The five estimate-like variables in the budget and expenditure files.**
 
 | Variable | n | Distinct values | Repetition | Distinct / n | Modal value share | Round |
 |---|---:|---:|---:|---:|---:|---:|
@@ -118,7 +133,7 @@ The last column is a sensitivity analysis on the S0b rule (§2.2). Excluding unt
 
 Reported separately as categorical: `hosp_type_mdr` (n = 1,631; 4 distinct values).
 
-**Table 2. For contrast, the six least-repetitive variables in the budget and expenditure files.**
+**Table 4. For contrast, the six least-repetitive variables in the budget and expenditure files.**
 
 | Variable | n | Repetition | Distinct / n |
 |---|---:|---:|---:|
@@ -165,9 +180,9 @@ We report this failure mode because we committed it ourselves. We also mis-repor
 
 ### 3.5 The screen's verdicts against the dictionary's labels
 
-Of the 443 variables, the dictionary labels **six** as estimated or typical (S5), all in the expenditure file: `hospd_prct_dstb`, `hospd_prct_mdr`, `hospd_dur_dstb`, `hospd_dur_mdr`, `hcfvisit_dstb` and `hcfvisit_mdr`. Table 3 cross-tabulates them against the screen.
+Of the 443 variables, the dictionary labels **six** as estimated or typical (S5), all in the expenditure file: `hospd_prct_dstb`, `hospd_prct_mdr`, `hospd_dur_dstb`, `hospd_dur_mdr`, `hcfvisit_dstb` and `hcfvisit_mdr`. Table 5 cross-tabulates them against the screen.
 
-**Table 3. Screen verdict by dictionary label.**
+**Table 5. Screen verdict by dictionary label.**
 
 | | Estimate-like | Mixed | Measurement-like | Categorical | Untestable |
 |---|---:|---:|---:|---:|---:|
@@ -176,7 +191,7 @@ Of the 443 variables, the dictionary labels **six** as estimated or typical (S5)
 
 **Where they agree.** All six labelled variables are classified non-measurement-like, four estimate-like and two mixed, and none measurement-like. Of the 358 continuous variables 152 are non-measurement-like, so six labelled variables falling there by chance has probability 0.006. We read this as agreement, not proof: six variables, one file, and the six come in related pairs, so they are not independent.
 
-**Where they disagree.** The screen flags 80 estimate-like variables that the dictionary does not label. Most are not evidence of estimation. Seventy of the 80 have zero as their most common value; in the notifications and outcomes files all 48 of the estimate-like variables do, mostly small counts of rare events. A repeated zero is what a stable absence of events looks like. The one financial variable among the 80, `cf_tot_usaid`, is defined as "Expected funding from USAID (US Dollars)", with no hint of estimation, yet screens estimate-like (64.4% repetition; 64.3% of values held by a single number). That number is zero. Among consecutive-year pairs with either value non-zero, 12.6% are identical, against 2.5-6.8% for the other expected-funding sources (§4.2). The screen therefore picked out a real difference between USAID and the other sources, but most of what it flagged is a repeated zero, and we do not call `cf_tot_usaid` an unlabelled estimate.
+**Where they disagree.** The screen flags 80 estimate-like variables that the dictionary does not label. Most are not evidence of estimation. Seventy of the 80 have zero as their most common value; in the notifications and outcomes files all 48 of the estimate-like variables do, mostly small counts of rare events. A repeated zero is what a stable absence of events looks like. The one financial variable among the 80, `cf_tot_usaid`, is defined as "Expected funding from USAID (US Dollars)", with no hint of estimation, yet screens estimate-like (64.4% repetition; 64.3% of values held by a single number). That number is zero. Among consecutive-year pairs with either value non-zero, 11.7% are identical, against 2.4-6.8% for the other expected-funding sources (§4.2). The screen therefore picked out a real difference between USAID and the other sources, but most of what it flagged is a repeated zero, and we do not call `cf_tot_usaid` an unlabelled estimate.
 
 **What the comparison does and does not show.** The dictionary and the screen answer different questions. The dictionary says what a variable is; the screen says whether its values move. They agree where an estimate is labelled and moves rarely. The hospitalisation variables are the clearest case: they are labelled, and the screen shows the label's practical consequence, which the label itself does not state.
 
@@ -194,7 +209,7 @@ Three things survive. First, the label sits in a different file from the data, s
 
 **A still earlier version said the division ran between financial and utilisation variables. Our own replication refutes that.** The reading rested on two files in which every high-repetition variable happened to be a utilisation variable, so the two explanations could not be told apart. Four further datasets from the same programme and countries separate them. Notifications and contact tracing are service-delivery data, not financial, and repeat 15.6% and 3.5% of the time, like or below the financial files; laboratory diagnostic services repeats 63.0% of the time. A financial/utilisation boundary predicts none of that. (The earlier version's classification was also inflated by a screen defect, the missing S0; the contact-tracing result in §3.1 is its clearest demonstration.)
 
-What survives is a distinction of kind. Quantities a programme can **count from its own records** (money spent, cases notified, contacts screened) are re-derived each year and repeat 13.0-15.6% of the time in the three large files, 3.5% in contact tracing. Quantities that **characterise the system's standing configuration** (laboratory infrastructure, typical share hospitalised and typical stay, visits per patient) repeat at 63.0% (53.5% under the inclusive rule) in laboratory diagnostic services and at 61.5-69.6% for the hospitalisation and visit variables of the expenditure file. A programme cannot count its way to the second kind; it can only describe it, and describes it the same way until something changes. This is a post hoc reading of six datasets, not a tested hypothesis, and the treatment-outcomes file (33.0%, unexplained) sits awkwardly between the two.
+What survives is a distinction of kind. Quantities a programme can **count from its own records** (money spent, cases notified, contacts screened) are re-derived each year and repeat 13.0-15.6% of the time in the three large files, 3.5% in contact tracing. Quantities that **characterise the system's standing configuration** (laboratory infrastructure, typical share hospitalised and typical stay, visits per patient) repeat at 63.0% (53.5% under the inclusive rule) in laboratory diagnostic services and at 61.5-69.6% for the hospitalisation and visit variables of the expenditure file. A programme cannot count its way to the second kind; it can only describe it, and describes it the same way until something changes. This is a post hoc reading of six datasets, not a tested hypothesis. The treatment-outcomes file appeared to sit between the two at 33.0%; once repeated zeros are excluded it falls to 6.5% and belongs with the counted files (§3.1).
 
 Distributing both kinds under one schema, one dictionary and no provenance field invites the inference that they are the same kind of thing. They are not, and the difference determines which analyses are possible.
 
@@ -202,7 +217,7 @@ Distributing both kinds under one schema, one dictionary and no provenance field
 
 We do not read the repetition as carelessness, and the replication strengthens the benign reading. A programme asked every year for its laboratory configuration will reasonably restate its standing answer; a hospitalisation share and average stay are properties of a service-delivery model that does not change annually. The reporting behaviour is sensible; what is missing is the flag that would let an analyst see it. This is inference from the shape of the data, not from any account of how countries completed the return (§5).
 
-The one financial variable the screen flags, `cf_tot_usaid`, is a different case and we do not read it as a restated estimate. Its dictionary definition ("Expected funding from USAID") carries no label of estimation, like every other financial variable. But 64.3% of its values are zero, and the high repetition is largely countries repeatedly reporting no USAID funding. Restricted to consecutive-year pairs in which either value is non-zero, 12.6% are identical (191 pairs), higher than the other expected-funding sources (2.5% for Global Fund, 3.4% for other grants, 6.8% for domestic) but far from the 61-70% of the hospitalisation variables. An earlier version of this section called `cf_tot_usaid` a fixed external commitment restated until it changes; the data do not support that, and the sentence is withdrawn.
+The one financial variable the screen flags, `cf_tot_usaid`, is a different case and we do not read it as a restated estimate. Its dictionary definition ("Expected funding from USAID") carries no label of estimation, like every other financial variable. But 64.3% of its values are zero, and the high repetition is largely countries repeatedly reporting no USAID funding. Restricted to consecutive-year pairs in which either value is non-zero, 11.7% are identical (24 of 206 pairs), higher than the other expected-funding sources (2.4% for Global Fund, 3.2% for other grants, 6.8% for domestic) but far from the 61-70% of the hospitalisation variables. An earlier version of this section called `cf_tot_usaid` a fixed external commitment restated until it changes; the data do not support that, and the sentence is withdrawn.
 
 ### 4.3 Implications for secondary analysis
 
@@ -234,7 +249,7 @@ The classification thresholds are conventions. We chose them before examining th
 
 Variables with fewer than 100 observations were excluded, so the screen is silent about sparsely reported quantities, which may be the least reliable of all.
 
-We screened six files from one programme at one point in time. Whether the counted/characterised division generalises to other WHO disease programmes is an open and directly testable question. The division itself was found post hoc, and the treatment-outcomes file does not fit it cleanly.
+We screened six files from one programme at one point in time. Whether the counted/characterised division generalises to other WHO disease programmes is an open and directly testable question. The division itself was found post hoc. A seventh file from the same programme, public-private mix (`TB_ppm`), was screened after the analysis was complete and is consistent with it but adds little: only two of its variables clear the 100-observation threshold, both counts of new diagnoses, and both screen measurement-like (median repetition 21.5%, 3.6% excluding zero-to-zero pairs). It is reported for completeness and the headline counts above exclude it.
 
 **The screen's validation is partial.** Before S0 existed it produced a false positive on the contact-tracing dataset, labelling a set of ordinary yes/no flags as estimate-like, and we found it only by replication on a further dataset. Both the five-or-fewer-values convention of S0 and the untestable class of S0b were added in response to failures. The comparison with the dictionary (§3.5) is the first external check, and it is thin: it covers six variables, all in one file, defined by a wording rule we chose, and it can show only that the screen does not miss labelled estimates, not that the 80 variables it flags beyond them are estimates. We found that 70 of those 80 have zero as their most common value, as do 71 of all 84 estimate-like variables, including 21 of the 31 in the laboratory file. A repeated zero (no such test performed, no such event) is not a restated estimate, and the screen does not distinguish them; the laboratory median of 63.0% in §3.1 should be read with that in mind. The hospitalisation and visit variables are not affected (of the four labelled estimate-like variables, only one has zero as its most common value). Other failure modes may remain: a six-valued code, for example, would not be caught by S0.
 

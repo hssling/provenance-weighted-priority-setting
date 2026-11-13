@@ -49,7 +49,7 @@ def test_rank_two_intervention_has_no_budget_line():
     assert "airborne_ipc" not in r.mapped
 
 
-def test_top_five_evidence_ranked_interventions_include_three_invisible():
+def test_top_five_interventions_by_favourability_include_three_invisible():
     # The finding that matters: three of the five best-evidenced interventions (ranks 2, 4
     # and 5) cannot be tracked, defended at budget time, or evaluated for value.
     keys = list(NODE_LABELS)  # insertion order is evidence rank 1..11

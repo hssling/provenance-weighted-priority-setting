@@ -6,19 +6,19 @@
 Department of Community Medicine, Shridevi Institute of Medical Sciences and Research Hospital, Tumkur – 572106, Karnataka, India.
 Correspondence: hssling@yahoo.com · ORCID 0000-0002-4771-8285
 
-**Target journal:** *BMJ Global Health* (Original Research) — alternative: *Health Policy and Planning*
+**Target journal:** *Health Policy and Planning* (Original Article). Abstract 250 words.
 
 ---
 
 ## Abstract
 
-**Background.** The World Health Organization's tuberculosis (TB) funding gap — budget required minus funding expected — is published annually for every high-burden country and read as a measure of under-resourcing. Whether it measures what it appears to, for any given country, has not to our knowledge been examined.
+**Background.** WHO's tuberculosis (TB) funding gap — budget required minus funding expected — is published annually for high-burden countries and read as a measure of under-resourcing. Whether it does so for any given country is unexamined.
 
-**Methods.** We analysed WHO's reported TB budget and expenditure data for 215 countries (2017–2025) against India's national programme accounts. The sources were compared through dimensionless internal ratios, requiring no currency conversion, and eleven interventions, ordered by a published literature-favourability score, were mapped onto WHO budget lines by their published definitions rather than their names.
+**Methods.** We compared WHO's reported TB budget and expenditure data for 215 countries (2017–2025) with India's national programme accounts, using dimensionless internal ratios (no currency conversion), and mapped eleven TB interventions onto WHO budget lines by definition, not name.
 
-**Results.** India reported expected funding exactly equal to budget required in all eight years 2018–2025, so its WHO funding gap is zero **by construction**, not by observation. Of 106 countries with five or more years of data, 14 report this way; 44 report a non-zero gap every year. Over the same period India's own accounts record ₹18,388 crore approved against ₹23,169 crore requested — a shortfall of 5.4% to 46.1% by year. The sources disagree on need but agree on execution (72% and 82% of budget spent), and both record Global Fund support falling from 37% of expenditure to 1%. **Six of eleven interventions have no budget line at all**; three more map only to drugs-only lines, leaving delivery costs unattributable. Three of the six are among the top five on the literature-favourability score used to order them, a score that is not human-validated and whose order depends on its coding rule.
+**Results.** India reported expected funding exactly equal to budget required in all eight years 2018–2025: its WHO funding gap is zero **by construction**, not by observation. Fourteen of the 106 countries with five or more years report this way; 44 report a non-zero gap every year. India's own accounts record ₹18,388 crore approved against ₹23,169 crore requested (shortfall 5.4–46.1% by year). The two sources agree on execution (72% and 82% of budget spent) and on Global Fund support falling from 37% of expenditure to 1%. **Six of the eleven interventions have no budget line**; three more map only to drugs-only lines, leaving delivery costs unattributable.
 
-**Conclusions.** A budget records what a programme buys, not what it does. Commodities have line items; services largely do not, so many of the interventions the literature favours cannot be costed, defended at budget time or evaluated for value. Meanwhile the indicator meant to signal shortfall is, for India, structurally unable to. Neither finding concerns how much tuberculosis control receives — both concern what the financial record can show, and both are correctable: publish unmet need as its own field, and tag expenditure to interventions rather than commodity classes.
+**Conclusions.** A budget records what a programme buys, not what it does. Commodities have line items; services largely do not, so spending on an intervention without a line cannot be identified. For India, the indicator meant to signal shortfall structurally cannot. Neither finding concerns how much TB control receives, and both are correctable: publish unmet need as its own field, and tag expenditure to interventions rather than commodity classes.
 
 **Keywords:** Antitubercular Agents; Costs and Cost Analysis; Financing, Government; Health Expenditures; Health Priorities; Healthcare Financing; India; Program Evaluation; Tuberculosis
 

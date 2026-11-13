@@ -504,7 +504,7 @@ def build_summary(c: dict) -> str:
     inv = c["invis"]
     none = [r["evidence_rank"] for r in inv if r["coverage"] == "none"]
     P("")
-    P(f"T5 existence: {len(none)} of {len(inv)} evidence-ranked interventions have no budget line "
+    P(f"T5 existence: {len(none)} of {len(inv)} interventions have no budget line "
       f"(ranks {', '.join(map(str, none))}); {sum(r['coverage'] == 'partial' for r in inv)} are mapped "
       "only partially (drugs-only or TB/HIV-only lines). Reported separately, not folded into any composite.")
     return "\n".join(L) + "\n"

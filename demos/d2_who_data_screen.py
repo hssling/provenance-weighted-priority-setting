@@ -77,6 +77,9 @@ DATASETS = [
 # S0: a variable with this many distinct values or fewer is categorical.
 # A convention, not a derived quantity.
 CATEGORICAL_MAX_DISTINCT = 5
+# Minimum adjacent pairs with at least one non-zero side before the
+# zero-excluded repetition is reported. Below this it is noise.
+MIN_NONZERO_PAIRS = 20
 
 ID_COLS = {"country", "iso2", "iso3", "iso_numeric", "g_whoregion", "year"}
 ABSENT = {"", "NA", "na", "N/A", "-"}
@@ -126,22 +129,34 @@ def screen_column(rows: list[dict], col: str) -> dict | None:
     if n_distinct <= CATEGORICAL_MAX_DISTINCT:
         return {"column": col, "n": len(vals), "countries": len(by_country),
                 "n_distinct": n_distinct, "categorical": True, "untestable": False,
-                "repetition": None, "distinct_ratio": None,
-                "modal_share": None, "roundish": None, "out_of_bounds": None}
+                "repetition": None, "repetition_nz": None,
+                "distinct_ratio": None, "modal_share": None,
+                "modal_is_zero": None, "roundish": None, "out_of_bounds": None}
 
-    # S1 repetition
-    same = pairs = 0
+    # S1 repetition. We also count repetition over the subset of pairs where
+    # at least one side is non-zero. A repeated zero is an absence, not a
+    # carried-forward estimate, and 71 of the 84 estimate-like variables have
+    # zero as their modal value, so the unrestricted statistic partly measures
+    # "this programme element does not exist here". The restricted statistic is
+    # reported as a sensitivity; it does NOT feed classify(), which is left as
+    # specified so the published verdicts stand.
+    same = pairs = same_nz = pairs_nz = 0
     for series in by_country.values():
         series.sort()
         for (_, a), (_, b) in zip(series, series[1:]):
             pairs += 1
             same += a == b
+            if a or b:
+                pairs_nz += 1
+                same_nz += a == b
     if pairs == 0:
         return {"column": col, "n": len(vals), "countries": len(by_country),
                 "n_distinct": n_distinct, "categorical": False,
-                "untestable": True, "repetition": None, "distinct_ratio": None,
-                "modal_share": None, "roundish": None, "out_of_bounds": None}
+                "untestable": True, "repetition": None, "repetition_nz": None,
+                "distinct_ratio": None, "modal_share": None,
+                "modal_is_zero": None, "roundish": None, "out_of_bounds": None}
     repetition = same / pairs
+    repetition_nz = same_nz / pairs_nz if pairs_nz >= MIN_NONZERO_PAIRS else None
 
     # S2 granularity
     distinct = n_distinct / len(vals)
@@ -166,8 +181,10 @@ def screen_column(rows: list[dict], col: str) -> dict | None:
         "categorical": False,
         "untestable": False,
         "repetition": repetition,
+        "repetition_nz": repetition_nz,
         "distinct_ratio": distinct,
         "modal_share": modal_share,
+        "modal_is_zero": counts.most_common(1)[0][0] == 0,
         "roundish": roundish,
         "out_of_bounds": out_of_bounds,
     }
@@ -249,17 +266,20 @@ def main() -> int:
 
     print("\nPer-dataset summary (continuous variables only; categorical excluded)")
     print(f"{'dataset':<14}{'cont':>5}{'cat':>5}{'untst':>6}{'median rep':>12}"
-          f"{'meas':>6}{'mixed':>6}{'est':>5}{'incl. median':>14}")
+          f"{'meas':>6}{'mixed':>6}{'est':>5}{'incl. median':>14}"
+          f"{'excl. 0-0':>11}{'zero-modal':>11}")
     for label in tables:
         c = [s for s in results if s["dataset"] == label]
         k = sum(1 for s in cats if s["dataset"] == label)
         u = sum(1 for s in unt if s["dataset"] == label)
         t = Counter(s["verdict"] for s in c)
         incl = median([s["repetition"] for s in c] + [0.0] * u)
+        nz = [s["repetition_nz"] for s in c if s["repetition_nz"] is not None]
+        zm = sum(1 for s in c if s["modal_is_zero"])
         print(f"{label:<14}{len(c):>5}{k:>5}{u:>6}"
               f"{median([s['repetition'] for s in c]):>12.1%}"
               f"{t['measurement-like']:>6}{t['mixed']:>6}{t['estimate-like']:>5}"
-              f"{incl:>14.1%}")
+              f"{incl:>14.1%}{median(nz):>11.1%}{zm:>7}/{len(c):<3}")
     tot = Counter(s["verdict"] for s in results)
     print(f"{'ALL':<14}{len(results):>5}{len(cats):>5}{len(unt):>6}"
           f"{median([s['repetition'] for s in results]):>12.1%}"
@@ -344,7 +364,8 @@ def main() -> int:
     with (OUT / "d2_variable_screen.csv").open("w", newline="", encoding="utf-8") as fh:
         w = csv.DictWriter(fh, fieldnames=["dataset", "column", "n", "countries",
                                            "n_distinct", "repetition",
-                                           "distinct_ratio", "modal_share",
+                                           "repetition_nz", "distinct_ratio",
+                                           "modal_share", "modal_is_zero",
                                            "roundish", "out_of_bounds", "verdict"],
                            extrasaction="ignore")
         w.writeheader()

@@ -215,14 +215,57 @@ first framed: the screen flags 80 unlabelled estimate-like variables, and **70 o
 value** (71 of all 84; 21 of the 31 laboratory ones). The one financial case, `cf_tot_usaid`, was proposed as a variable
 WHO does not label that the screen nonetheless catches. It is defined as "Expected funding from USAID", unlabelled, and
 screens estimate-like (64.4% repetition), but its modal value, held by 64.3% of observations, is **zero** (no USAID
-funding). Over consecutive-year pairs with either value non-zero only 12.6% are identical (191 pairs), against 2.5% (Global
-Fund), 3.4% (other grants) and 6.8% (domestic). So it is a real difference between USAID and the other sources, but not an
+funding). Over consecutive-year pairs with either value non-zero only 11.7% are identical (24 of 206 pairs), against 2.4% (Global
+Fund), 3.2% (other grants) and 6.8% (domestic). (An earlier pass reported 12.6% of 191 pairs, 2.5% and 3.4%; those did not
+reproduce from `demos/d2_who_data_screen.py` and the figures here are the ones the code produces.) So it is a real difference between USAID and the other sources, but not an
 unlabelled estimate, and the earlier §4.2 sentence calling it "a fixed external commitment, restated unchanged until it
-changes" is withdrawn. The screen cannot tell a repeated zero from a repeated estimate. No reported screen number
-changed; this is a limitation that was previously unstated (it bears on the laboratory median of 63.0%).
+changes" is withdrawn. The screen cannot tell a repeated zero from a repeated estimate on a single variable. Whether this
+explains the per-file division is a separate question, and §2.4 answers it.
 
 **Paper A, same pass.** "Evidence-ranked" for the eleven interventions overstated the source ranking (see §1.4); the
 six-of-eleven count is independent of it, the three-of-top-five observation is not.
+
+### 2.4 Repeated zeros do not produce the counted/characterised division
+
+§2.3 established that the repetition statistic cannot, on a single variable, separate a carried-forward estimate from a
+stable absence of events, and that most estimate-like variables are zero-dominated. That raised a direct threat to Paper
+B's central result, the per-file division. The test is to recompute repetition over the subset of adjacent country-year
+pairs in which at least one of the two values is non-zero. It is implemented as `repetition_nz` in
+`demos/d2_who_data_screen.py` (reported only; it does not feed `classify()`, so no published verdict moves) and is
+covered by `tests/test_d2_screen.py`, which had no predecessor -- the screen was previously untested.
+
+| dataset | median repetition | excluding zero-to-zero pairs | zero as modal value |
+|---|---:|---:|---:|
+| budget | 13.0% | 9.2% | 30 / 37 |
+| expenditure and utilisation | 15.4% | 7.3% | 32 / 39 |
+| notifications | 15.6% | 5.2% | 129 / 166 |
+| treatment outcomes | 33.0% | 6.5% | 65 / 66 |
+| laboratory diagnostic services | **63.0%** | **48.0%** | **24 / 41** |
+| contact tracing / TPT | 3.5% | 1.9% | 8 / 9 |
+| `hospd_prct_mdr` (headline variable) | 69.6% | 66.8% | no (modal value is 100) |
+
+**The finding survives and is better evidenced than before.** Every file falls, but the three large counted files
+converge on 5.2-9.2% while laboratory diagnostic services holds 48.0%. The gap widens in relative terms, from 4.0-4.8x
+to 5.2-9.2x. The confound also runs the wrong way to explain the result: laboratory diagnostic services has the
+**lowest** share of zero-modal variables of any file (24 of 41, 59%) and the highest repetition, while treatment
+outcomes has the highest share (65 of 66, 98%). The headline variable barely moves because its modal value is 100, not
+zero.
+
+**One finding is overturned.** Treatment outcomes was reported at 33.0% and described in Paper B as sitting between the
+two groups, unexplained. Excluding zero-to-zero pairs it is 6.5% -- below budget and expenditure, and the lowest of the
+three large files. Its intermediate position was entirely repeated zeros in disaggregated counts of rare outcomes. It is
+a counted file, not a third kind. Paper B §3.1, §4.1.1 and §5 are corrected accordingly, and the sentence "the
+treatment-outcomes file does not fit it cleanly" is withdrawn.
+
+This is the sixth occasion in this project on which the instrument was found committing the error it exists to detect: a
+number (33.0%) moved because the accounting category behind it moved, not because the quantity did.
+
+**Out-of-sample check, seventh file.** `data/TB_ppm_2026-08-25.csv` (public-private mix) was downloaded during
+development and never screened. Run after the analysis was fixed, it yields only two variables clearing the
+100-observation threshold (`priv_new_dx`, `pub_new_dx`); both screen measurement-like, median repetition 21.5% and 3.6%
+excluding zero-to-zero pairs. Consistent with the counted/characterised division, but on two variables from the same
+programme, so it is weak evidence and is reported in Paper B §5 as such. The headline counts (443 variables, six files)
+exclude it.
 
 ## 3. Data provenance
 
