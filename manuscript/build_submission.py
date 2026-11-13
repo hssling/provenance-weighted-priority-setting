@@ -124,6 +124,14 @@ def main() -> int:
 
         stamp_counts(d / "01_title_page.md", abstract, body, tables, refs)
 
+        # The supplementary file belongs with its paper, so it converts to
+        # .docx with everything else and cannot be forgotten at upload.
+        letter = key[-1]
+        supp = HERE / f"supplementary_paper_{letter}.md"
+        if supp.exists():
+            (d / "06_supplementary.md").write_text(
+                supp.read_text(encoding="utf-8"), encoding="utf-8")
+
     print("\nThese counts are written into the title pages by this script. Type them "
           "into the portal from here, not from memory.")
     print(f"\n{to_docx()}")

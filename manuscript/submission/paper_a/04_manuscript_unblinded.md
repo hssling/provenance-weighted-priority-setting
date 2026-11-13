@@ -16,7 +16,7 @@ Correspondence: hssling@yahoo.com · ORCID 0000-0002-4771-8285
 
 **Methods.** We compared WHO's reported TB budget and expenditure data for 215 countries (2017–2025) with India's national programme accounts, using dimensionless internal ratios (no currency conversion), and mapped eleven TB interventions onto WHO budget lines by definition, not name.
 
-**Results.** India reported expected funding exactly equal to budget required in all eight years 2018–2025: its WHO funding gap is zero **by construction**, not by observation. Fourteen of 106 countries with five or more years report this way; 44 report a gap every year. India's own accounts record ₹18,388 crore approved against ₹23,169 crore requested (shortfall 5.4–46.1% by year, Figure 1). The sources agree on execution (72% and 82% of budget spent) and on Global Fund support falling from 37% of expenditure to 1%. **No intervention of eleven has a budget line of its own.** Two have no line; three are named by WHO's collection form inside one line pooling fourteen activities; three cover the drug but not its delivery.
+**Results.** India reported expected funding exactly equal to budget required in all eight years 2018–2025: its WHO funding gap is zero **by construction**, not by observation. Fourteen of 106 countries with five or more years report this way; 44 report a gap every year. India's own accounts record ₹18,388 crore approved against ₹23,169 crore requested (shortfall 5.4–46.1% by year). The sources agree on execution (72% and 82% of budget spent) and on Global Fund support falling from 37% of expenditure to 1%. **No intervention of eleven has a budget line of its own.** Two have no line; three are named by WHO's collection form inside one line pooling fourteen activities; three cover the drug but not its delivery.
 
 **Conclusions.** A budget records what a programme buys, not what it does. Commodities have line items; services largely do not, so spending on an intervention without a line cannot be identified. For India, the indicator meant to signal shortfall structurally cannot. Neither finding concerns how much TB control receives, and both are correctable: publish unmet need as its own field, and tag expenditure to interventions rather than commodity classes.
 
@@ -69,15 +69,19 @@ An earlier formulation compared year-on-year proportional change in each source,
 
 Eleven tuberculosis interventions were mapped onto WHO budget line items by definition. Their ranking, and the definitions of the interventions themselves, are taken as given from a companion paper now in press (Siddalingaiah 2026a), in which they are ordered by a priority score built from the favourability of coded literature, not from a formal evidence synthesis. The mapping to budget lines does not depend on that ranking (§5).
 
-**Which definition governs.** Two WHO documents define these columns and they do not agree. The data dictionary distributed with the datasets gives `budget_prog` as *"Budget required for programme costs to treat drug-susceptible TB"*. The data collection form, the instrument countries actually complete, gives the same line as covering *"the management and supervision of the TB control programme, training, policy development, meetings, visits for supervision, purchase of office equipment/vehicles, construction of buildings for use by programme staff, routine surveillance, advocacy and communication, public-private mix activities, community engagement, active case-finding, infection control, management of TB drug procurement and distribution, and programme activities linked to contact investigation for TB preventive treatment"* (WHO 2026c). The dictionary's abbreviation excludes case-finding and infection control; the form includes them. **We map against the form**, because it is what determines what a country enters. An earlier version of this analysis mapped against the dictionary and reported three activities as having no budget line when the form names them; §4.2 reports that error, because it is the kind of error this paper is about.
+**Which definition governs.** Two WHO documents define these columns and they do not agree. The data dictionary distributed with the datasets gives `budget_prog` as *"Budget required for programme costs to treat drug-susceptible TB"*. The data collection form, the instrument countries actually complete, gives the same line as covering *"the management and supervision of the TB control programme, training, policy development, meetings, visits for supervision, purchase of office equipment/vehicles, construction of buildings for use by programme staff, routine surveillance, advocacy and communication, public-private mix activities, community engagement, active case-finding, infection control, management of TB drug procurement and distribution, and programme activities linked to contact investigation for TB preventive treatment"* (WHO 2026c). The dictionary's abbreviation excludes case-finding and infection control; the form includes them. **We map against the form**, because it is what determines what a country enters; Supplementary S1 sets both definitions of every column used side by side. An earlier version of this analysis mapped against the dictionary and reported three activities as having no budget line when the form names them; §4.2 reports that error, because it is the kind of error this paper is about.
 
 Each mapping was then classified as **no line** (no WHO line covers the activity), **pooled** (the form names the activity inside a line it shares with many others), **commodity-only** (the line covers the drug or one arm, not the delivery), or **dominant** (the line's scope is largely this activity, though still shared). Mapping is declared data and is published with the code.
 
 ### 2.4 Reproducibility
 
-All analysis is pure-Python with no third-party numerical dependency. Every figure in this paper is regenerated from the raw files by a single command, following the practice of computational reproducibility (Peng 2011), and a verification suite (255 tests) checks the derived quantities, including that every number quoted here is reproduced from source rather than transcribed. Code and data: [repository URL to be inserted at acceptance].
+All analysis is pure-Python with no third-party numerical dependency. Every number in this paper is regenerated from the raw files by a single command, following the practice of computational reproducibility (Peng 2011); the figures are drawn from the same outputs by a separate script, and a verification suite checks the derived quantities. A large language model was used as a drafting and analysis assistant; every analytical decision, the code and its verification are the author's. Code and data: https://github.com/hssling/provenance-weighted-priority-setting, doi:10.5281/zenodo.24187367.
 
-### 2.5 Ethics
+### 2.5 Reporting
+
+This study is reported in accordance with the RECORD statement for studies using routinely collected health data (Benchimol et al. 2015); the completed checklist accompanies this submission.
+
+### 2.6 Ethics
 
 Not required. The analysis uses aggregated, publicly available financial and programmatic summaries with no individual-level records and no patient-identifiable information. Institutional ethics approval and informed consent were not applicable.
 
@@ -89,13 +93,13 @@ Not required. The analysis uses aggregated, publicly available financial and pro
 
 In all eight years 2018–2025, India reported expected funding (`cf_tot`) **exactly equal** to budget required (`budget_tot`). The reported gap is therefore identically zero in every year — not as a finding about financing, but as a consequence of how the two fields are populated. WHO's dictionary defines `budget_tot` as "Total budget required (US Dollars)" and `cf_tot` as "Total expected funding for all budget line items (US Dollars)" (WHO 2026b); neither definition states that the two should be equal, so the equality is a reporting convention we infer from the data, not one WHO documents.
 
-This is not universal practice. Among 106 countries with at least five years of data, **14** report budget equal to expected funding in every year. **44** report a non-zero gap in every year, including Vietnam (~72% mean gap), Nigeria (~69%), Indonesia (~59%) and China (~10%). Pakistan reports gaps of 43–66% from 2018 to 2023 and exactly zero in 2024 and 2025 — one of several countries whose reporting convention changes mid-series.
+This is not universal practice. Among 106 countries with at least five years of data, **14** report budget equal to expected funding in every year (Supplementary S3 lists them). **44** report a non-zero gap in every year, including Vietnam (~72% mean gap), Nigeria (~69%), Indonesia (~59%) and China (~10%). Pakistan reports gaps of 43–66% from 2018 to 2023 and exactly zero in 2024 and 2025 — one of several countries whose reporting convention changes mid-series.
 
 The indicator is therefore informative for most countries and uninformative for a minority, with no field distinguishing the two cases.
 
 ### 3.2 India's own accounts record a substantial shortfall over the same years
 
-Over 2017-18 to 2023-24 the national programme requested ₹23,169.14 crore and was approved ₹18,388.23 crore — 79.4% of request. The annual shortfall ranges from 5.4% to 46.1%.
+Over 2017-18 to 2023-24 the national programme requested ₹23,169.14 crore and was approved ₹18,388.23 crore — 79.4% of request. The annual shortfall ranges from 5.4% to 46.1% (Figure 1; Supplementary S2 gives the full series).
 
 **Table 1. Two sources, one programme, 2017–2025.**
 
@@ -264,6 +268,8 @@ Neither finding is about how much money tuberculosis control receives. Both are 
 ---
 
 ## References
+
+Benchimol EI, Smeeth L, Guttmann A et al. 2015. The REporting of studies Conducted using Observational Routinely-collected health Data (RECORD) Statement. *PLOS Medicine* **12**: e1001885. doi: 10.1371/journal.pmed.1001885
 
 Bertone MP, Barroy H, Sparkes S et al. 2026. Political economy of budgeting reforms: a comparative analysis of the adoption and implementation of programme-based budgeting in health across seven LMIC countries. *The International Journal of Health Planning and Management*, published online 29 September 2026. doi: 10.1002/hpm.70142
 

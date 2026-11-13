@@ -34,6 +34,15 @@ def body_of(text: str) -> str:
         i = text.find(marker)
         if i != -1:
             text = text[:i]
+    # The abstract and key messages are not running text, and journals do not
+    # allow exhibits to be cited in them. Counting them let a "Figure 1" in
+    # paper A's abstract satisfy the first-citation check, which passed for the
+    # wrong reason until this was excluded.
+    for start, stop in (("## Abstract", "\n## "), ("## Key messages", "\n## ")):
+        i = text.find(start)
+        if i != -1:
+            j = text.find(stop, i + len(start))
+            text = text[:i] + (text[j:] if j != -1 else "")
     text = re.sub(r"(?m)^\*\*(Table|Figure) \d+\..*$", "", text)   # captions
     text = re.sub(r"(?m)^\|.*$", "", text)                          # table rows
     return text

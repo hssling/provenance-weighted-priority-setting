@@ -46,7 +46,7 @@ The quality of routine health data has been assessed in other settings [3,4], bu
 
 Six files from WHO's tuberculosis programme, retrieved in November 2026 and archived with the analysis code; file versions are WHO's own release dates, 12 November 2026 for the budget file and 25 August 2026 for the other five and the dictionary. Together they hold 25,181 country-year records for 217 countries and areas, 1980 to 2026; Supplementary S0 lists each file's rows, years and columns. The budget and expenditure files were screened first (77 variables) and the other four afterwards, as a replication.
 
-WHO's published data dictionary [5] supplied every variable definition and is the comparison standard in §3.5. Definitions are used rather than column names, because the two diverge: `budget_prog` reads as programme costs generally but is defined as *"programme costs to treat drug-susceptible TB"*.
+WHO's published data dictionary [5] supplied every variable definition and is the comparison standard in §3.4. Definitions are used rather than column names, because the two diverge: `budget_prog` reads as programme costs generally but is defined as *"programme costs to treat drug-susceptible TB"*.
 
 ### 2.2 The screens
 
@@ -56,7 +56,7 @@ These screens are our own operationalisation of non-measurement, justified by fa
 
 ### 2.3 Reproducibility
 
-The screen is a single pure-Python script with no third-party dependency. It regenerates every figure in this paper from the raw files in one command [7] (including the pre-S0 counterfactual of §3.1) and writes a per-variable results table. Code, archived inputs and the results table: https://github.com/hssling/provenance-weighted-priority-setting, doi:10.5281/zenodo.24187367.
+The screen is a single pure-Python script with no third-party dependency. It regenerates every number in this paper from the raw files in one command [7], including the counterfactual without rule S0 (Supplementary S1c), and writes a per-variable results table; the figures are drawn from those outputs separately. A large language model was used as a drafting and analysis assistant; every analytical decision, the code and its verification are the author's. Code, archived inputs and the results table: https://github.com/hssling/provenance-weighted-priority-setting, doi:10.5281/zenodo.24187367.
 
 ### 2.4 Ethics
 
@@ -81,7 +81,7 @@ Of 443 variables meeting the inclusion threshold across the six files, **42 are 
 | Laboratory diagnostic services | 41 | 12 | 16 | **63.0%** | 9 | 1 | **31** | **53.5%** |
 | Contact tracing / TPT | 9 | 12 | 0 | **3.5%** | 9 | 0 | 0 | 3.5% |
 
-**Repeated zeros do not produce the division (Figure 2).** A repeated zero is a stable absence, not a carried-forward estimate, and most variables in these files are zero-dominated (§3.5). Repetition was therefore recomputed over the subset of adjacent pairs in which at least one of the two values is non-zero (Table 2). Every file falls, but not equally: the three large counted files converge on 5.2-9.2% while laboratory diagnostic services remains at 48.0%, a 5.2 to 9.2-fold gap, wider than the unrestricted 4.0 to 4.8-fold one. The potential confound also runs the wrong way to explain the finding. Laboratory diagnostic services has the **lowest** share of zero-dominated variables of any file (24 of 41, 59%) and the highest repetition; treatment outcomes has the highest share (65 of 66, 98%) and, once zero-to-zero pairs are removed, ordinary repetition. The restricted statistic is reported only; it does not feed the classification in Table 1.
+**Repeated zeros do not produce the division (Figure 2).** A repeated zero is a stable absence, not a carried-forward estimate, and most variables in these files are zero-dominated (§3.4). Repetition was therefore recomputed over the subset of adjacent pairs in which at least one of the two values is non-zero (Table 2). Every file falls, but not equally: the three large counted files converge on 5.2-9.2% while laboratory diagnostic services remains at 48.0%, a 5.2 to 9.2-fold gap, wider than the unrestricted 4.0 to 4.8-fold one. The potential confound also runs the wrong way to explain the finding. Laboratory diagnostic services has the **lowest** share of zero-dominated variables of any file (24 of 41, 59%) and the highest repetition; treatment outcomes has the highest share (65 of 66, 98%) and, once zero-to-zero pairs are removed, ordinary repetition. The restricted statistic is reported only; it does not feed the classification in Table 1.
 
 **Table 2. Repetition excluding adjacent pairs in which both values are zero.** Restricted to variables with at least 20 such pairs.
 
@@ -145,7 +145,7 @@ It has **81 distinct values**. **35.3%** of observations are exactly 100; **11.6
 
 A "global trend in DR-TB hospitalisation, 2017–2025" computed from this variable would be driven by whichever minority of countries revised their entry, and by when they did so. It would describe revision behaviour, not clinical practice. The same applies to duration of hospitalisation (66.5% repetition) and facility visits per patient (61.6%).
 
-### 3.5 The screen's verdicts against the dictionary's labels
+### 3.4 The screen's verdicts against the dictionary's labels
 
 Of the 443 variables, the dictionary labels **six** as estimated or typical (S5), all in the expenditure file: `hospd_prct_dstb`, `hospd_prct_mdr`, `hospd_dur_dstb`, `hospd_dur_mdr`, `hcfvisit_dstb` and `hcfvisit_mdr`. Table 6 cross-tabulates them against the screen.
 
@@ -198,11 +198,9 @@ The one financial variable the screen flags, `cf_tot_usaid`, is a different case
 
 ### 4.4 What would fix it
 
-**A vintage flag per value.** Because the kind of quantity is often already labelled (§4.1), the remedy is not to add a kind field. It is to record, for each variable-year, whether the value was newly established, re-confirmed or restated unchanged from the previous return, or the year in which it was last revised. Countries presumably know which applies when they complete the return, though we cannot observe that process (§5). Provenance metadata is a recognised element of data stewardship [11], with a substantial technical literature [12].
+**A vintage flag per value.** Because the kind of quantity is often already labelled (§4.1), the remedy is not to add a kind field. It is to record, for each variable-year, whether the value was newly established, re-confirmed or restated unchanged from the previous return, or the year in which it was last revised. Countries presumably know which applies when completing the return. Provenance metadata is a recognised element of data stewardship [11], with a substantial technical literature [12].
 
-**Ship the labels with the data.** The dictionary's definitions, including its "Estimated" and "Typical" labels, would reach analysts if they were carried in the data file or its column metadata, so that they are not a separate download that a join on column names bypasses.
-
-**A stated denominator pairing.** Where a file publishes two plausible denominators, the dictionary should say which belongs with which numerator.
+**Ship the labels with the data.** The dictionary's "Estimated" and "Typical" labels would reach analysts if carried in the data file or its column metadata, rather than in a separate download that a join on column names bypasses.
 
 **Publish the screen with the data.** The tests here are generic. Running them at release and shipping the results table would let every user see, before analysis, which variables carry annual information; until a vintage flag exists, this is a stand-in for it. Documentation shipped with a dataset has precedent in the datasheet proposal [13].
 
@@ -210,7 +208,7 @@ The one financial variable the screen flags, `cf_tot_usaid`, is a different case
 
 ## 5. Limitations
 
-The screens detect signatures consistent with non-measurement; they cannot prove any particular value was carried forward rather than re-measured and found unchanged. A genuinely stable quantity is indistinguishable, on internal evidence, from an unrevised one, which is precisely the ambiguity a provenance flag would remove. The thresholds are conventions chosen before the results were examined and stated in the code; the bimodality of the underlying distribution means moderate changes do not move variables between classes, but a reader preferring different cut-points can recompute. We screened six files from one programme at one point in time, and the counted/characterised division was found post hoc, so whether it generalises to other WHO disease programmes is an open and directly testable question. The 43 untestable variables are unclassified, not clean, and are concentrated in treatment outcomes and laboratory data. Supplementary S3 states these limitations in full, together with two failure modes the method itself exhibits on these data (S1c, S2).
+The screens detect signatures consistent with non-measurement; they cannot prove any particular value was carried forward rather than re-measured and found unchanged. A genuinely stable quantity is indistinguishable, on internal evidence, from an unrevised one, which is precisely the ambiguity a provenance flag would remove. The thresholds are conventions chosen before the results were examined and stated in the code; the bimodality of the underlying distribution means moderate changes do not move variables between classes, but a reader preferring different cut-points can recompute. We screened six files from one programme at one point in time, and the counted/characterised division was found post hoc, so whether it generalises to other WHO disease programmes is an open and directly testable question. The 43 untestable variables are unclassified, not clean, and are concentrated in treatment outcomes and laboratory data. Supplementary S3 states these limitations in full, and Supplementary S1c and S2 demonstrate two failure modes the method itself exhibits on these data.
 
 ## 6. Conclusions
 
@@ -233,6 +231,7 @@ Two changes would settle this at source: a vintage flag for each value, which th
 11. Wilkinson MD, Dumontier M, Aalbersberg IJ, Appleton G, Axton M, Baak A, et al. The FAIR Guiding Principles for scientific data management and stewardship. Sci Data. 2016;3:160018. doi:10.1038/sdata.2016.18
 12. Herschel M, Diestelkamper R, Ben Lahmar H. A survey on provenance: what for? What form? What from? VLDB J. 2017;26(6):881-906. doi:10.1007/s00778-017-0486-1
 13. Gebru T, Morgenstern J, Vecchione B, Vaughan JW, Wallach H, Daume H 3rd, et al. Datasheets for datasets. Commun ACM. 2021;64(12):86-92. doi:10.1145/3458723
+14. Benchimol EI, Smeeth L, Guttmann A, Harron K, Moher D, Petersen I, et al. The REporting of studies Conducted using Observational Routinely-collected health Data (RECORD) Statement. PLOS Med. 2015;12(10):e1001885. doi:10.1371/journal.pmed.1001885
 
 
 ## Figure captions
@@ -249,6 +248,8 @@ Two changes would settle this at source: a vintage flag for each value, which th
 
 ## Declarations
 
+**Reporting.** This study is reported in accordance with the RECORD statement for studies using routinely collected health data [14]; the completed checklist accompanies this submission.
+
 **Contributors.** Sole author: conception, analysis, code, verification, manuscript.
 
 **Funding.** None. **Competing interests.** None declared. **Ethical clearance.** Not required (§2.4).
@@ -261,7 +262,7 @@ Two changes would settle this at source: a vintage flag for each value, which th
 
 ## Notes for the author — not for submission
 
-1. **References placed (13, Vancouver, numbered by first appearance).** Still outstanding: (a) [done 13 Nov 2026] Maiga 2019 (3), Lundin 2022 (4), Bassili 2013 (8) and Ho 2017 (9) were read against the sentences they support via Europe PMC and all four support them; the Bassili DOI 10.4269/ajtmh.13-0004 was re-confirmed as the TB review, not the mosquito paper the mistyped 13-0040 returns. Herschel 2017 (12) supports only a generic 'substantial technical literature' claim and was not read in full; (b) the WHO Module 4 (ref 10) was confirmed to cover models of care but its specific wording on hospitalisation was not checked -- read the relevant section; (c) [done 13 Nov 2026] the dictionary labels the hospitalisation and visit variables as "Estimated" or "Typical"; the central claim was retracted and rebuilt around vintage (abstract, §1, §3.5, §4.1, §4.4, §6). NOTE: the new §3.5 comparison found that `cf_tot_usaid` is mostly repeated zeros, and that 70 of 80 unlabelled estimate-like variables are zero-dominated; see FINDINGS §2.3; `verification/dictionary_vs_screen.py` regenerates the numbers; (d) the screens have no external validation or citable precedent for country-reported programme data (see §2.2); (e) RECORD, Munafo, Kenett and Loveday were considered and left out as not supporting a specific sentence.
+1. **References placed (13, Vancouver, numbered by first appearance).** Still outstanding: (a) [done 13 Nov 2026] Maiga 2019 (3), Lundin 2022 (4), Bassili 2013 (8) and Ho 2017 (9) were read against the sentences they support via Europe PMC and all four support them; the Bassili DOI 10.4269/ajtmh.13-0004 was re-confirmed as the TB review, not the mosquito paper the mistyped 13-0040 returns. Herschel 2017 (12) supports only a generic 'substantial technical literature' claim and was not read in full; (b) the WHO Module 4 (ref 10) was confirmed to cover models of care but its specific wording on hospitalisation was not checked -- read the relevant section; (c) [done 13 Nov 2026] the dictionary labels the hospitalisation and visit variables as "Estimated" or "Typical"; the central claim was retracted and rebuilt around vintage (abstract, §1, §3.4, §4.1, §4.4, §6). NOTE: the new §3.4 comparison found that `cf_tot_usaid` is mostly repeated zeros, and that 70 of 80 unlabelled estimate-like variables are zero-dominated; see FINDINGS §2.3; `verification/dictionary_vs_screen.py` regenerates the numbers; (d) the screens have no external validation or citable precedent for country-reported programme data (see §2.2); (e) RECORD, Munafo, Kenett and Loveday were considered and left out as not supporting a specific sentence.
 2. **Companion paper.** The India financing analysis (`manuscript_draft_v1.md`) shares §3.4's dataset and the general theme. They must cite each other and be written independently — run `check_self_similarity.py` across both before submitting either.
 3. **Possible strengthening:** repeat the screen on one other WHO programme dataset (HIV or malaria financing) to test whether the counted/characterised division generalises beyond TB. Same code. A seventh TB file (TB_ppm) was screened on 13 Nov 2026 and is consistent but yields only two testable variables; it is reported in §5 and does not test generalisation beyond TB.
 4. **Honest framing to preserve:** §3.4 discloses an error we made. Keep it. A methods paper about data traps that conceals its author's own is worth less.

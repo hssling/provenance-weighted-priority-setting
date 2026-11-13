@@ -74,6 +74,10 @@ We report this failure mode because we committed it ourselves. We also mis-repor
 
 ---
 
+**Implication for publishers.** Where a file publishes two plausible denominators, the dictionary should state which belongs with which numerator. Nothing in the file can settle it, and the two choices give materially different answers.
+
+---
+
 ## S3. Extended limitations
 
 The screens detect signatures consistent with non-measurement; they cannot prove that any particular value was carried forward rather than re-measured and found unchanged. A genuinely stable quantity is indistinguishable, on internal evidence, from an unrevised one — which is precisely the ambiguity a provenance flag would remove.
