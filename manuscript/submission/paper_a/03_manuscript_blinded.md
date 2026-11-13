@@ -118,7 +118,7 @@ This is the clearest signal in the dataset and it is monotone. It also changes w
 
 ### 3.5 Six of eleven interventions have no budget line at all
 
-**Table 2. Interventions, in the rank order of a published literature-favourability score [6], against the budget classification.**
+**Table 2. Interventions, in the rank order of a literature-favourability score from a manuscript under review [6], against the budget classification.**
 
 | Rank | Intervention | WHO budget line | Coverage |
 |---:|---|---|---|
