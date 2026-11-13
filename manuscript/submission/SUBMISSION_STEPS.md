@@ -37,7 +37,7 @@ Type counts into the portal from the title page, never from memory.
 | Abstract | 250 words, Background/Objectives, Methods, Results, Conclusions | 250 words |
 | Keywords | **1 to 7** | — |
 | Highlights / Key messages | Highlights file, 5 bullets of at most 85 characters (house set) | exactly 3 key messages |
-| References | 40 or fewer, numbered, printed as [1] | 50 or fewer, numbered |
+| References | 40 or fewer; superscript in the text, "1." in the list, no brackets (as IJTB prints) | 50 or fewer, numbered |
 | Review model | **single-anonymized** → the unblinded manuscript is the primary upload | not anonymized |
 | Figures | separate files; **600 dpi TIFF** (Elsevier minimum 500 dpi for line-and-tone art) | 300 dpi PNG, ≥3,600 px |
 | Reporting guideline | none named; RECORD supplied | RECORD required |
@@ -98,7 +98,7 @@ Paper B's cover letter now says its companion goes to IJTB and that IJTB-S-26-01
 **Open the PDF the portal builds and read it.** Your IJTB-S-26-01305 portal PDF is where broken table
 columns were caught. Check specifically:
 
-- in-text citations are **superscript, after punctuation** (IJTB guide: "identify the reference numbers in the text in superscript"; your published IJTB article prints them so), and the reference list prints **[1] to [22]** in order. Word restarted a list-numbered reference list at 1 on
+- in-text citations are **superscript, after punctuation** (IJTB guide: "identify the reference numbers in the text in superscript"; your published IJTB article prints them so), and the reference list prints **1. to 22.** in order, with no brackets, as the printed journal does. Word restarted a list-numbered reference list at 1 on
   the third entry, so the build now writes the numbers as text; confirm they survived;
 - tables have rules and no words broken mid-syllable; ₹, §, en-dashes and "Sempé" render;
 - the abstract pasted into the portal matches the document word for word;

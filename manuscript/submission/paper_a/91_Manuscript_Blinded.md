@@ -164,49 +164,49 @@ All inputs are publicly available: the WHO TB budget and expenditure datasets an
 
 ## References
 
-[1] World Health Organization. Global tuberculosis report 2025. Geneva: World Health Organization; 2025. Available from: https://www.who.int/teams/global-programme-on-tuberculosis-and-lung-health/tb-reports/global-tuberculosis-report-2025 [accessed 13 November 2026].
+1\. World Health Organization. Global tuberculosis report 2025. Geneva: World Health Organization; 2025. Available from: https://www.who.int/teams/global-programme-on-tuberculosis-and-lung-health/tb-reports/global-tuberculosis-report-2025 [accessed 13 November 2026].
 
-[2] Central TB Division, Ministry of Health and Family Welfare, Government of India. India TB Report 2024: National TB Elimination Programme annual report. New Delhi: Ministry of Health and Family Welfare; 2024. Available from: https://tbcindia.mohfw.gov.in/wp-content/uploads/2024/10/TB-Report_for-Web_08_10-2024-1.pdf [accessed 13 November 2026].
+2\. Central TB Division, Ministry of Health and Family Welfare, Government of India. India TB Report 2024: National TB Elimination Programme annual report. New Delhi: Ministry of Health and Family Welfare; 2024. Available from: https://tbcindia.mohfw.gov.in/wp-content/uploads/2024/10/TB-Report_for-Web_08_10-2024-1.pdf [accessed 13 November 2026].
 
-[3] Central TB Division, Ministry of Health and Family Welfare, Government of India. National Strategic Plan for Tuberculosis Elimination 2017–2025. New Delhi: Ministry of Health and Family Welfare; 2017.
+3\. Central TB Division, Ministry of Health and Family Welfare, Government of India. National Strategic Plan for Tuberculosis Elimination 2017–2025. New Delhi: Ministry of Health and Family Welfare; 2017.
 
-[4] Reid MJA, Arinaminpathy N, Bloom A, Bloom BR, Boehme C, Chaisson R, et al. Building a tuberculosis-free world: the Lancet Commission on tuberculosis. Lancet 2019;393(10178):1331–84. doi:10.1016/S0140-6736(19)30024-8
+4\. Reid MJA, Arinaminpathy N, Bloom A, Bloom BR, Boehme C, Chaisson R, et al. Building a tuberculosis-free world: the Lancet Commission on tuberculosis. Lancet 2019;393(10178):1331–84. doi:10.1016/S0140-6736(19)30024-8
 
-[5] Global Fund to Fight AIDS, Tuberculosis and Malaria. Allocation methodology for Grant Cycle 8 (2026–2028 allocation period). Board paper GF/B52/08B, 52nd Board Meeting, 20–22 November 2024. Geneva: The Global Fund; 2024. Available from: https://archive.theglobalfund.org/media/15310/archive_bm52-08b-allocation-methodology-gc8_report_en.pdf [accessed 13 November 2026].
+5\. Global Fund to Fight AIDS, Tuberculosis and Malaria. Allocation methodology for Grant Cycle 8 (2026–2028 allocation period). Board paper GF/B52/08B, 52nd Board Meeting, 20–22 November 2024. Geneva: The Global Fund; 2024. Available from: https://archive.theglobalfund.org/media/15310/archive_bm52-08b-allocation-methodology-gc8_report_en.pdf [accessed 13 November 2026].
 
-[6] Floyd K, Pantoja A, Dye C. Financing tuberculosis control: the role of a global financial monitoring system. Bull World Health Organ 2007;85(5):334–40. doi:10.2471/BLT.06.034942
+6\. Floyd K, Pantoja A, Dye C. Financing tuberculosis control: the role of a global financial monitoring system. Bull World Health Organ 2007;85(5):334–40. doi:10.2471/BLT.06.034942
 
-[7] [dataset] World Health Organization. Global Tuberculosis Programme country data: TB budget (release of 12 November 2026) and TB expenditure and utilisation (release of 25 August 2026) datasets. Geneva: World Health Organization; 2026. Available from: https://extranet.who.int/tme/ [accessed 13 November 2026]. This data-collection system no longer accepts updates; the input files are archived with the analysis code.
+7\. [dataset] World Health Organization. Global Tuberculosis Programme country data: TB budget (release of 12 November 2026) and TB expenditure and utilisation (release of 25 August 2026) datasets. Geneva: World Health Organization; 2026. Available from: https://extranet.who.int/tme/ [accessed 13 November 2026]. This data-collection system no longer accepts updates; the input files are archived with the analysis code.
 
-[8] World Health Organization. Global Tuberculosis Programme data dictionary (file TB_dictionary_2026-08-25.csv). Geneva: World Health Organization; 2026. Available from: https://extranet.who.int/tme/ [accessed 13 November 2026].
+8\. World Health Organization. Global Tuberculosis Programme data dictionary (file TB_dictionary_2026-08-25.csv). Geneva: World Health Organization; 2026. Available from: https://extranet.who.int/tme/ [accessed 13 November 2026].
 
-[9] World Health Organization. WHO TB data collection form 2026, version 2026-03-25. Geneva: World Health Organization; 2026. Available from: https://github.com/GTB-TME/gtbreport2026 (file doc/who_tb_dcf2026.pdf) [accessed 13 November 2026].
+9\. World Health Organization. WHO TB data collection form 2026, version 2026-03-25. Geneva: World Health Organization; 2026. Available from: https://github.com/GTB-TME/gtbreport2026 (file doc/who_tb_dcf2026.pdf) [accessed 13 November 2026].
 
-[10] [Author] Drug-resistant tuberculosis in India, 2017–2024: improving outcomes, no worsening axis, and a caution for NTEP trend analysis. Manuscript under review at the Indian Journal of Tuberculosis (IJTB-S-26-01305), submitted 13 November 2026.
+10\. [Author] Drug-resistant tuberculosis in India, 2017–2024: improving outcomes, no worsening axis, and a caution for NTEP trend analysis. Manuscript under review at the Indian Journal of Tuberculosis (IJTB-S-26-01305), submitted 13 November 2026.
 
-[11] Peng RD. Reproducible research in computational science. Science 2011;334(6060):1226–7. doi:10.1126/science.1213847
+11\. Peng RD. Reproducible research in computational science. Science 2011;334(6060):1226–7. doi:10.1126/science.1213847
 
-[12] Benchimol EI, Smeeth L, Guttmann A, Harron K, Moher D, Petersen I, et al. The REporting of studies Conducted using Observational Routinely-collected health Data (RECORD) statement. PLoS Med 2015;12(10):e1001885. doi:10.1371/journal.pmed.1001885
+12\. Benchimol EI, Smeeth L, Guttmann A, Harron K, Moher D, Petersen I, et al. The REporting of studies Conducted using Observational Routinely-collected health Data (RECORD) statement. PLoS Med 2015;12(10):e1001885. doi:10.1371/journal.pmed.1001885
 
-[13] Piatti-Funfkirchen M, Barroy H, Pivodic F, Margini F. Budget execution in health. Washington, DC: World Bank; 2021. doi:10.1596/36583
+13\. Piatti-Funfkirchen M, Barroy H, Pivodic F, Margini F. Budget execution in health. Washington, DC: World Bank; 2021. doi:10.1596/36583
 
-[14] Floyd K, Fitzpatrick C, Pantoja A, Raviglione M. Domestic and donor financing for tuberculosis care and control in low-income and middle-income countries: an analysis of trends, 2002–11, and requirements to meet 2015 targets. Lancet Glob Health 2013;1(2):e105–15. doi:10.1016/S2214-109X(13)70032-9
+14\. Floyd K, Fitzpatrick C, Pantoja A, Raviglione M. Domestic and donor financing for tuberculosis care and control in low-income and middle-income countries: an analysis of trends, 2002–11, and requirements to meet 2015 targets. Lancet Glob Health 2013;1(2):e105–15. doi:10.1016/S2214-109X(13)70032-9
 
-[15] Su Y, Garcia Baena I, Harle AC, Crosby SW, Micah AE, Siroka A, et al. Tracking total spending on tuberculosis by source and function in 135 low-income and middle-income countries, 2000–17: a financial modelling study. Lancet Infect Dis 2020;20(8):929–42. doi:10.1016/S1473-3099(20)30124-9
+15\. Su Y, Garcia Baena I, Harle AC, Crosby SW, Micah AE, Siroka A, et al. Tracking total spending on tuberculosis by source and function in 135 low-income and middle-income countries, 2000–17: a financial modelling study. Lancet Infect Dis 2020;20(8):929–42. doi:10.1016/S1473-3099(20)30124-9
 
-[16] [Author] India's human immunodeficiency virus and sexually transmitted infection response at the close of NACP-V: an evidence-practice gap analysis and a priority agenda for clinical sexually transmitted infection services. J Skin Sex Transm Dis 2026; in production, volume and pages not yet assigned. doi:10.25259/JSSTD_120_2026
+16\. [Author] India's human immunodeficiency virus and sexually transmitted infection response at the close of NACP-V: an evidence-practice gap analysis and a priority agenda for clinical sexually transmitted infection services. J Skin Sex Transm Dis 2026; in production, volume and pages not yet assigned. doi:10.25259/JSSTD_120_2026
 
-[17] Chatterjee S, Toshniwal MN, Bhide P, Sachdeva KS, Rao R, Laurence YV, et al. Costs of TB services in India. Int J Tuberc Lung Dis 2021;25(12):1013–8. doi:10.5588/ijtld.21.0105
+17\. Chatterjee S, Toshniwal MN, Bhide P, Sachdeva KS, Rao R, Laurence YV, et al. Costs of TB services in India. Int J Tuberc Lung Dis 2021;25(12):1013–8. doi:10.5588/ijtld.21.0105
 
-[18] Madden L, Hussey R, Mooney G, Church E. Public health and economics in tandem: programme budgeting, marginal analysis and priority setting in practice. Health Policy 1995;33(2):161–8. doi:10.1016/0168-8510(95)93676-R
+18\. Madden L, Hussey R, Mooney G, Church E. Public health and economics in tandem: programme budgeting, marginal analysis and priority setting in practice. Health Policy 1995;33(2):161–8. doi:10.1016/0168-8510(95)93676-R
 
-[19] Johns B, Baltussen R, Hutubessy R. Programme costs in the economic evaluation of health interventions. Cost Eff Resour Alloc 2003;1(1):1. doi:10.1186/1478-7547-1-1
+19\. Johns B, Baltussen R, Hutubessy R. Programme costs in the economic evaluation of health interventions. Cost Eff Resour Alloc 2003;1(1):1. doi:10.1186/1478-7547-1-1
 
-[20] Bertone MP, Barroy H, Sparkes S, Sempé L, Yungrattanachai M, Witter S. Political economy of budgeting reforms: a comparative analysis of the adoption and implementation of programme-based budgeting in health across seven LMIC countries. Int J Health Plann Manage 2026 Sep 29 [online ahead of print]. doi:10.1002/hpm.70142
+20\. Bertone MP, Barroy H, Sparkes S, Sempé L, Yungrattanachai M, Witter S. Political economy of budgeting reforms: a comparative analysis of the adoption and implementation of programme-based budgeting in health across seven LMIC countries. Int J Health Plann Manage 2026 Sep 29 [online ahead of print]. doi:10.1002/hpm.70142
 
-[21] Stenberg K, Hanssen O, Edejer TT, Bertram M, Brindley C, Meshreky A, et al. Financing transformative health systems towards achievement of the health Sustainable Development Goals: a model for projected resource needs in 67 low-income and middle-income countries. Lancet Glob Health 2017;5(9):e875–87. doi:10.1016/S2214-109X(17)30263-2
+21\. Stenberg K, Hanssen O, Edejer TT, Bertram M, Brindley C, Meshreky A, et al. Financing transformative health systems towards achievement of the health Sustainable Development Goals: a model for projected resource needs in 67 low-income and middle-income countries. Lancet Glob Health 2017;5(9):e875–87. doi:10.1016/S2214-109X(17)30263-2
 
-[22] Tandon A, Cashin C. Assessing public expenditure on health from a fiscal space perspective. Health, Nutrition and Population Discussion Paper. Washington, DC: World Bank; 2010. doi:10.1596/13613
+22\. Tandon A, Cashin C. Assessing public expenditure on health from a fiscal space perspective. Health, Nutrition and Population Discussion Paper. Washington, DC: World Bank; 2010. doi:10.1596/13613
 
 ## Tables
 

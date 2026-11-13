@@ -148,9 +148,8 @@ def main() -> int:
             # identity, and the blinded form is safe for either review model.
             (d / lay["tables_file"]).write_text(
                 "# Tables\n\n" + "\n\n---\n\n".join(table_blocks) + "\n", encoding="utf-8")
-        bracket = lay["tables_in_manuscript"]          # IJTB prints "[1]"
-        blinded_body = literal_reference_numbers(superscript_citations(blinded_body), bracket)
-        unblinded_body = literal_reference_numbers(superscript_citations(unblinded_body), bracket)
+        blinded_body = literal_reference_numbers(superscript_citations(blinded_body))
+        unblinded_body = literal_reference_numbers(superscript_citations(unblinded_body))
         (d / lay["blinded"]).write_text(blinded_body, encoding="utf-8")
         # The unblinded source goes in too: a single-anonymized journal wants
         # that one, and having both means the choice is made at upload, not here.
@@ -215,7 +214,7 @@ def superscript_citations(text: str) -> str:
     return CITATION.sub(sup, head) + refs + CITATION.sub(sup, tail)
 
 
-def literal_reference_numbers(text: str, bracket: bool) -> str:
+def literal_reference_numbers(text: str) -> str:
     """Write each reference number as text, one paragraph per reference.
 
     Pandoc turns the source's "1." lines into one Word list, and the .docx
@@ -223,8 +222,10 @@ def literal_reference_numbers(text: str, bracket: bool) -> str:
     the count at 1 on the third reference, so references 3-22 printed as 1-20
     and every citation after [2] pointed at the wrong source. Nothing in the
     file was wrong; only a render showed it. Literal numbers cannot be
-    renumbered. IJTB prints them as "[1]", as the author's IJTB-S-26-01305
-    manuscript did; IJE keeps "1." (escaped so pandoc does not make a list)."""
+    renumbered. Both journals print "1." (escaped here so pandoc does not make
+    a list). The author's published IJTB article prints "1." in the list and
+    unbracketed superscripts in the text; the "[1]" of the IJTB-S-26-01305
+    submission was the author's own convention, not the journal's."""
     i = text.find("## References")
     if i == -1:
         return text
@@ -234,7 +235,7 @@ def literal_reference_numbers(text: str, bracket: bool) -> str:
     for ln in text[i:j].split("\n"):
         m = re.match(r"^(\d+)\. (.*)$", ln)
         if m:
-            num = f"[{m.group(1)}]" if bracket else f"{m.group(1)}\\."
+            num = f"{m.group(1)}\\."
             out += [f"{num} {m.group(2)}", ""]
         elif ln.strip():
             out += [ln, ""]
