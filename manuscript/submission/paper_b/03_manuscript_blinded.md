@@ -90,11 +90,11 @@ This matters for interpretation. The financial variables are not merely more var
 
 `hospd_prct_mdr`, the share of drug-resistant TB patients hospitalised, illustrates the practical consequence. It covers **199 countries** and **1,421 country-years** — coverage that invites a cross-country or trend analysis.
 
-Whether patients with drug-resistant TB are hospitalised or managed in ambulatory or decentralised settings is a substantive model-of-care choice. The effectiveness of the two approaches has been reviewed systematically [8,9], and WHO's current treatment guidance addresses models of care [10].
+Hospitalised versus ambulatory or decentralised management is a substantive model-of-care choice, reviewed systematically [8,9] and addressed in WHO's current guidance [10].
 
 It has **81 distinct values**. **35.3%** of observations are exactly 100; **11.6%** are exactly 0; **70.5%** fall on multiples of ten. Among the 178 countries with four or more years of data, **42% report an identical value in their first and last year**.
 
-A "global trend in DR-TB hospitalisation, 2017–2025" computed from this variable would be driven by whichever minority of countries revised their entry, and by when they did so. It would describe revision behaviour, not clinical practice. The same applies to duration of hospitalisation (66.5% repetition) and facility visits per patient (61.6%).
+A "global trend in DR-TB hospitalisation, 2017–2025" from this variable would be driven by whichever minority of countries revised their entry, and when. It would describe revision behaviour, not clinical practice. The same applies to duration of hospitalisation (66.5% repetition) and facility visits per patient (61.6%).
 
 ### 3.4 The screen's verdicts against the dictionary's labels
 
@@ -128,23 +128,25 @@ Distributing both kinds under one schema, one dictionary and no provenance field
 
 ### 4.2 Why the characterised variables are probably not errors
 
-We do not read the repetition as carelessness, and the replication strengthens the benign reading. A programme asked every year for its laboratory configuration will reasonably restate its standing answer; a hospitalisation share and average stay are properties of a service-delivery model that does not change annually. The reporting behaviour is sensible; what is missing is the flag that would let an analyst see it. This is inference from the shape of the data, not from any account of how countries completed the return (§5).
+We do not read the repetition as carelessness. A programme asked every year for its laboratory configuration will reasonably restate its standing answer; a hospitalisation share and average stay are properties of a service-delivery model that does not change annually. The reporting behaviour is sensible; what is missing is the flag that would let an analyst see it. This is inference from the shape of the data, not from any account of how countries completed the return (§5).
 
-The one financial variable the screen flags, `cf_tot_usaid`, is a different case. Its definition ("Expected funding from USAID") carries no label of estimation, but 64.3% of its values are zero and the high repetition is largely countries repeatedly reporting no USAID funding. Over pairs in which either value is non-zero, 11.7% are identical (24 of 206), above the other expected-funding sources (2.4% Global Fund, 3.2% other grants, 6.8% domestic) but far below the 61-70% of the hospitalisation variables. That is a real difference between sources, not evidence of a restated estimate.
+The one financial variable the screen flags, `cf_tot_usaid`, is a different case. Its definition carries no label of estimation, but 64.3% of its values are zero: the repetition is largely countries repeatedly reporting no USAID funding. Over pairs in which either value is non-zero, 11.7% are identical (24 of 206), above the other expected-funding sources (2.4% Global Fund, 3.2% other grants, 6.8% domestic) but far below the 61-70% of the hospitalisation variables. That is a real difference between sources, not evidence of a restated estimate.
 
-### 4.3 Implications for secondary analysis
+### 4.3 Implications for analysis and programme evaluation
 
-**Trend claims from characterised variables should not be made** without first showing that the variable moves for reasons other than revision. The screen in §2.2 takes seconds and settles it.
+**Trend claims from characterised variables need a vintage check first**; the screen in §2.2 takes seconds.
 
 **Cross-sectional comparison is weaker than it looks.** With 81 distinct values over 199 countries, much apparent between-country variation is variation between conventional answers.
 
-**Internal consistency is not validity.** The financial variables reconcile at 98.9% to 100% and are still subject to definitional change, pooling and reporting convention; perfect arithmetic says nothing about whether a line item means the same thing in two countries. WHO's data quality framework likewise separates internal from external consistency [6].
+**Internal consistency is not validity.** The financial variables reconcile at 98.9-100% yet remain subject to definitional change and reporting convention; arithmetic cannot show that a line item means the same thing in two countries, a distinction WHO's data quality framework also draws [6].
+
+**Programme evaluation inherits the same blind spot.** Strategic-plan reviews track laboratory capacity and models of care over time. An unchanged characterised variable may record an unchanged system or a figure nobody re-measured; only the reporting programme can say which, and an evaluation that does not ask will read restatement as stability.
 
 **Published coverage is not evidential weight.** 1,421 observations across 199 countries reads as a strong dataset; after accounting for repetition the independent information is a small fraction of that.
 
 ### 4.4 What would fix it
 
-**A vintage flag per value.** Because the kind of quantity is often already labelled (§4.1), the remedy is not to add a kind field. It is to record, for each variable-year, whether the value was newly established, re-confirmed or restated unchanged from the previous return, or the year in which it was last revised. Countries presumably know which applies when completing the return. Provenance metadata is a recognised element of data stewardship [11], with a substantial technical literature [12].
+**A vintage flag per value.** Because the kind of quantity is often already labelled (§4.1), the remedy is not to add a kind field. It is to record, for each variable-year, whether the value was newly established, re-confirmed or restated unchanged from the previous return, or the year in which it was last revised. Only the national programme completing the return knows which applies, and recording it costs nothing. Provenance metadata is a recognised element of data stewardship [11], with a substantial technical literature [12].
 
 **Ship the labels with the data.** The dictionary's "Estimated" and "Typical" labels would reach analysts if carried in the data file or its column metadata, rather than in a separate download that a join on column names bypasses.
 
@@ -164,16 +166,16 @@ Two changes would settle this at source: a vintage flag for each value, which th
 
 ## References
 
-1. World Health Organization. Global Tuberculosis Programme country data: budget, expenditure and utilisation, notifications, treatment outcomes, laboratory diagnostic services, and contact tracing and preventive treatment datasets. Geneva: World Health Organization; 2026. Available from: https://extranet.who.int/tme/ [data files dated 25 August and 12 November 2026]. This data-collection system no longer accepts updates; the archived input files are deposited with the analysis code.
-2. World Health Organization. Global tuberculosis report 2025. Geneva: World Health Organization; 2025.
+1. World Health Organization. Global Tuberculosis Programme country data: budget, expenditure and utilisation, notifications, treatment outcomes, laboratory diagnostic services, and contact tracing and preventive treatment datasets. Geneva: World Health Organization; 2026. Available from: https://extranet.who.int/tme/ [cited 2026 Nov 13] [data files dated 25 August and 12 November 2026]. This data-collection system no longer accepts updates; the archived input files are deposited with the analysis code.
+2. World Health Organization. Global tuberculosis report 2025. Geneva: World Health Organization; 2025. Available from: https://www.who.int/teams/global-programme-on-tuberculosis-and-lung-health/tb-reports/global-tuberculosis-report-2025 [cited 2026 Nov 13].
 3. Maiga A, Jiwani SS, Mutua MK, Porth TA, Taylor CM, Asiki G, et al. Generating statistics from health facility data: the state of routine health information systems in Eastern and Southern Africa. BMJ Glob Health. 2019;4(5):e001849. doi:10.1136/bmjgh-2019-001849
 4. Lundin R, Mariani I, Peven K, Day LT, Lazzerini M. Quality of routine health facility data used for newborn indicators in low- and middle-income countries: a systematic review. J Glob Health. 2022;12:04019. doi:10.7189/jogh.12.04019
-5. World Health Organization. Global Tuberculosis Programme data dictionary [file TB_dictionary_2026-08-25.csv]. Geneva: World Health Organization; 2026. Archived with the analysis code.
-6. World Health Organization. Data quality assurance: module 1: framework and metrics. Geneva: World Health Organization; 2023. ISBN 978-92-4-004735-8. Available from: https://www.who.int/publications/i/item/9789240047365
+5. World Health Organization. Global Tuberculosis Programme data dictionary [file TB_dictionary_2026-08-25.csv]. Geneva: World Health Organization; 2026. Available from: https://extranet.who.int/tme/ [cited 2026 Nov 13]. Archived with the analysis code.
+6. World Health Organization. Data quality assurance: module 1: framework and metrics. Geneva: World Health Organization; 2023. ISBN 978-92-4-004735-8. Available from: https://www.who.int/publications/i/item/9789240047365 [cited 2026 Nov 13].
 7. Peng RD. Reproducible research in computational science. Science. 2011;334(6060):1226-7. doi:10.1126/science.1213847
 8. Bassili A, Fitzpatrick C, Qadeer E, Fatima R, Floyd K, Jaramillo E. A systematic review of the effectiveness of hospital- and ambulatory-based management of multidrug-resistant tuberculosis. Am J Trop Med Hyg. 2013;89(2):271-80. doi:10.4269/ajtmh.13-0004
 9. Ho J, Byrne AL, Linh NN, Jaramillo E, Fox GJ. Decentralized care for multidrug-resistant tuberculosis: a systematic review and meta-analysis. Bull World Health Organ. 2017;95(8):584-93. doi:10.2471/BLT.17.193375
-10. World Health Organization. WHO consolidated guidelines on tuberculosis. Module 4: treatment and care. 2nd ed. Geneva: World Health Organization; 2026. ISBN 978-92-4-012512-4.
+10. World Health Organization. WHO consolidated guidelines on tuberculosis. Module 4: treatment and care. 2nd ed. Geneva: World Health Organization; 2026. ISBN 978-92-4-012512-4. Available from: https://www.who.int/publications/i/item/9789240125124 [cited 2026 Nov 13].
 11. Wilkinson MD, Dumontier M, Aalbersberg IJ, Appleton G, Axton M, Baak A, et al. The FAIR Guiding Principles for scientific data management and stewardship. Sci Data. 2016;3:160018. doi:10.1038/sdata.2016.18
 12. Herschel M, Diestelkamper R, Ben Lahmar H. A survey on provenance: what for? What form? What from? VLDB J. 2017;26(6):881-906. doi:10.1007/s00778-017-0486-1
 13. Gebru T, Morgenstern J, Vecchione B, Vaughan JW, Wallach H, Daume H 3rd, et al. Datasheets for datasets. Commun ACM. 2021;64(12):86-92. doi:10.1145/3458723

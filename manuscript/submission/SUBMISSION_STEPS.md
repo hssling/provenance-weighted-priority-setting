@@ -35,13 +35,9 @@ result tables still match what the screen prints.
 |---|---|---|
 | Article type | Original Article | Original Article |
 | Main text limit | 6,000 words (quantitative or fixed design) | **3,000 words** |
-| This paper | 5,001 | **2,998** |
 | Abstract limit | 300 words | **250 words** |
-| This paper | 288 | **250** |
 | Key Messages | 3–4 bullets | **exactly 3, each one complete sentence** |
-| This paper | 4 | 3 |
 | Tables + figures | not specified | **8 maximum** |
-| This paper | 3 tables, 2 figures | 6 tables, 2 figures |
 | References | not specified | 50 maximum (14 used) |
 | Referencing style | **author–date (Harvard)**, alphabetical | numbered, Oxford SCIMED |
 | Review model | **double-anonymized** → upload `03_` | **not anonymized**; the main document carries author names → upload `04_` |
@@ -50,6 +46,9 @@ result tables still match what the screen prints.
 | Layout | — | double spaced, 2.5 cm margins, pages numbered, no footnotes in text |
 
 Both journals want **tables and figures in separate files, not inside the main text.**
+
+The table gives each journal's **limits** only. The paper's **current counts** are on its title page,
+`01_title_page`, which the build writes on every run — so they cannot go stale the way a typed number does.
 
 ---
 

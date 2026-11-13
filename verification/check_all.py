@@ -41,6 +41,10 @@ def main() -> int:
     # Self-similarity gates on a factual condition (a long verbatim run), not a
     # percentage, so it is safe in the suite. It skips cleanly if a comparison
     # document is missing from this machine.
+    results.append(run("verification/check_language.py",
+                       [sys.executable, str(ROOT / "verification" / "check_language.py")]))
+    results.append(run("verification/check_references.py",
+                       [sys.executable, str(ROOT / "verification" / "check_references.py")]))
     results.append(run("verification/check_cross_references.py",
                        [sys.executable, str(ROOT / "verification" / "check_cross_references.py")]))
     results.append(run("verification/check_exhibit_order.py",

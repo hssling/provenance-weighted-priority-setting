@@ -58,7 +58,7 @@ The last column is a sensitivity analysis on the S0b rule (§2.2). Excluding unt
 
 ## S1b. The two files screened first
 
-**In the two files first screened (77 variables)**, one variable is categorical, **`hosp_type_mdr`** (4 distinct values: 2, 140, 141, 142; a code, not a measure), and none is untestable, so the S0b rule leaves them unaffected. Of the 76 continuous variables, **63 are measurement-like, 8 mixed and 5 estimate-like.** An earlier version of this paper reported six estimate-like variables and listed `hosp_type_mdr` among them; that was the S0 error, corrected here.
+**In the two files first screened (77 variables)**, one variable is categorical, **`hosp_type_mdr`** (4 distinct values: 2, 140, 141, 142; a code, not a measure), and none is untestable, so the S0b rule leaves them unaffected. Of the 76 continuous variables, **63 are measurement-like, 8 mixed and 5 estimate-like.** Without rule S0, `hosp_type_mdr` would be counted as a sixth estimate-like variable: as a code it repeats, takes few values and sits on round numbers, which is the failure mode S0 exists to prevent (S1c).
 
 ---
 
@@ -70,7 +70,7 @@ The dictionary defines `exp_tot` as "Total actual expenditure (US Dollars)" and 
 
 The extreme case is instructive beyond the pairing. The maximum ratio is **28,417%** (Chad, 2019): US$1,989,218 reported as received from the Global Fund against a reported total TB expenditure of **US$7,000** for the year. A national programme expenditure of seven thousand dollars is not plausible, so the implausibility that the wrong denominator exposes is not only in the ratio — it is in the denominator itself. A screen applied to a derived quantity can therefore surface a problem in a variable that passes every screen applied to it directly: `exp_tot` is measurement-like on all four tests.
 
-We report this failure mode because we committed it ourselves. We also mis-reported its magnitude: an earlier draft gave the maximum as 687%, which was the largest value in a filtered subset we happened to be examining rather than the maximum in the data. Both errors were found the same way — by a value that looked wrong forcing a check — and neither would have been caught by the screens in §2.2.
+The case also shows why this failure is easy to compound. A maximum computed on a filtered subset of country-years can understate the extreme by orders of magnitude, so the check must run on the full file. Errors of both kinds are caught the same way — an implausible value prompting a check against the full data — and neither would be caught by the screens in §2.2, which assess variables one at a time rather than the ratios analysts build from them.
 
 ---
 
