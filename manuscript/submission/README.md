@@ -60,7 +60,8 @@ journal reviews blind. `build_submission.py` fails the build if any identifier s
    Planning* still requires its Key Messages box (3 to 5 bullets). The publisher's author-guideline pages are
    bot-protected and could not be read automatically; open them in a normal browser. Paper A's abstract is 249 words
    against a 250-word limit, so it has no margin if the limit has changed.
-2. **One incomplete citation.** Paper A ref [13], the JSSTD paper, is listed as forthcoming; Crossref returned 404,
-   so volume, pages and DOI are still pending. Supply them if the paper has appeared, or keep "Forthcoming".
+2. **One incomplete citation.** Paper A ref [13], the JSSTD paper, carries the DOI printed on the journal's R14
+   proof (10.25259/JSSTD_120_2026). It does not resolve yet — the article is in production and the DOI is
+   registered at publication. Volume and pages are still unassigned.
 3. **Decide blinded versus unblinded** per journal, as above. The blinded copies also give a main-text count 7 words
    shorter for Paper B, which is the withheld identifier; the title pages state the unblinded counts.

@@ -163,6 +163,22 @@ Citation form (use until volume and pages exist):
 
 Re-check the volume, issue and pages when the issue is released. Do not write "published" or give an issue number before then.
 
+**Resolved 13 November 2026.** An earlier pass deliberately omitted the DOI because Crossref returned 404. On
+re-examination that was the wrong call: 10.25259/JSSTD_120_2026 is the journal's own identifier, printed on the R14
+proof and in the proof's "How to cite this article" line, which the journal sets as
+
+> Siddalingaiah HS. India's human immunodeficiency virus and sexually transmitted infection response at the close of
+> NACP-V: An evidence-practice gap analysis and a priority agenda for clinical sexually transmitted infection
+> services. J Skin Sex Transm Dis. doi: 10.25259/JSSTD_120_2026
+
+with no year, volume or pages, because none are assigned yet. Paper A ref 13 now carries the DOI with "[accepted 10
+September 2026; in production, volume and pages not yet assigned]". It still returns 404 from doi.org, which is
+expected for an article whose DOI is registered at publication, and the bracket says so.
+
+The proof PDFs are encrypted (owner password only, so they open and read normally). The accepted Markdown text at
+`Revision_R1/Manuscript.md` is what the self-similarity checker compares against, since that checker uses only the
+standard library.
+
 ### C2. Source of paper A's Table 2 evidence ranking
 
 I did not open the IJTB-S-26-01305 submission itself; the details below come from your brief and from project memory.

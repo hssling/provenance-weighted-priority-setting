@@ -115,8 +115,10 @@ Then check, specifically:
 - No author name, affiliation, ORCID, email, GitHub username or Zenodo DOI anywhere in a double-blind upload.
 - The abstract in the portal field matches the abstract in the document.
 - Table numbering runs 1 to 5 in Paper B with no repeats — two tables shared a number until this was fixed.
-- Reference 13 of Paper A still reads "Forthcoming" unless the JSSTD paper has appeared, in which case add
-  volume, pages and DOI first.
+- Reference 13 of Paper A carries the DOI the journal printed on its proof, 10.25259/JSSTD_120_2026, and
+  says volume and pages are not yet assigned. The DOI does **not** resolve yet, because the article is in
+  production and the DOI is not registered with Crossref until publication. That is expected; do not
+  "correct" it. Add volume and pages once the issue is released.
 
 ---
 
@@ -134,5 +136,5 @@ If a revision is requested, the repository is the source of truth: rerun `check_
 
 1. **Journal limits** — abstract and main-text limits, and whether either journal wants anything not listed
    here. Bot-protected; check in a browser.
-2. **Paper A reference 13**, the JSSTD paper — still "Forthcoming"; Crossref returns 404, so volume, pages and
-   DOI are pending.
+2. **Paper A reference 13**, the JSSTD paper — DOI now carried (10.25259/JSSTD_120_2026, from the R14 proof).
+   Volume and pages are still unassigned; add them when the issue is released.

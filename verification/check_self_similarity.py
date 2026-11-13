@@ -45,6 +45,13 @@ PRIOR = [
     ("TPT network meta-analysis (IJTB)",
      Path(r"D:/research-automation/TB_prevention_deliverables/09_outputs/IJTB_submission_assets"
           r"/manuscript/IJTB_manuscript_tpt_nma_v1.md")),
+    # Paper A's section 4.3 replicates this paper's fiscal-invisibility finding in a
+    # second programme, so it is the likeliest source of an avoidable self-match of
+    # anything in the set. The accepted R1 text is used because the journal's own
+    # proof PDFs are encrypted and this checker stays on the standard library.
+    ("JSSTD NACP-V paper, accepted, in production",
+     Path(r"D:/AI Book and Content Writer/STD abd HIV/JSSTD_HIV_STD"
+          r"/Revision_R1/Manuscript.md")),
 ]
 
 
