@@ -1,4 +1,4 @@
-# Not every reported number is a measurement: a reproducible screen of 77 variables in WHO's tuberculosis financing and utilisation data
+# Not every reported number is a measurement: a reproducible screen of 443 variables in six WHO tuberculosis datasets
 
 **Running title:** Measurement or estimate in WHO TB data
 
@@ -14,11 +14,11 @@ Correspondence: hssling@yahoo.com · ORCID 0000-0002-4771-8285
 
 **Background.** WHO publishes country-reported tuberculosis financing and service-utilisation data as a single annual dataset. Analysts treat its variables interchangeably as annual country reports. We asked whether they are.
 
-**Methods.** We screened all 77 numeric variables in WHO's TB budget and TB expenditure-and-utilisation datasets (215 countries, 2017–2025) with four tests computable from the published files alone: **repetition** (share of consecutive country-year pairs with an identical value), **granularity** (distinct values per observation, modal share, share on round numbers), **identity** (do stated components reconcile with their stated total), and **bounds** (do values respect their definition's range). No single test condemns a variable; the signature is several at once.
+**Methods.** We screened every numeric variable with at least 100 observations in six WHO TB datasets from one programme (budget; expenditure and utilisation; notifications; treatment outcomes; laboratory diagnostic services; contact tracing and preventive treatment), 443 variables in all. The screens are computable from the published files alone: **S0 categorical** (five or fewer distinct values: a status flag or a code, not a measure; excluded and reported separately), **repetition** (share of consecutive country-year pairs with an identical value; undefined, so reported as untestable, where no country has an adjacent pair), **granularity** (distinct values per observation, modal share, share on round numbers), **identity** (do stated components reconcile with their stated total) and **bounds**. No single test condemns a variable; the signature is several at once.
 
-**Results.** The variables separate almost completely into two populations. Seventy financial variables have a median repetition of 14.6% (range 2.2–64.4%); seven utilisation variables have a median of 65.8% (range 61.5–81.4%). Only one financial variable falls inside the utilisation range. Sixty-three variables screen as measurement-like, eight as mixed and six as estimate-like; all six estimate-like variables are utilisation measures or a single external-funding line. The financial data is internally immaculate: all five component-to-total identities reconcile in 100% of testable country-years (849/849, 845/845, 895/895, 892/892), and the funding-source identity in 98.9% (881/891). Against this, `hospd_prct_mdr` — the share of drug-resistant TB patients hospitalised — has 81 distinct values across 1,421 observations, 35.3% of them exactly 100, and is unchanged between a country's first and last reporting year in 42% of the 178 countries with four or more years.
+**Results.** Forty-two variables were categorical and 43 untestable on repetition; of the remaining 358 continuous variables, 206 screen as measurement-like, 68 as mixed and 84 as estimate-like. The proportion differs sharply by dataset. Median repetition is 13.0% in budget, 15.4% in expenditure and utilisation, 15.6% in notifications and 3.5% in contact tracing, but 63.0% in laboratory diagnostic services (53.5% if untestable variables are scored as zero); treatment outcomes sit between, at 33.0% (20.5%). In the two files first screened (77 variables), one is categorical (`hosp_type_mdr`, a code), 63 are measurement-like, 8 mixed and 5 estimate-like, and the financial identities reconcile in 98.9-100% of testable country-years. Against this, `hospd_prct_mdr`, the share of drug-resistant TB patients hospitalised, has 81 distinct values across 1,421 observations, 35.3% of them exactly 100, and is unchanged between a country's first and last reporting year in 42% of the 178 countries with four or more years. An earlier version of this screen, lacking S0, classified the contact-tracing dataset as estimate-like (median repetition 63.8%, or 59.7% with its one untestable variable scored as zero); its yes/no flags were the cause, and with them excluded the dataset has a median of 3.5% and no estimate-like variable. Our earlier reading of the division as financial versus utilisation is refuted by this replication.
 
-**Conclusions.** Two kinds of data are distributed under one name, with nothing in the file distinguishing them. Analyses of trends in TB service delivery drawn from these variables describe reporting behaviour rather than practice. A single provenance flag per variable-year — measured, estimated, or carried forward — would resolve this at negligible cost, and the screen presented here can be run by any analyst on any version of the files.
+**Conclusions.** The division runs between quantities a programme can count from its own records (money spent, cases notified, contacts screened: 13-16% repetition, or 3.5% for contacts) and quantities that describe the system's standing configuration (laboratory infrastructure, typical hospitalisation share and stay, visits per patient: 53.5-69.6%), which a programme reasonably restates until it changes. Nothing in the files distinguishes the two. Trend analyses of the second kind describe reporting behaviour rather than practice. A provenance flag per variable-year would resolve this at negligible cost, and a screen that classifies variables needs its own validation, as this one did.
 
 **Keywords:** Data Accuracy; Datasets as Topic; Health Services Research; Reproducibility of Results; Tuberculosis; World Health Organization
 
@@ -38,16 +38,26 @@ We are not aware of prior work screening these datasets for that distinction. Th
 
 ### 2.1 Data
 
-Two files, retrieved November 2026 and archived with the analysis code:
+Six files from WHO's TB programme, retrieved August to November 2026 and archived with the analysis code:
 
-- **TB budget** — 1,720 rows, 215 countries, 2018–2025, 43 variables.
-- **TB expenditure and utilisation** — 2017–2026, 46 variables.
+- **TB budget** — 1,720 rows, 2018–2025, 43 columns.
+- **TB expenditure and utilisation** — 2,123 rows, 2017–2026, 46 columns.
+- **TB notifications** — 9,337 rows, 1980–2025, 221 columns.
+- **TB outcomes** — 5,953 rows, 1994–2024, 97 columns.
+- **TB laboratory diagnostic services** — 3,683 rows, 2009–2025, 75 columns.
+- **TB contact tracing and preventive treatment** — 2,365 rows, 2015–2025, 37 columns.
+
+The first two were screened first (77 variables); the other four were added as a replication after the first analysis was complete, and the replication overturned two of the first analysis's conclusions (§3.1, §4.1).
 
 WHO's published data dictionary supplied every variable definition. The dictionary is used, not the column names: definitions and names diverge in ways that matter, as in `budget_prog`, defined as *"programme costs to treat drug-susceptible TB"* rather than programme costs generally.
 
-### 2.2 Four screens
+### 2.2 The screens
 
 Each is computable from the published file. For each variable with at least 100 non-missing values:
+
+**S0 Categorical.** Runs first. A variable with five or fewer distinct values is classified *categorical* and excluded from the measurement/mixed/estimate classification entirely; it is reported separately and never counted as estimate-like. The rationale: a binary or categorical status flag (is the national reference laboratory accredited? is data available?) legitimately repeats year after year, takes few values and sits on round numbers, so it trips the repetition, granularity and modal-share tests for reasons that have nothing to do with carried-forward estimation. "Five or fewer" is a convention, not a derived quantity.
+
+**S0b Untestable.** A continuous variable for which no country has an adjacent pair of observations (each country reports at most once) cannot be screened for repetition. It is classified *untestable* on S1, reported separately, and never counted as measurement-like: a test that could not run is not evidence of cleanliness. This rule was adopted after a discrepancy was found. An exploratory pass had silently dropped such variables through a division-by-zero guard, producing figures that matched no stated rule; reconciling the discrepancy exposed it, and the class was then made explicit. The rule raises the median repetition of two datasets (laboratory and outcomes), which favours the paper's argument, so we justify it on principle alone and report the results under both rules (§3.1). It does not touch the first two files, in which no variable is untestable.
 
 **S1 Repetition.** The share of consecutive country-year pairs holding an identical value. A genuinely stable quantity repeats; a quantity that repeats in most countries in most years is not being re-measured.
 
@@ -57,11 +67,11 @@ Each is computable from the published file. For each variable with at least 100 
 
 **S4 Bounds.** Where a definition implies a range — a percentage must lie in [0, 100] — do the values respect it?
 
-**No single screen condemns a variable.** A small integer count is legitimately round; a stable quantity legitimately repeats. We therefore count how many screens a variable trips and classify it as *measurement-like* (0–1), *mixed* (2) or *estimate-like* (3–4). Thresholds are conventions, stated in the code so a reader can change them; the classification is insensitive to small changes because the underlying distribution is strongly bimodal (§3.1).
+**No single screen condemns a variable.** A small integer count is legitimately round; a stable quantity legitimately repeats. We therefore count how many of four tests a continuous variable trips (repetition, distinct ratio, modal share, roundness) and classify it as *measurement-like* (0–1), *mixed* (2) or *estimate-like* (3–4). Thresholds are conventions, stated in the code so a reader can change them; the classification is insensitive to small changes where the underlying distribution is strongly bimodal (§3.1).
 
 ### 2.3 Reproducibility
 
-The screen is a single pure-Python script with no third-party dependency. It regenerates every figure in this paper from the raw files in one command and writes a per-variable results table. Code, archived inputs and the results table: [repository URL and DOI to be inserted at acceptance].
+The screen is a single pure-Python script with no third-party dependency. It regenerates every figure in this paper from the raw files in one command (including the pre-S0 counterfactual of §3.1) and writes a per-variable results table. Code, archived inputs and the results table: [repository URL and DOI to be inserted at acceptance].
 
 ### 2.4 Ethics
 
@@ -71,31 +81,42 @@ Not required: aggregated, publicly available programme data with no individual-l
 
 ## 3. Results
 
-### 3.1 The variables form two populations
+### 3.1 Six datasets: the division is counted versus characterised
 
-Seventy-seven variables met the inclusion threshold. **Sixty-three screen as measurement-like, eight as mixed, six as estimate-like.**
+Of 443 variables meeting the inclusion threshold across the six files, **42 are categorical (S0)** and **43 are untestable on repetition**. Of the remaining 358 continuous variables, **206 screen as measurement-like, 68 as mixed and 84 as estimate-like.**
 
-The separation is almost complete and it follows the financial/utilisation boundary:
+| Dataset | Continuous | Categorical | Untestable | Median repetition | Measurement | Mixed | Estimate | Median if untestable scored 0% |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| Budget | 37 | 0 | 0 | 13.0% | 35 | 1 | 1 | 13.0% |
+| Expenditure and utilisation | 39 | 1 | 0 | 15.4% | 28 | 7 | 4 | 15.4% |
+| Notifications | 166 | 16 | 3 | 15.6% | 104 | 39 | 23 | 14.9% |
+| Treatment outcomes | 66 | 1 | 24 | 33.0% | 21 | 20 | 25 | 20.5% |
+| Laboratory diagnostic services | 41 | 12 | 16 | **63.0%** | 9 | 1 | **31** | **53.5%** |
+| Contact tracing / TPT | 9 | 12 | 0 | **3.5%** | 9 | 0 | 0 | 3.5% |
 
-| Group | n | Median repetition | Range |
-|---|---:|---:|---|
-| Financial (budget, expenditure, funding) | 70 | **14.6%** | 2.2 – 64.4% |
-| Utilisation (hospitalisation, facility visits) | 7 | **65.8%** | 61.5 – 81.4% |
+The last column is a sensitivity analysis on the S0b rule (§2.2). Excluding untestable variables, laboratory repetition is 63.0% against 13.0-15.6% for the budget, expenditure and notification files, 4.0 to 4.8 times as high; scoring them as zero, it is 53.5%, 3.4 to 4.1 times as high. The division holds under either rule; it does not depend on the rule that favours it.
 
-Only one financial variable — `cf_tot_usaid`, at 64.4% repetition with 64.3% of its values held by a single number — falls inside the utilisation range. Every other financial variable repeats less often than every utilisation variable.
+**The division is not financial versus utilisation.** Notifications (15.6%) and contact tracing (3.5%) are service-delivery data, yet they repeat as rarely as the financial files. Laboratory diagnostic services repeats at 63.0%. The first two files alone had suggested a financial/utilisation split because their high-repetition variables were all utilisation variables; the replication shows that was a confound, not the principle (§4.1). What the high-repetition variables share is that they *characterise* the system (laboratory capacity and status, typical hospitalisation share and duration, facility visits per patient), whereas the low-repetition ones are *counted* from the programme's own records (money spent, cases notified, contacts screened).
 
-**Table 1. The six estimate-like variables.**
+**Treatment outcomes sit in between (33.0%, or 20.5% under the inclusive rule) and we do not explain it.** It also has the highest proportion of untestable variables: 24 of its 91 variables have no country with an adjacent pair, which suggests that some cohort outcome data is reported in a way that yields a single observation per country. We note this and do not rely on it.
 
-| Variable | n | Repetition | Distinct / n | Modal value share | Round |
-|---|---:|---:|---:|---:|---:|
-| `hosp_type_mdr` | 1,631 | 81.4% | 0.00 | 52.1% | 11.8% |
-| `hospd_prct_mdr` | 1,421 | 69.6% | 0.06 | 35.3% | 66.6% |
-| `hospd_dur_mdr` | 1,368 | 66.5% | 0.08 | 11.8% | 67.1% |
-| `cf_tot_usaid` | 628 | 64.4% | 0.29 | 64.3% | 49.1% |
-| `hcfvisit_mdr` | 1,364 | 61.6% | 0.14 | 11.1% | 40.4% |
-| `hospd_prct_dstb` | 1,467 | 61.5% | 0.06 | 9.8% | 48.0% |
+**The screen's own false positive.** Before S0 existed, the contact-tracing dataset looked estimate-like. Its 12 categorical flags (`prevtx_data_available`, `tpt_3hp` and similar) repeat and sit on round numbers by nature. Scored without S0, the dataset had 20 testable variables, a median repetition of 63.8% (59.7% with its one untestable variable scored as zero) and 11 estimate-like variables. With S0 it has a median of 3.5% and none. Its apparent unreliability was entirely an artefact of the screen, and we found it only by replicating on a further dataset (§5).
 
-**Table 2. For contrast, the six least-repetitive variables.**
+**In the two files first screened (77 variables)**, one variable is categorical, **`hosp_type_mdr`** (4 distinct values: 2, 140, 141, 142; a code, not a measure), and none is untestable, so the S0b rule leaves them unaffected. Of the 76 continuous variables, **63 are measurement-like, 8 mixed and 5 estimate-like.** An earlier version of this paper reported six estimate-like variables and listed `hosp_type_mdr` among them; that was the S0 error, corrected here.
+
+**Table 1. The five estimate-like variables in the budget and expenditure files.**
+
+| Variable | n | Distinct values | Repetition | Distinct / n | Modal value share | Round |
+|---|---:|---:|---:|---:|---:|---:|
+| `hospd_prct_mdr` | 1,421 | 81 | 69.6% | 0.06 | 35.3% | 66.6% |
+| `hospd_dur_mdr` | 1,368 | 111 | 66.5% | 0.08 | 11.8% | 67.1% |
+| `cf_tot_usaid` | 628 | 182 | 64.4% | 0.29 | 64.3% | 49.1% |
+| `hcfvisit_mdr` | 1,364 | 197 | 61.6% | 0.14 | 11.1% | 40.4% |
+| `hospd_prct_dstb` | 1,467 | 92 | 61.5% | 0.06 | 9.8% | 48.0% |
+
+Reported separately as categorical: `hosp_type_mdr` (n = 1,631; 4 distinct values).
+
+**Table 2. For contrast, the six least-repetitive variables in the budget and expenditure files.**
 
 | Variable | n | Repetition | Distinct / n |
 |---|---:|---:|---:|
@@ -118,9 +139,9 @@ All five component-to-total identities reconcile in **100%** of testable country
 | `rcvd_tot` = Σ 11 receipt lines | 892 / 892 (100%) | 1,231 |
 | `rcvd_tot` = Σ 4 funding sources | 881 / 891 (98.9%) | 1,232 |
 
-This matters for interpretation. The financial variables are not merely more variable than the utilisation ones; they are demonstrably coherent. Whatever process produces them enforces arithmetic consistency across eleven line items in every reporting country. No comparable constraint operates on the utilisation variables, which have no total to reconcile against.
+This matters for interpretation. The financial variables are not merely more variable than the characterised ones; they are demonstrably coherent. Whatever process produces them enforces arithmetic consistency across eleven line items in every reporting country. No comparable constraint operates on the characterised variables, which have no total to reconcile against.
 
-### 3.3 What the utilisation variables cannot support
+### 3.3 What the characterised variables cannot support
 
 `hospd_prct_mdr`, the share of drug-resistant TB patients hospitalised, illustrates the practical consequence. It covers **199 countries** and **1,421 country-years** — coverage that invites a cross-country or trend analysis.
 
@@ -138,21 +159,23 @@ Receipts and expenditure differ because money received in one year may be spent 
 
 ## 4. Discussion
 
-### 4.1 One dataset, two kinds of object
+### 4.1 Counted versus characterised: a retraction of our earlier reading
 
-The file is titled *expenditure and utilisation*, and that conjunction is the problem. Its expenditure half behaves like measurement: highly granular, rarely repeated, arithmetically coherent across eleven components in every country. Its utilisation half behaves like a standing estimate: a small set of round values, over half of them unchanged from year to year, with no internal constraint to violate.
+**An earlier version of this paper said the division ran between financial and utilisation variables. Our own replication refutes that.** The reading rested on two files in which every high-repetition variable happened to be a utilisation variable, so the two explanations could not be told apart. Four further datasets from the same programme and countries separate them. Notifications and contact tracing are service-delivery data, not financial, and repeat 15.6% and 3.5% of the time, like or below the financial files; laboratory diagnostic services repeats 63.0% of the time. A financial/utilisation boundary predicts none of that. (The earlier version's classification was also inflated by a screen defect, the missing S0; the contact-tracing result in §3.1 is its clearest demonstration.)
 
-Distributing both under one schema, with one dictionary and no provenance field, invites the inference that they are the same kind of thing. They are not, and the difference determines which analyses are possible.
+What survives is a distinction of kind. Quantities a programme can **count from its own records** (money spent, cases notified, contacts screened) are re-derived each year and repeat 13.0-15.6% of the time in the three large files, 3.5% in contact tracing. Quantities that **characterise the system's standing configuration** (laboratory infrastructure, typical share hospitalised and typical stay, visits per patient) repeat at 63.0% (53.5% under the inclusive rule) in laboratory diagnostic services and at 61.5-69.6% for the hospitalisation and visit variables of the expenditure file. A programme cannot count its way to the second kind; it can only describe it, and describes it the same way until something changes. This is a post hoc reading of six datasets, not a tested hypothesis, and the treatment-outcomes file (33.0%, unexplained) sits awkwardly between the two.
 
-### 4.2 Why the utilisation variables are probably not errors
+Distributing both kinds under one schema, one dictionary and no provenance field invites the inference that they are the same kind of thing. They are not, and the difference determines which analyses are possible.
 
-We do not read the repetition as carelessness. Hospitalisation share and average stay are properties of a country's service-delivery model, and that model does not change annually. A programme asked each year for a figure it has no new survey to support will reasonably repeat its best standing estimate. The reporting behaviour is sensible; what is missing is the flag that would let an analyst see it.
+### 4.2 Why the characterised variables are probably not errors
 
-That reading is supported by `cf_tot_usaid`, the one financial variable in the utilisation range: a fixed external commitment, restated unchanged until it changes. Repetition here is a feature of the quantity, not a defect in the reporting.
+We do not read the repetition as carelessness, and the replication strengthens the benign reading. A programme asked every year for its laboratory configuration will reasonably restate its standing answer; a hospitalisation share and average stay are properties of a service-delivery model that does not change annually. The reporting behaviour is sensible; what is missing is the flag that would let an analyst see it.
+
+The one financial variable in this range, `cf_tot_usaid`, points the same way: a fixed external commitment, restated unchanged until it changes. Repetition here is a feature of the quantity, not a defect in the reporting.
 
 ### 4.3 Implications for secondary analysis
 
-**Trend claims from utilisation variables should not be made** without first showing that the variable moves for reasons other than revision. The screen in §2.2 takes seconds and settles it.
+**Trend claims from characterised variables should not be made** without first showing that the variable moves for reasons other than revision. The screen in §2.2 takes seconds and settles it.
 
 **Cross-sectional comparison is weaker than it looks.** With 81 distinct values over 199 countries, much apparent between-country variation is variation between conventional answers.
 
@@ -166,7 +189,7 @@ That reading is supported by `cf_tot_usaid`, the one financial variable in the u
 
 **A stated denominator pairing.** Where a file publishes two plausible denominators, the dictionary should say which belongs with which numerator.
 
-**Publish the screen with the data.** The four tests here are generic. Running them at release and shipping the results table would let every user see, before analysis, which variables carry annual information.
+**Publish the screen with the data.** The tests here are generic. Running them at release and shipping the results table would let every user see, before analysis, which variables carry annual information.
 
 ---
 
@@ -178,7 +201,11 @@ The classification thresholds are conventions. We chose them before examining th
 
 Variables with fewer than 100 observations were excluded, so the screen is silent about sparsely reported quantities, which may be the least reliable of all.
 
-We screened two files from one programme at one point in time. Whether the financial/utilisation division generalises to other WHO disease programmes is an open and directly testable question.
+We screened six files from one programme at one point in time. Whether the counted/characterised division generalises to other WHO disease programmes is an open and directly testable question. The division itself was found post hoc, and the treatment-outcomes file does not fit it cleanly.
+
+**The screen needed its own validation, and had not had it.** Before S0 existed it produced a false positive on the contact-tracing dataset, labelling a set of ordinary yes/no flags as estimate-like, and we found it only by replication on a further dataset. A screen that classifies variables is a measuring instrument and must itself be validated against cases whose answer is known; we did not do this before the first analysis, and both the five-or-fewer-values convention of S0 and the untestable class of S0b were added in response to failures. Other failure modes may remain: a six-valued code, for example, would not be caught by S0.
+
+The 43 untestable variables are unclassified, not clean; they are concentrated in treatment outcomes and laboratory data.
 
 Finally, we cannot observe the national reporting process, so §4.2's benign interpretation is inference from the data's shape, not evidence about what reporters did.
 
@@ -186,7 +213,7 @@ Finally, we cannot observe the national reporting process, so §4.2's benign int
 
 ## 6. Conclusions
 
-Seventy-seven variables, four screens, and a near-complete separation: WHO's TB financing variables behave like measurements and are arithmetically immaculate; its utilisation variables behave like standing estimates, over half of them unchanged year on year. Both are published under one name with nothing to tell them apart.
+Across six WHO TB datasets, variables a programme counts from its own records (expenditure, notifications, contacts screened) behave like annual measurements, repeating 15.6% of the time or less, and the financial ones are arithmetically immaculate. Variables that describe the system's standing configuration (laboratory capacity, hospitalisation share and stay, visits per patient) behave like standing estimates, repeating 53.5-69.6% of the time. Of the 77 variables first screened, five are estimate-like, not six: `hosp_type_mdr` is a categorical code. Our first reading of the division as financial versus utilisation was wrong, and our own replication showed it. Both kinds are published under one name with nothing to tell them apart.
 
 The remedy is a single flag the reporting country is already in a position to supply. Until it exists, the screen presented here is a few seconds of work that tells an analyst which of these widely used numbers can support the question being asked.
 
@@ -208,5 +235,5 @@ The remedy is a single flag the reporting country is already in a position to su
 
 1. **References not yet written.** Needed: WHO Global TB Report 2025; the WHO TB data dictionary; 3–4 on secondary analysis of routine health data quality; 1–2 on TB service-delivery models / ambulatory DR-TB care (to motivate §3.3); 1–2 on data provenance or FAIR metadata standards for §4.4.
 2. **Companion paper.** The India financing analysis (`manuscript_draft_v1.md`) shares §3.4's dataset and the general theme. They must cite each other and be written independently — run `check_self_similarity.py` across both before submitting either.
-3. **Possible strengthening:** repeat the screen on one other WHO programme dataset (HIV or malaria financing). If the financial/utilisation division replicates, §5's open question becomes a finding and the paper is materially stronger. Roughly a day's work on the same code.
+3. **Possible strengthening:** repeat the screen on one other WHO programme dataset (HIV or malaria financing) to test whether the counted/characterised division generalises beyond TB. Same code.
 4. **Honest framing to preserve:** §3.4 discloses an error we made. Keep it. A methods paper about data traps that conceals its author's own is worth less.
