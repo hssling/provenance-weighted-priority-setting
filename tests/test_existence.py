@@ -9,6 +9,7 @@ from provenance.existence import (
     NODE_LABELS,
     TB_BUDGET_COMMODITY_ONLY,
     TB_BUDGET_MAPPING,
+    TB_BUDGET_NO_LINE_BY_DICTIONARY,
     TB_BUDGET_PARTIAL,
     TB_BUDGET_POOLED,
     TB_BUDGET_SEPARABLE,
@@ -47,6 +48,20 @@ def test_no_intervention_has_a_budget_line_of_its_own():
     assert not any(TB_BUDGET_SEPARABLE.values())
     r = existence_report(NODE_LABELS, TB_BUDGET_MAPPING)
     assert len(r.invisible) + len(r.mapped) == 11
+
+
+def test_the_dictionary_alone_moves_two_to_five_not_six():
+    # Read against the dictionary, budget_prog is treatment only, so the three
+    # pooled activities lose their line: 2 + 3 = 5. Whole-genome sequencing stays
+    # in budget_lab under either document -- the dictionary's "laboratory
+    # infrastructure, equipment and supplies" covers it -- so it must not be
+    # counted as a dictionary effect, which it once was.
+    assert len(TB_BUDGET_NO_LINE_BY_DICTIONARY) == 5
+    assert TB_BUDGET_NO_LINE_BY_DICTIONARY == (
+        {k for k, v in TB_BUDGET_MAPPING.items() if v is None} | set(TB_BUDGET_POOLED))
+    assert "wgs_dst" not in TB_BUDGET_NO_LINE_BY_DICTIONARY
+    assert "supplies" in BUDGET_DEFINITIONS["budget_lab"]
+    assert "to treat" in BUDGET_DEFINITIONS["budget_prog"]
 
 
 def test_the_three_pooled_activities_are_named_by_the_form():

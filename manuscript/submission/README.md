@@ -1,64 +1,40 @@
 # Submission set
 
-Two independent papers from one project. They share one dataset and are written to stand alone; a text-overlap
-screen between them returns 0.6% (A against B) and 0.4% (B against A).
+Two independent papers from one project. They share one dataset and are written to stand alone; the measured
+text overlap between them is stated in each cover letter and rechecked by `verification/check_consistency.py`.
 
 | | Paper A | Paper B |
 |---|---|---|
 | title | What a tuberculosis budget cannot see | The label says what kind, not how old |
-| target | *Health Policy and Planning*, Original Article | *International Journal of Epidemiology* |
+| target | *Indian Journal of Tuberculosis*, Original Article | *International Journal of Epidemiology*, Original Article |
+| layout | IJTB house set (as IJTB-S-26-01305) | generic set |
 
-Current counts are on each paper's title page, `01_title_page`, which `manuscript/build_submission.py`
-writes on every run. They are deliberately not repeated here, where they could go stale. Rerun it after any edit; it also rewrites the
-blinded copies. A cover letter in an earlier project claimed 400 dpi for 600 dpi figures because a number was typed
-rather than derived, which is why nothing here is typed.
+File names by role for each paper are in `manuscript/submission_layout.py`; the build and every check read
+them from there. Current counts are on each title page, written by `manuscript/build_submission.py` on every
+run, and are deliberately not repeated here. How to upload: `SUBMISSION_STEPS.md`.
 
-## Files
+## What is generated and what is hand-written
 
-```
-paper_a/  01_title_page.md  02_cover_letter.md  03_manuscript_blinded.md
-paper_b/  01_title_page.md  02_cover_letter.md  03_manuscript_blinded.md
-```
+Generated on every build (never edit by hand): both manuscripts, the blinded copies, Paper A's highlights,
+figure captions and supplement, Paper B's tables file and supplement, all figures, and every `.docx`.
 
-The blinded copy strips the author block, the target-journal line, the author's working notes, and replaces
-self-citations by name with `[Author]`. Both journals may be single-blind, in which case the unblinded source
-(`manuscript/manuscript_draft_v1.md`, `manuscript/manuscript_b_draft_v1.md`) is what to upload. Check the journal
-before choosing. Declarations are inside each manuscript's own `## Declarations` section and are repeated on the
-title page.
+Hand-written, and checked by the suite: cover letters, title pages, Paper A's declarations, declaration of
+interests and copyright transfer, and both RECORD checklists.
 
 ## Verified before submission
 
-- **Every number regenerates from code.** `python -I verification/check_all.py` runs the test suite, both demos and
-  the self-similarity screen.
-- **References read, not just resolved.** Seven were read in full text against the sentences citing them on
-  13 November 2026; see `manuscript/references_verified.md`. Two DOIs produced from memory earlier in this project
-  were wrong and were caught by direct lookup, which is why that rule exists.
-- **Self-similarity.** `verification/check_self_similarity.py` compares both papers against each other and against
-  four prior manuscripts by the same author. It fails the build on a verbatim run of 40 or more words, and does not
-  gate on a percentage: no journal publishes a numeric threshold and inventing one would dress a guess as a rule.
-  It is a screen, not iThenticate — run the institutional check before uploading.
+- **Every number regenerates from code**, including the counts that drifted when typed: budget_prog's fifteen
+  activities and the five interventions with no line under the dictionary are both derived in
+  `src/provenance/existence.py` and checked against every sentence that states them.
+- **References.** Numbered in order of first citation, each URL with an access date, each journal article with
+  a DOI that resolves (`verification/verify_dois.py`, on demand).
+- **Rendered, not only built.** Both manuscripts were exported through Word to PDF and the reference numbering
+  read back from the PDF.
+- **Self-similarity** against each other and five prior manuscripts by the same author, failing on any verbatim
+  run of 40+ words. A screen, not iThenticate.
 
 ## Deposit
 
-Archived at Zenodo on 13 November 2026, from GitHub release v1.0.0.
-
-- **Version DOI, cite this one:** 10.5281/zenodo.24187367 — the exact archived state every number in both papers
-  was computed from.
-- Concept DOI: 10.5281/zenodo.24187366 — always resolves to the latest version.
-
-Both data-availability statements now carry the version DOI. The **blinded** copies do not: the repository URL
-contains the author's GitHub username and resolving the DOI shows the author record, so both are replaced with
-"[repository and archive DOI withheld for blind review]". Give the identifiers to the editor separately if the
-journal reviews blind. `build_submission.py` fails the build if any identifier survives into a blinded copy.
-
-## Outstanding, in order
-
-1. **Confirm each journal's current limits** — abstract length, main-text length, and whether *Health Policy and
-   Planning* still requires its Key Messages box (3 to 5 bullets). The publisher's author-guideline pages are
-   bot-protected and could not be read automatically; open them in a normal browser. Paper A's abstract is 249 words
-   against a 250-word limit, so it has no margin if the limit has changed.
-2. **One incomplete citation.** Paper A ref [13], the JSSTD paper, carries the DOI printed on the journal's R14
-   proof (10.25259/JSSTD_120_2026). It does not resolve yet — the article is in production and the DOI is
-   registered at publication. Volume and pages are still unassigned.
-3. **Decide blinded versus unblinded** per journal, as above. The blinded copies also give a main-text count 7 words
-   shorter for Paper B, which is the withheld identifier; the title pages state the unblinded counts.
+Zenodo, from GitHub release v1.0.0: version DOI **10.5281/zenodo.24187367** (cite this); concept DOI
+10.5281/zenodo.24187366. Blinded copies withhold the author's repository URL and the DOI; WHO's own GitHub
+repository, cited for the data collection form, is kept.

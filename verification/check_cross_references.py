@@ -25,6 +25,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 M = ROOT / "manuscript"
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "manuscript"))
+from submission_layout import LAYOUT  # noqa: E402
 PAPERS = {
     "paper A": (M / "manuscript_draft_v1.md", M / "supplementary_paper_a.md"),
     "paper B": (M / "manuscript_b_draft_v1.md", M / "supplementary_paper_b.md"),
@@ -122,8 +124,8 @@ def main() -> int:
         # The RECORD checklist tells a reviewer where to find each item. Paper
         # B's pointed at section 3.5 after that section had been renumbered
         # 3.4, so every pointer in it must resolve in its own paper.
-        record = (paper.parent / "submission" / f"paper_{name[-1].lower()}"
-                  / "05_RECORD_checklist.md")
+        key = f"paper_{name[-1].lower()}"
+        record = paper.parent / "submission" / key / LAYOUT[key]["record"]
         if record.exists():
             rec = record.read_text(encoding="utf-8")
             tables = set(re.findall(r"(?m)^\*\*Table (\d+)\.", text))

@@ -132,6 +132,17 @@ TB_BUDGET_COMMODITY_ONLY: dict[str, str] = {
 # Kept under the old name so nothing that imported it breaks silently.
 TB_BUDGET_PARTIAL = TB_BUDGET_COMMODITY_ONLY
 
+# The same eleven nodes classified against the data dictionary instead of the form. Only
+# budget_prog differs in substance between the two documents: the dictionary defines it as
+# programme costs "to treat" drug-susceptible TB, so each pooled node -- none of which is
+# treatment -- loses its line, and every other mapping stands under either document.
+# Derived, not typed: a typed "six" once counted whole-genome sequencing here, but its
+# exclusion had been a separate mapping error, since the dictionary's budget_lab
+# ("laboratory infrastructure, equipment and supplies") covers sequencing as well as the form
+# does. The dictionary's own effect is the pooled nodes, no more.
+TB_BUDGET_NO_LINE_BY_DICTIONARY: frozenset[str] = frozenset(
+    k for k, v in TB_BUDGET_MAPPING.items() if v is None or k in TB_BUDGET_POOLED)
+
 # No WHO budget line is specific to any one of these interventions: every line pools several
 # activities. This is the finding, and it is stated as data rather than left to prose.
 TB_BUDGET_SEPARABLE: dict[str, bool] = {key: False for key in TB_BUDGET_MAPPING}

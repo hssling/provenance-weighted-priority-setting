@@ -27,7 +27,14 @@ M = ROOT / "manuscript"
 
 FILES = [M / "manuscript_draft_v1.md", M / "manuscript_b_draft_v1.md",
          M / "supplementary_paper_a.md", M / "supplementary_paper_b.md"]
-FILES += sorted((M / "submission").glob("paper_*/0[125]_*.md"))
+# Every hand-written upload: title page, cover letter, checklist, and the
+# IJTB declarations. Generated uploads repeat the sources checked above.
+sys.path.insert(0, str(M))
+from submission_layout import LAYOUT  # noqa: E402
+for _key, _lay in LAYOUT.items():
+    for _role in ("title_page", "cover", "record", "declarations", "interests", "copyright"):
+        if _role in _lay:
+            FILES.append(M / "submission" / _key / _lay[_role])
 
 DRAFT_HISTORY = re.compile(
     r"earlier (?:version|draft)s?\b|still earlier|"
@@ -36,6 +43,7 @@ DRAFT_HISTORY = re.compile(
     r"\b(?:is|was|are|were) withdrawn\b|"
     r"\bcorrected here\b|\bwe committed\b|\bthis paper made\b|"
     r"\bfirst analysis\b|\bown earlier drafts?\b|\bin a previous draft\b|"
+    r"\ban? early version of this\b|\ban earlier formulation\b|\bthe mapping was wrong\b|"
     r"\bruling [A-Z]{1,2}\b",
     re.I)
 

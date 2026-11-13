@@ -111,6 +111,7 @@ def main() -> int:
                   s["zero_modal"].replace("/", " / "), cells[3], errors)
 
     errors += check_activity_counts()
+    errors += check_dictionary_count()
 
     if errors:
         print(f"FAILED: {len(errors)} mismatch(es) between the papers and the code")
@@ -141,7 +142,7 @@ def check_activity_counts() -> list[str]:
     from provenance.existence import BUDGET_PROG_ACTIVITIES as total
     errs = []
     files = [ROOT / "manuscript" / "manuscript_draft_v1.md",
-             ROOT / "manuscript" / "submission" / "paper_a" / "02_cover_letter.md"]
+             ROOT / "manuscript" / "submission" / "paper_a" / "01_Cover_Letter.md"]
     num = r"(\d+|" + "|".join(WORDS) + r")"
     for f in files:
         text = f.read_text(encoding="utf-8")
@@ -158,6 +159,35 @@ def check_activity_counts() -> list[str]:
             n = int(word) if word.isdigit() else WORDS[word.lower()]
             if n != total:
                 errs.append(f"  {f.name}: '{m.group(0)}' -- the form lists {total}")
+    return errs
+
+
+def check_dictionary_count() -> list[str]:
+    """Paper A states how many interventions would have no budget line if the
+    data dictionary, not the collection form, defined the lines. It was once
+    typed as six, which silently counted a separate mapping error as a
+    dictionary effect; the true figure is derived in the code. Every sentence
+    that ties a no-line count to the dictionary must agree with it."""
+    sys.path.insert(0, str(ROOT / "src"))
+    from provenance.existence import TB_BUDGET_NO_LINE_BY_DICTIONARY as by_dict
+    want = len(by_dict)
+    errs, seen = [], 0
+    num = r"(\d+|" + "|".join(WORDS) + r")"
+    pat = re.compile(rf"(?is)dictionary[^.]{{0,90}}?\b{num} (?:interventions )?(?:would )?"
+                     rf"have no (?:budget )?line")
+    for f in (ROOT / "manuscript" / "manuscript_draft_v1.md",
+              ROOT / "manuscript" / "submission" / "paper_a" / "01_Cover_Letter.md"):
+        text = f.read_text(encoding="utf-8")
+        i = text.find("## Notes for the author")
+        text = text[:i] if i != -1 else text
+        for m in pat.finditer(text):
+            seen += 1
+            n = int(m.group(1)) if m.group(1).isdigit() else WORDS[m.group(1).lower()]
+            if n != want:
+                errs.append(f"  {f.name}: '...{m.group(0)[-60:]}' -- the code derives {want}")
+    if not seen:
+        errs.append("  no sentence states the dictionary no-line count; the pattern "
+                    "may no longer match the wording")
     return errs
 
 

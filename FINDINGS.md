@@ -339,6 +339,15 @@ if their values are not known. **Enter 0 only if the true value is zero.**" Pape
 a repeated statement of true absence, rather than as missing data, is therefore backed by the primary instrument and
 not only by inference (§2.4).
 
+**The dictionary's own effect is two to five, not two to six (13 November 2026).** The "six" above mixed two errors.
+Five of the six follow from the dictionary: the two with no line under either document, plus the three pooled
+activities, which the dictionary's "to treat" excludes. The sixth, whole-genome sequencing, had been unmapped by a
+separate judgement; the dictionary's `budget_lab` ("laboratory infrastructure, equipment and supplies") covers
+sequencing as well as the form does. So the measured effect of consulting the dictionary is **2 → 5**, and "threefold"
+overstated it. The count is now derived as `TB_BUDGET_NO_LINE_BY_DICTIONARY` and every sentence stating it is checked
+(`verification/check_manuscript_numbers.py`, mutation-tested). Paper A, retargeted to the *Indian Journal of
+Tuberculosis* the same day, reports it as a result (§3.5), without drafting history.
+
 ---
 
 ## 3. Data provenance

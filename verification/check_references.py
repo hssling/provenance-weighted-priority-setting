@@ -1,15 +1,17 @@
 """Check citation integrity and reference metadata in both papers.
 
-Paper B uses numbered Vancouver citations; paper A uses Health Policy and
-Planning's author-date style. Each needs a different check, and both need the
-same metadata rules.
+Both papers now use numbered Vancouver citations: paper B for the
+International Journal of Epidemiology, paper A for the Indian Journal of
+Tuberculosis. Paper A was in Health Policy and Planning's author-date style
+until it moved journal, and the author-date check is kept for any paper that
+returns to that style.
 
-Paper B (numbered):
+Numbered (both papers):
   * the list is numbered 1..n with no gaps;
   * every reference is cited, and nothing is cited that is not listed;
   * references are numbered in order of first citation in the text.
 
-Paper A (author-date):
+Author-date (kept, currently unused):
   * every in-text citation resolves to exactly one list entry;
   * every list entry is cited at least once;
   * the list is alphabetical by first author, then year.
@@ -57,12 +59,12 @@ def metadata(name: str, entries: list[str]) -> list[str]:
     return errs
 
 
-def check_numbered(text: str) -> list[str]:
+def check_numbered(text: str, name: str = "paper B") -> list[str]:
     errs = []
     before, entries, after = split(text)
     nums = [int(m.group(1)) for e in entries if (m := re.match(r"(\d+)\. ", e))]
     if nums != list(range(1, len(nums) + 1)):
-        errs.append(f"  paper B: reference list numbered {nums}, expected 1..{len(nums)}")
+        errs.append(f"  {name}: reference list numbered {nums}, expected 1..{len(nums)}")
     order: list[int] = []
     # citations in the running text, then in the declarations after the list
     for m in re.finditer(r"\[(\d+(?:\s*[,–-]\s*\d+)*)\]", before + after):
@@ -78,13 +80,13 @@ def check_numbered(text: str) -> list[str]:
     missing = sorted(set(nums) - set(order))
     phantom = sorted(set(order) - set(nums))
     if missing:
-        errs.append(f"  paper B: listed but never cited: {missing}")
+        errs.append(f"  {name}: listed but never cited: {missing}")
     if phantom:
-        errs.append(f"  paper B: cited but not listed: {phantom}")
+        errs.append(f"  {name}: cited but not listed: {phantom}")
     if order != sorted(order):
-        errs.append(f"  paper B: not numbered in order of first citation; "
+        errs.append(f"  {name}: not numbered in order of first citation; "
                     f"first-citation order is {order}")
-    return errs + metadata("paper B", entries)
+    return errs + metadata(name, entries)
 
 
 def key_of(entry: str) -> tuple[str, str]:
@@ -140,7 +142,8 @@ def keywords(s: str) -> set[str]:
     return {w for w in re.findall(r"[a-z]{6,}", s.lower()) if w not in stop}
 
 
-def check_supplement_citations(main_text: str, supp: Path) -> list[str]:
+def check_supplement_citations(main_text: str, supp: Path,
+                               name: str = "paper B") -> list[str]:
     """A supplement in a separate file cites the main list by number, so a
     renumbering of the main list does not reach it. After one did, its [5]
     pointed at a newborn-indicator review instead of the WHO dictionary --
@@ -160,25 +163,27 @@ def check_supplement_citations(main_text: str, supp: Path) -> list[str]:
         context = keywords(text[max(0, m.start() - 300):m.start()])
         for n in nums:
             if n not in by_num:
-                errs.append(f"  paper B supplement: cites [{n}], which is not in the main list")
+                errs.append(f"  {name} supplement: cites [{n}], which is not in the main list")
             elif not context & keywords(by_num[n]):
-                errs.append(f"  paper B supplement: [{n}] points to '{by_num[n][:55]}...', "
+                errs.append(f"  {name} supplement: [{n}] points to '{by_num[n][:55]}...', "
                             f"which shares nothing with the text citing it")
     return errs
 
 
 def main() -> int:
-    errs = check_author_date(A.read_text(encoding="utf-8"))
-    errs += check_numbered(B.read_text(encoding="utf-8"))
-    errs += check_supplement_citations(
-        B.read_text(encoding="utf-8"), ROOT / "manuscript" / "supplementary_paper_b.md")
+    errs: list[str] = []
+    for name, path, supp in (("paper A", A, "supplementary_paper_a.md"),
+                             ("paper B", B, "supplementary_paper_b.md")):
+        text = path.read_text(encoding="utf-8")
+        errs += check_numbered(text, name)
+        errs += check_supplement_citations(text, ROOT / "manuscript" / supp, name)
     if errs:
         print(f"FAILED: {len(errs)} reference problem(s)")
         print("\n".join(errs))
         return 1
-    print("PASSED: paper A's author-date citations and paper B's numbered citations "
-          "all resolve and are all cited; B is in first-citation order, A is "
-          "alphabetical; every URL has an access date and every journal article a DOI")
+    print("PASSED: both papers' numbered citations resolve, every reference is cited, "
+          "both lists are in first-citation order, each supplement's citations point at "
+          "the right reference, every URL has an access date and every journal article a DOI")
     return 0
 
 

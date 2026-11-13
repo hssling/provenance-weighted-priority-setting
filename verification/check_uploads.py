@@ -25,6 +25,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 S = ROOT / "manuscript" / "submission"
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "manuscript"))
+from submission_layout import LAYOUT  # noqa: E402
 
 AUTHOR_ONLY = [
     r"\*?\*?Target journal:\*?\*?",          # the internal header line (colon form)
@@ -42,8 +44,9 @@ def text_of(p: Path) -> str:
 
 def main() -> int:
     errs: list[str] = []
-    uploads = sorted(f for f in S.glob("paper_*/0[1-7]_*")
-                     if f.suffix in (".md", ".docx"))
+    # Every document in a paper's folder is an upload; the folders hold
+    # nothing else. Figures are images and carry no text to check.
+    uploads = sorted(f for f in S.glob("paper_*/*") if f.suffix in (".md", ".docx"))
     if not uploads:
         print("FAILED: no upload files found; run manuscript/build_submission.py")
         return 1
@@ -53,7 +56,9 @@ def main() -> int:
             for m in re.finditer(pat, t, re.I):
                 ctx = t[max(0, m.start() - 30):m.end() + 40].replace("\n", " ")
                 errs.append(f"  {f.relative_to(S)}: author-only content  ...{ctx}...")
-        if re.match(r"0[34]_manuscript", f.name) and not re.search(
+        lay = LAYOUT[f.parent.name]
+        names = {Path(lay[k]).stem for k in ("manuscript", "blinded")}
+        if f.stem in names and not re.search(
                 r"Word count:\s*\*?\*?\s*[\d,]+ words", t):
             errs.append(f"  {f.relative_to(S)}: no word count on the title section")
     if errs:

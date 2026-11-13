@@ -29,6 +29,8 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "manuscript"))
+from submission_layout import LAYOUT  # noqa: E402
 M = ROOT / "manuscript"
 S = M / "submission"
 PAPERS = {
@@ -104,7 +106,7 @@ def check_stated_overlap() -> list[str]:
                 "B": 100 * len(sh["B"] & sh["A"]) / len(sh["B"])}
     for key, folder in (("A", S / "paper_a"), ("B", S / "paper_b")):
         m = re.search(r"overlap screen between them returns (\d+\.\d)%",
-                      read(folder / "02_cover_letter.md"))
+                      read(folder / LAYOUT[folder.name]["cover"]))
         if not m:
             errs.append(f"  paper {key}: cover letter states no overlap figure")
         elif abs(float(m.group(1)) - round(measured[key], 1)) > 1e-9:
@@ -118,8 +120,9 @@ def main() -> int:
     for name, p in PAPERS.items():
         src = read(p["src"])
         f = p["folder"]
-        title_page, cover = read(f / "01_title_page.md"), read(f / "02_cover_letter.md")
-        record, supp = read(f / "05_RECORD_checklist.md"), read(p["supp"])
+        lay = LAYOUT[f.name]
+        title_page, cover = read(f / lay["title_page"]), read(f / lay["cover"])
+        record, supp = read(f / lay["record"]), read(p["supp"])
 
         # 1. title -------------------------------------------------------------
         title = norm(re.search(r"(?m)^# (.+)$", src).group(1))
@@ -137,7 +140,7 @@ def main() -> int:
         # 2. journal -----------------------------------------------------------
         j_src = re.search(r"\*\*Target journal:\*\*\s*\*([^*]+)\*", src)
         j_tp = re.search(r"\*\*Target journal\.\*\*\s*\*([^*]+)\*", title_page)
-        j_cl = re.search(r"To the Editors, \*([^*]+)\*", cover)
+        j_cl = re.search(r"(?:To the Editors|The Editor-in-Chief), \*([^*]+)\*", cover)
         names = {k: (v.group(1).strip() if v else None)
                  for k, v in (("manuscript", j_src), ("title page", j_tp), ("cover letter", j_cl))}
         if len(set(names.values())) != 1 or None in names.values():
@@ -167,7 +170,7 @@ def main() -> int:
             if not m or int(m.group(1)) != value:
                 errs.append(f"  {name}: title page says {row} = "
                             f"{m.group(1) if m else '(missing)'}, the manuscript has {value}")
-        figs = list(f.glob("08_Figure_*.png"))
+        figs = list(f.glob(lay["figure_glob"]))
         if len(figs) != fresh["Figures"]:
             errs.append(f"  {name}: {len(figs)} figure files for {fresh['Figures']} figure captions")
 
@@ -177,6 +180,7 @@ def main() -> int:
         summaries = {
             "abstract": section(src, "## Abstract"),
             "key messages": section(src, "## Key messages"),
+            "highlights": section(src, "## Highlights"),
             "cover letter": section(cover, "**What the paper reports.**", "**Declarations.**"),
         }
         for label, text in summaries.items():

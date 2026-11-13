@@ -19,8 +19,13 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "src"))
 from provenance.existence import (                                  # noqa: E402
     BUDGET_DEFINITIONS, DCF_DEFINITIONS, NODE_LABELS, TB_BUDGET_MAPPING,
-    TB_BUDGET_COMMODITY_ONLY, TB_BUDGET_POOLED,
+    TB_BUDGET_COMMODITY_ONLY, TB_BUDGET_NO_LINE_BY_DICTIONARY, TB_BUDGET_POOLED,
 )
+
+# Table 2 and Figure 2 list interventions in the order of the budget lines they
+# reach; the supplement follows the same order so a reader can read across.
+LINE_ORDER = ["budget_lab", "budget_prog", "budget_tpt", "budget_sld",
+              "budget_patsup", "budget_tbhiv", None]
 
 OUT = ROOT / "manuscript" / "supplementary_paper_a.md"
 
@@ -54,18 +59,26 @@ def main() -> int:
         "evidence: the WHO budget column each intervention maps to, the definition of "
         "that column in the **data dictionary** distributed with the datasets, and the "
         "definition of the same column in the **data collection form** that countries "
-        "complete (WHO 2026c). Where the two differ, the form governs (SS2.3), and SS4.2 "
-        "reports the consequence of that choice.",
+        "complete [9]; the dictionary is reference [8] of the main text. Where the two "
+        "differ, the form governs (SS2.3). The last column applies the dictionary's "
+        "definitions instead, which SS3.5 reports.",
         "",
-        "| Rank | Intervention | Column | Coverage | Dictionary definition | Collection-form definition |",
-        "|---:|---|---|---|---|---|",
+        "| Intervention | Column | Coverage (form) | Dictionary definition | "
+        "Collection-form definition | Coverage if the dictionary governed |",
+        "|---|---|---|---|---|---|",
     ]
-    for rank, (key, label) in enumerate(NODE_LABELS.items(), start=1):
+    keys = sorted(NODE_LABELS, key=lambda k: (LINE_ORDER.index(TB_BUDGET_MAPPING[k]),
+                                              list(NODE_LABELS).index(k)))
+    for key in keys:
+        label = NODE_LABELS[key]
         col = TB_BUDGET_MAPPING[key]
         dic = BUDGET_DEFINITIONS.get(col, "—") if col else "—"
         dcf = DCF_DEFINITIONS.get(col, "—") if col else "—"
-        L.append(f"| {rank} | {label} | {'`' + col + '`' if col else '—'} | "
-                 f"{condition(key)} | {dic} | {dcf} |")
+        by_dict = "no line" if key in TB_BUDGET_NO_LINE_BY_DICTIONARY else condition(key)
+        L.append(f"| {label} | {col or '—'} | {condition(key)} | {dic} | {dcf} | {by_dict} |")
+    L += ["", f"Under the form, {sum(TB_BUDGET_MAPPING[k] is None for k in keys)} "
+          f"interventions have no line; under the dictionary, "
+          f"{len(TB_BUDGET_NO_LINE_BY_DICTIONARY)}."]
 
     L += ["", "Notes on the pooled and commodity-only conditions, verbatim from the code:", ""]
     for key, note in {**TB_BUDGET_POOLED, **TB_BUDGET_COMMODITY_ONLY}.items():
@@ -79,7 +92,8 @@ def main() -> int:
           "The series behind Figure 1, as published in the India TB Report 2024, "
           "Table 16.1 (p.174). Amounts are in INR crore. The shortfall column is "
           "(requested - approved) / requested. Two cells of the source table were "
-          "damaged by OCR and are restored digit-faithfully; see SS2.1.",
+          "damaged in text extraction and were restored digit by digit against the "
+          "printed page. Released amounts are not printed for 2022 and 2023.",
           "",
           "| Fiscal year | Requested | Approved | Released | Spent | Shortfall |",
           "|---|---:|---:|---:|---:|---:|"]

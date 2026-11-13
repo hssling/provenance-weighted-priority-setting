@@ -38,7 +38,8 @@ def body_of(text: str) -> str:
     # allow exhibits to be cited in them. Counting them let a "Figure 1" in
     # paper A's abstract satisfy the first-citation check, which passed for the
     # wrong reason until this was excluded.
-    for start, stop in (("## Abstract", "\n## "), ("## Key messages", "\n## ")):
+    for start, stop in (("## Abstract", "\n## "), ("## Key messages", "\n## "),
+                        ("## Highlights", "\n## ")):
         i = text.find(start)
         if i != -1:
             j = text.find(stop, i + len(start))

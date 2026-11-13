@@ -168,21 +168,35 @@ Two changes would settle this at source: a vintage flag for each value, which th
 
 ## References
 
-1. World Health Organization. Global Tuberculosis Programme country data: budget, expenditure and utilisation, notifications, treatment outcomes, laboratory diagnostic services, and contact tracing and preventive treatment datasets. Geneva: World Health Organization; 2026. Available from: https://extranet.who.int/tme/ [cited 2026 Nov 13] [data files dated 25 August and 12 November 2026]. This data-collection system no longer accepts updates; the archived input files are deposited with the analysis code.
-2. World Health Organization. Global tuberculosis report 2025. Geneva: World Health Organization; 2025. Available from: https://www.who.int/teams/global-programme-on-tuberculosis-and-lung-health/tb-reports/global-tuberculosis-report-2025 [cited 2026 Nov 13].
-3. Croushore D, Stark T. A real-time data set for macroeconomists: does the data vintage matter? Rev Econ Stat. 2003;85(3):605-17. doi:10.1162/003465303322369759
-4. Maiga A, Jiwani SS, Mutua MK, Porth TA, Taylor CM, Asiki G, et al. Generating statistics from health facility data: the state of routine health information systems in Eastern and Southern Africa. BMJ Glob Health. 2019;4(5):e001849. doi:10.1136/bmjgh-2019-001849
-5. Lundin R, Mariani I, Peven K, Day LT, Lazzerini M. Quality of routine health facility data used for newborn indicators in low- and middle-income countries: a systematic review. J Glob Health. 2022;12:04019. doi:10.7189/jogh.12.04019
-6. World Health Organization. Global Tuberculosis Programme data dictionary [file TB_dictionary_2026-08-25.csv]. Geneva: World Health Organization; 2026. Available from: https://extranet.who.int/tme/ [cited 2026 Nov 13]. Archived with the analysis code.
-7. World Health Organization. Data quality assurance: module 1: framework and metrics. Geneva: World Health Organization; 2023. ISBN 978-92-4-004735-8. Available from: https://www.who.int/publications/i/item/9789240047365 [cited 2026 Nov 13].
-8. Peng RD. Reproducible research in computational science. Science. 2011;334(6060):1226-7. doi:10.1126/science.1213847
-9. Bassili A, Fitzpatrick C, Qadeer E, Fatima R, Floyd K, Jaramillo E. A systematic review of the effectiveness of hospital- and ambulatory-based management of multidrug-resistant tuberculosis. Am J Trop Med Hyg. 2013;89(2):271-80. doi:10.4269/ajtmh.13-0004
-10. Ho J, Byrne AL, Linh NN, Jaramillo E, Fox GJ. Decentralized care for multidrug-resistant tuberculosis: a systematic review and meta-analysis. Bull World Health Organ. 2017;95(8):584-93. doi:10.2471/BLT.17.193375
-11. World Health Organization. WHO consolidated guidelines on tuberculosis. Module 4: treatment and care. 2nd ed. Geneva: World Health Organization; 2026. ISBN 978-92-4-012512-4. Available from: https://www.who.int/publications/i/item/9789240125124 [cited 2026 Nov 13].
-12. Wilkinson MD, Dumontier M, Aalbersberg IJ, Appleton G, Axton M, Baak A, et al. The FAIR Guiding Principles for scientific data management and stewardship. Sci Data. 2016;3:160018. doi:10.1038/sdata.2016.18
-13. Herschel M, Diestelkamper R, Ben Lahmar H. A survey on provenance: what for? What form? What from? VLDB J. 2017;26(6):881-906. doi:10.1007/s00778-017-0486-1
-14. Gebru T, Morgenstern J, Vecchione B, Vaughan JW, Wallach H, Daume H 3rd, et al. Datasheets for datasets. Commun ACM. 2021;64(12):86-92. doi:10.1145/3458723
-15. Benchimol EI, Smeeth L, Guttmann A, Harron K, Moher D, Petersen I, et al. The REporting of studies Conducted using Observational Routinely-collected health Data (RECORD) Statement. PLOS Med. 2015;12(10):e1001885. doi:10.1371/journal.pmed.1001885
+1\. World Health Organization. Global Tuberculosis Programme country data: budget, expenditure and utilisation, notifications, treatment outcomes, laboratory diagnostic services, and contact tracing and preventive treatment datasets. Geneva: World Health Organization; 2026. Available from: https://extranet.who.int/tme/ [cited 2026 Nov 13] [data files dated 25 August and 12 November 2026]. This data-collection system no longer accepts updates; the archived input files are deposited with the analysis code.
+
+2\. World Health Organization. Global tuberculosis report 2025. Geneva: World Health Organization; 2025. Available from: https://www.who.int/teams/global-programme-on-tuberculosis-and-lung-health/tb-reports/global-tuberculosis-report-2025 [cited 2026 Nov 13].
+
+3\. Croushore D, Stark T. A real-time data set for macroeconomists: does the data vintage matter? Rev Econ Stat. 2003;85(3):605-17. doi:10.1162/003465303322369759
+
+4\. Maiga A, Jiwani SS, Mutua MK, Porth TA, Taylor CM, Asiki G, et al. Generating statistics from health facility data: the state of routine health information systems in Eastern and Southern Africa. BMJ Glob Health. 2019;4(5):e001849. doi:10.1136/bmjgh-2019-001849
+
+5\. Lundin R, Mariani I, Peven K, Day LT, Lazzerini M. Quality of routine health facility data used for newborn indicators in low- and middle-income countries: a systematic review. J Glob Health. 2022;12:04019. doi:10.7189/jogh.12.04019
+
+6\. World Health Organization. Global Tuberculosis Programme data dictionary [file TB_dictionary_2026-08-25.csv]. Geneva: World Health Organization; 2026. Available from: https://extranet.who.int/tme/ [cited 2026 Nov 13]. Archived with the analysis code.
+
+7\. World Health Organization. Data quality assurance: module 1: framework and metrics. Geneva: World Health Organization; 2023. ISBN 978-92-4-004735-8. Available from: https://www.who.int/publications/i/item/9789240047365 [cited 2026 Nov 13].
+
+8\. Peng RD. Reproducible research in computational science. Science. 2011;334(6060):1226-7. doi:10.1126/science.1213847
+
+9\. Bassili A, Fitzpatrick C, Qadeer E, Fatima R, Floyd K, Jaramillo E. A systematic review of the effectiveness of hospital- and ambulatory-based management of multidrug-resistant tuberculosis. Am J Trop Med Hyg. 2013;89(2):271-80. doi:10.4269/ajtmh.13-0004
+
+10\. Ho J, Byrne AL, Linh NN, Jaramillo E, Fox GJ. Decentralized care for multidrug-resistant tuberculosis: a systematic review and meta-analysis. Bull World Health Organ. 2017;95(8):584-93. doi:10.2471/BLT.17.193375
+
+11\. World Health Organization. WHO consolidated guidelines on tuberculosis. Module 4: treatment and care. 2nd ed. Geneva: World Health Organization; 2026. ISBN 978-92-4-012512-4. Available from: https://www.who.int/publications/i/item/9789240125124 [cited 2026 Nov 13].
+
+12\. Wilkinson MD, Dumontier M, Aalbersberg IJ, Appleton G, Axton M, Baak A, et al. The FAIR Guiding Principles for scientific data management and stewardship. Sci Data. 2016;3:160018. doi:10.1038/sdata.2016.18
+
+13\. Herschel M, Diestelkamper R, Ben Lahmar H. A survey on provenance: what for? What form? What from? VLDB J. 2017;26(6):881-906. doi:10.1007/s00778-017-0486-1
+
+14\. Gebru T, Morgenstern J, Vecchione B, Vaughan JW, Wallach H, Daume H 3rd, et al. Datasheets for datasets. Commun ACM. 2021;64(12):86-92. doi:10.1145/3458723
+
+15\. Benchimol EI, Smeeth L, Guttmann A, Harron K, Moher D, Petersen I, et al. The REporting of studies Conducted using Observational Routinely-collected health Data (RECORD) Statement. PLOS Med. 2015;12(10):e1001885. doi:10.1371/journal.pmed.1001885
 
 ## Figure captions
 

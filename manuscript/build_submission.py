@@ -24,6 +24,8 @@ import sys
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
+sys.path.insert(0, str(HERE))
+from submission_layout import LAYOUT  # noqa: E402
 OUT = HERE / "submission"
 
 PAPERS = {
@@ -78,7 +80,10 @@ def blind(text: str) -> tuple[str, int]:
     # carries the author's username, and resolving the DOI shows the author
     # record. A journal reviewing blind expects these to be withheld and given
     # to the editor instead. The unblinded source keeps them in full.
-    text = re.sub(r"https://github\.com/[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+",
+    # Only the author's own repository: WHO's data collection form is also on
+    # GitHub (GTB-TME/gtbreport2026), and a pattern matching any github.com
+    # URL blanked that reference in the blinded copy.
+    text = re.sub(r"https://github\.com/hssling/[A-Za-z0-9_.-]+",
                   "[repository URL withheld for blind review]", text)
     text = re.sub(r"doi:10\.5281/zenodo\.[0-9]+",
                   "[archive DOI withheld for blind review]", text)
@@ -94,20 +99,20 @@ def blind(text: str) -> tuple[str, int]:
 
 def main() -> int:
     OUT.mkdir(exist_ok=True)
-    print(f"{'paper':<9}{'abstract':>10}{'body':>8}{'refs':>6}{'tables':>8}  blinded to")
+    print(f"{'paper':<9}{'abstract':>10}{'body':>8}{'refs':>6}{'tables':>8}  journal")
     for key, (fname, intro) in PAPERS.items():
+        lay = LAYOUT[key]
         src = (HERE / fname).read_text(encoding="utf-8")
         abstract = count_words(section(src, "## Abstract", "**Keywords")
                                if "**Keywords" in src else
                                section(src, "## Abstract", "\n---"))
-        body = count_words(section(src, intro, "## References"))
+        # IJTB counts Introduction through Conclusions; the declarations its
+        # house style places before the references are outside the limit.
+        body = count_words(section(src, intro, lay["body_end"]))
         reflist = src.split('## References')[1]
         nxt = reflist.find(chr(10) + '## ')
         if nxt != -1:
             reflist = reflist[:nxt]
-        # Paper A uses Health Policy and Planning's author-date style, paper B
-        # uses numbered Vancouver. Count whichever this one is, rather than
-        # silently reporting zero when the style changes -- which it did.
         refs = (len(re.findall(r'^\d+\. ', reflist, flags=re.M))
                 or len(re.findall(r'^[A-Z][^\n|]*?\.\s\d{4}[a-z]?\.', reflist, flags=re.M)))
         assert refs, f"{key}: counted no references; the list style may have changed"
@@ -121,51 +126,134 @@ def main() -> int:
         d = OUT / key
         d.mkdir(exist_ok=True)
         for leak in ("Siddalingaiah", "hssling", "ORCID", "Shridevi", "0000-0002",
-                     "github.com", "zenodo."):
+                     "zenodo.", "8941087719"):
             assert leak not in text, f"{key}: blinded copy still contains {leak!r}"
 
-        # Both journals want tables in a separate file, not in the text. Each
-        # table leaves a placement marker; its in-text citation stays put.
-        blinded_body, table_blocks = split_tables(add_word_count(text, body))
+        basis = lay["word_count_basis"]
+        blinded_body, table_blocks = split_tables(add_word_count(text, body, basis))
         unblinded_body, unblinded_tables = split_tables(
-            add_word_count(for_submission(src), body))
+            add_word_count(for_submission(src), body, basis))
         assert len(table_blocks) == tables == len(unblinded_tables), (
             f"{key}: {tables} table captions but {len(table_blocks)} tables split out")
-        dest = d / "03_manuscript_blinded.md"
-        dest.write_text(blinded_body, encoding="utf-8")
-        # The unblinded source goes in too: a single-blind journal wants that
-        # one, and having both means the choice is made at upload, not here.
-        (d / "04_manuscript_unblinded.md").write_text(unblinded_body, encoding="utf-8")
-        # Tables are written from the blinded text: they carry no author
-        # identity in either paper, and the blinded form is safe for both.
-        (d / "07_tables.md").write_text(
-            "# Tables\n\n" + "\n\n---\n\n".join(table_blocks) + "\n", encoding="utf-8")
-        print(f"{key:<9}{abstract:>10}{body:>8}{refs:>6}{tables:>8}  {dest.relative_to(HERE)}")
+        if lay["tables_in_manuscript"]:
+            # IJTB house set: highlights travel as their own file, and tables
+            # sit after the reference list, each marked where it belongs.
+            blinded_body = tables_after_references(
+                drop_section(blinded_body, "## Highlights"), table_blocks)
+            unblinded_body = tables_after_references(
+                drop_section(unblinded_body, "## Highlights"), unblinded_tables)
+            write_ijtb_extras(d, lay, src)
+        else:
+            # Tables are written from the blinded text: they carry no author
+            # identity, and the blinded form is safe for either review model.
+            (d / lay["tables_file"]).write_text(
+                "# Tables\n\n" + "\n\n---\n\n".join(table_blocks) + "\n", encoding="utf-8")
+        bracket = lay["tables_in_manuscript"]          # IJTB prints "[1]"
+        blinded_body = literal_reference_numbers(blinded_body, bracket)
+        unblinded_body = literal_reference_numbers(unblinded_body, bracket)
+        (d / lay["blinded"]).write_text(blinded_body, encoding="utf-8")
+        # The unblinded source goes in too: a single-anonymized journal wants
+        # that one, and having both means the choice is made at upload, not here.
+        (d / lay["manuscript"]).write_text(unblinded_body, encoding="utf-8")
+        print(f"{key:<9}{abstract:>10}{body:>8}{refs:>6}{tables:>8}  {lay['journal']}")
 
-        stamp_counts(d / "01_title_page.md", abstract, body, tables, refs, figures)
-
-        # Figures belong in the paper's own folder, named by the figure number
-        # the text cites, so each folder is the complete upload for its journal.
-        letter = key[-1]
-        figdir = HERE.parent / "figures"
-        figs = sorted(figdir.glob(f"figure_{letter}*.png"))
-        assert len(figs) == figures, (
-            f"{key}: {figures} figure captions but {len(figs)} figure files in "
-            f"{figdir}; run figures/make_figures.py")
-        for old in d.glob("08_Figure_*.png"):
-            old.unlink()
-        for fig in figs:
-            n = re.match(rf"figure_{letter}(\d+)_", fig.name).group(1)
-            shutil.copyfile(fig, d / f"08_Figure_{n}.png")
-        supp = HERE / f"supplementary_paper_{letter}.md"
+        stamp_counts(d / lay["title_page"], abstract, body, tables, refs, figures)
+        copy_figures(key, d, lay, figures)
+        supp = HERE / f"supplementary_paper_{key[-1]}.md"
         if supp.exists():
-            (d / "06_supplementary.md").write_text(
-                supp.read_text(encoding="utf-8"), encoding="utf-8")
+            (d / lay["supplement"]).write_text(supp.read_text(encoding="utf-8"),
+                                               encoding="utf-8")
 
     print("\nThese counts are written into the title pages by this script. Type them "
           "into the portal from here, not from memory.")
     print(f"\n{to_docx()}")
     return 0
+
+
+def copy_figures(key: str, d: Path, lay: dict, figures: int) -> None:
+    """Each folder is the complete upload for its journal, named by the
+    figure number the text cites. Paper A takes the 600 dpi TIFF masters,
+    with PNG previews as the author's IJTB uploads carried; paper B takes PNG."""
+    letter = key[-1]
+    figdir = HERE.parent / "figures"
+    ext = ".tif" if lay["figure"].endswith(".tif") else ".png"
+    figs = sorted(figdir.glob(f"figure_{letter}*{ext}"))
+    assert len(figs) == figures, (
+        f"{key}: {figures} figure captions but {len(figs)} {ext} files in "
+        f"{figdir}; run figures/make_figures.py")
+    for old in list(d.glob("*_Figure_*.tif")) + list(d.glob("*_Figure_*.png")):
+        old.unlink()
+    for fig in figs:
+        k = int(re.match(rf"figure_{letter}(\d+)_", fig.name).group(1))
+        shutil.copyfile(fig, d / lay["figure"].format(n=10 + k, k=k))
+        if "preview" in lay:
+            shutil.copyfile(fig.with_suffix(".png"),
+                            d / lay["preview"].format(n=91 + k, k=k))
+
+
+def literal_reference_numbers(text: str, bracket: bool) -> str:
+    """Write each reference number as text, one paragraph per reference.
+
+    Pandoc turns the source's "1." lines into one Word list, and the .docx
+    holds a single numbering instance -- yet Word, rendering paper A, restarted
+    the count at 1 on the third reference, so references 3-22 printed as 1-20
+    and every citation after [2] pointed at the wrong source. Nothing in the
+    file was wrong; only a render showed it. Literal numbers cannot be
+    renumbered. IJTB prints them as "[1]", as the author's IJTB-S-26-01305
+    manuscript did; IJE keeps "1." (escaped so pandoc does not make a list)."""
+    i = text.find("## References")
+    if i == -1:
+        return text
+    j = text.find("\n## ", i + 5)
+    j = j if j != -1 else len(text)
+    out = []
+    for ln in text[i:j].split("\n"):
+        m = re.match(r"^(\d+)\. (.*)$", ln)
+        if m:
+            num = f"[{m.group(1)}]" if bracket else f"{m.group(1)}\\."
+            out += [f"{num} {m.group(2)}", ""]
+        elif ln.strip():
+            out += [ln, ""]
+    block = "\n".join(out).rstrip() + "\n"
+    return text[:i] + block + text[j:]
+
+
+def drop_section(text: str, heading: str) -> str:
+    """Remove one '## ' section, up to the next heading or rule."""
+    i = text.find(heading)
+    if i == -1:
+        return text
+    stops = [x for x in (text.find("\n## ", i + len(heading)),
+                         text.find("\n---", i + len(heading))) if x != -1]
+    return text[:i] + (text[min(stops) + 1:] if stops else "")
+
+
+def tables_after_references(text: str, blocks: list[str]) -> str:
+    """Place every table after the reference list and before the figure
+    legends, as in the author's IJTB-S-26-01305 manuscript."""
+    tables = "## Tables\n\n" + "\n\n".join(blocks) + "\n\n"
+    i = text.find("## Figure captions")
+    return text[:i] + tables + text[i:] if i != -1 else text.rstrip() + "\n\n" + tables
+
+
+def write_ijtb_extras(d: Path, lay: dict, src: str) -> None:
+    """Highlights and figure captions are separate uploads at IJTB. Both are
+    cut from the manuscript source, so they cannot disagree with it."""
+    title = re.search(r"(?m)^# (.+)$", src).group(1).strip()
+    hi = section(src, "## Highlights", "## 1. Introduction")
+    bullets = [ln for ln in hi.splitlines() if ln.startswith("- ")]
+    assert 3 <= len(bullets) <= 5, f"IJTB house set wants 3-5 highlights, found {len(bullets)}"
+    for b in bullets:
+        assert len(b[2:]) <= 85, f"highlight over 85 characters: {b[2:]}"
+    (d / lay["highlights"]).write_text(
+        "# Highlights\n\n" + "\n".join(bullets) + "\n", encoding="utf-8")
+    caps = src[src.index("## Figure captions") + len("## Figure captions"):]
+    if "\n---" in caps:
+        caps = caps[:caps.index("\n---")]
+    (d / lay["captions"]).write_text(
+        f"# Figure captions\n\n**Manuscript.** {title}\n\n"
+        "Figures are supplied separately as 600 dpi TIFF files for production, with PNG "
+        "previews.\n\n" + caps.strip() + "\n", encoding="utf-8")
 
 
 def for_submission(text: str) -> str:
@@ -183,12 +271,11 @@ def for_submission(text: str) -> str:
     return re.sub(r"\n{3,}", "\n\n", text)
 
 
-def add_word_count(text: str, body: int) -> str:
+def add_word_count(text: str, body: int, basis: str) -> str:
     """IJE: "The main document should include a title page with author names
     and affiliations. The word count should be included on the title page."
     The count is the one the build derived, never typed."""
-    line = (f"**Word count:** {body:,} words (main text, excluding abstract, key "
-            f"messages, tables, figures, references and declarations)")
+    line = f"**Word count:** {body:,} {basis}"
     m = re.search(r"(?m)^\*\*Running title:\*\*.*$", text)
     assert m, "no running title to anchor the word count"
     return text[:m.end()] + "\n\n" + line + text[m.end():]
@@ -256,6 +343,7 @@ def stamp_counts(page: Path, abstract: int, body: int, tables: int,
 
 def to_docx() -> str:
     """Convert every .md under submission/ to .docx. Optional by design."""
+    import style_docx_tables as style_tables
     pandoc = shutil.which("pandoc")
     if not pandoc:
         return ("pandoc not on PATH: wrote Markdown only. Neither journal accepts "
@@ -269,8 +357,12 @@ def to_docx() -> str:
             [pandoc, str(md), "-f", "markdown+pipe_tables", "-o", str(docx),
              "--standalone", "--wrap=none"],
             capture_output=True, text=True, encoding="utf-8", errors="replace")
-        (made if proc.returncode == 0 and docx.exists() else failed).append(
-            md.relative_to(OUT).as_posix())
+        ok = proc.returncode == 0 and docx.exists()
+        if ok:
+            # Pandoc's tables arrive in Word with no borders; the author's IJTB
+            # tooling writes journal (booktabs) rules into each table.
+            style_tables.process(docx)
+        (made if ok else failed).append(md.relative_to(OUT).as_posix())
     msg = f"pandoc: wrote {len(made)} .docx beside the Markdown"
     if failed:
         msg += f"; FAILED on {failed}"
@@ -285,7 +377,9 @@ def check_docx_metadata() -> str:
     """
     import zipfile
     leaks = []
-    for docx in sorted(OUT.rglob("03_manuscript_blinded.docx")):
+    blinded = [OUT / k / Path(v["blinded"]).with_suffix(".docx").name
+               for k, v in LAYOUT.items()]
+    for docx in sorted(p for p in blinded if p.exists()):
         try:
             z = zipfile.ZipFile(docx)
             meta = " ".join(z.read(n).decode("utf-8", "ignore")
