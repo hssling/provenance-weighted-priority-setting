@@ -44,7 +44,7 @@ WHO's published data dictionary [5] supplied every variable definition and is th
 
 ### 2.2 The screens
 
-Each screen is computable from the published file alone; the full specification, with the convention chosen for every threshold, is in Supplementary S1. **S0** sets aside as *categorical* any variable with five or fewer distinct values, because a status flag legitimately repeats, takes few values and sits on round numbers for reasons unrelated to estimation. **S0b** sets aside as *untestable* any continuous variable for which no country has an adjacent pair of observations, since a test that could not run is not evidence of cleanliness. The remaining continuous variables are assessed on four signatures: **repetition**, the share of consecutive country-year pairs holding an identical value; **granularity**, the distinct-value ratio, the share held by the single most common value, and the share falling on round numbers; **identity**, whether published components sum to their published total; and **bounds**, whether values respect a range implied by the definition. A variable is classified *measurement-like* (trips none or one), *mixed* (two) or *estimate-like* (three or four). No single screen condemns a variable: a small count is legitimately round and a stable quantity legitimately repeats. Thresholds are conventions, stated in the code. Finally, **S5** compares each verdict with the variable's dictionary definition, counting a variable as labelled if that definition contains "estimat" or "typical".
+Each screen is computable from the published file alone (Figure 2); the full specification, with the convention chosen for every threshold, is in Supplementary S1. **S0** sets aside as *categorical* any variable with five or fewer distinct values, because a status flag legitimately repeats, takes few values and sits on round numbers for reasons unrelated to estimation. **S0b** sets aside as *untestable* any continuous variable for which no country has an adjacent pair of observations, since a test that could not run is not evidence of cleanliness. The remaining continuous variables are assessed on four signatures: **repetition**, the share of consecutive country-year pairs holding an identical value; **granularity**, the distinct-value ratio, the share held by the single most common value, and the share falling on round numbers; **identity**, whether published components sum to their published total; and **bounds**, whether values respect a range implied by the definition. A variable is classified *measurement-like* (trips none or one), *mixed* (two) or *estimate-like* (three or four). No single screen condemns a variable: a small count is legitimately round and a stable quantity legitimately repeats. Thresholds are conventions, stated in the code. Finally, **S5** compares each verdict with the variable's dictionary definition, counting a variable as labelled if that definition contains "estimat" or "typical".
 
 These screens are our own operationalisation of non-measurement, justified by face validity; we know of no published validation of them for country-reported programme data. The nearest framework, WHO's data quality assurance toolkit [6], assesses completeness and internal and external consistency of facility data; our screens are of that general kind but were designed for published country returns and are not an implementation of it.
 
@@ -62,7 +62,7 @@ Not required: aggregated, publicly available programme data with no individual-l
 
 ### 3.1 Six datasets: the division is counted versus characterised
 
-Of 443 variables meeting the inclusion threshold across the six files, **42 are categorical (S0)** and **43 are untestable on repetition**. Of the remaining 358 continuous variables, **206 screen as measurement-like, 68 as mixed and 84 as estimate-like.**
+Of 443 variables meeting the inclusion threshold across the six files, **42 are categorical (S0)** and **43 are untestable on repetition**. Of the remaining 358 continuous variables, **206 screen as measurement-like, 68 as mixed and 84 as estimate-like**, and the proportions differ sharply by file (Table 1).
 
 **Table 1. Screen results by dataset.**
 
@@ -75,7 +75,7 @@ Of 443 variables meeting the inclusion threshold across the six files, **42 are 
 | Laboratory diagnostic services | 41 | 12 | 16 | **63.0%** | 9 | 1 | **31** | **53.5%** |
 | Contact tracing / TPT | 9 | 12 | 0 | **3.5%** | 9 | 0 | 0 | 3.5% |
 
-**Repeated zeros do not produce the division (Figure 1).** A repeated zero is a stable absence of events, not a carried-forward estimate, and most variables in these files are zero-dominated (§3.5). Repetition was therefore recomputed over the subset of adjacent pairs in which at least one of the two values is non-zero (Table 2). Every file falls, but not equally: the three large counted files converge on 5.2-9.2% while laboratory diagnostic services remains at 48.0%, a 5.2 to 9.2-fold gap, wider in relative terms than the unrestricted 4.0 to 4.8-fold one. The potential confound also runs the wrong way to explain the finding. Laboratory diagnostic services has the **lowest** share of zero-dominated variables of any file (24 of 41, 59%) and the highest repetition; treatment outcomes has the highest share (65 of 66, 98%) and, once zero-to-zero pairs are removed, ordinary repetition. The restricted statistic is reported only; it does not feed the classification in Table 1, which stands as specified.
+**Repeated zeros do not produce the division (Figure 1).** A repeated zero is a stable absence, not a carried-forward estimate, and most variables in these files are zero-dominated (§3.5). Repetition was therefore recomputed over the subset of adjacent pairs in which at least one of the two values is non-zero (Table 2). Every file falls, but not equally: the three large counted files converge on 5.2-9.2% while laboratory diagnostic services remains at 48.0%, a 5.2 to 9.2-fold gap, wider than the unrestricted 4.0 to 4.8-fold one. The potential confound also runs the wrong way to explain the finding. Laboratory diagnostic services has the **lowest** share of zero-dominated variables of any file (24 of 41, 59%) and the highest repetition; treatment outcomes has the highest share (65 of 66, 98%) and, once zero-to-zero pairs are removed, ordinary repetition. The restricted statistic is reported only; it does not feed the classification in Table 1.
 
 **Table 2. Repetition excluding adjacent pairs in which both values are zero.** Restricted to variables with at least 20 such pairs.
 
@@ -88,7 +88,9 @@ Of 443 variables meeting the inclusion threshold across the six files, **42 are 
 | Laboratory diagnostic services | **63.0%** | **48.0%** | **24 / 41** |
 | Contact tracing / TPT | 3.5% | 1.9% | 8 / 9 |
 
-**Treatment outcomes appear intermediate (33.0%, or 20.5% under the inclusive rule), but the appearance is repeated zeros.** Sixty-five of its 66 continuous variables have zero as their most common value -- they are counts of rare outcomes in disaggregated categories, mostly zero in most countries -- and excluding zero-to-zero pairs the file falls to 6.5%, the lowest of the three large files (Table 2). It is a counted file whose counts are usually zero, not a third kind. It also has the highest proportion of untestable variables: 24 of its 91 variables have no country with an adjacent pair, which suggests that some cohort outcome data is reported in a way that yields a single observation per country. We note this and do not rely on it.
+**Treatment outcomes appear intermediate (33.0%), but the appearance is repeated zeros.** Sixty-five of its 66 continuous variables are zero-modal -- they are counts of rare outcomes in disaggregated categories, mostly zero in most countries -- and excluding zero-to-zero pairs the file falls to 6.5%, the lowest of the three large files (Table 2). It is a counted file whose counts are usually zero, not a third kind. It also has the highest proportion of untestable variables (24 of 91), which we note and do not rely on.
+
+The variables driving this are identifiable individually. Table 3 lists the five estimate-like variables of the budget and expenditure files, all of them hospitalisation or visit quantities; Table 4 lists the six least repetitive variables of the same two files for contrast, all of them counts or amounts.
 
 **Table 3. The five estimate-like variables in the budget and expenditure files.**
 
@@ -99,8 +101,6 @@ Of 443 variables meeting the inclusion threshold across the six files, **42 are 
 | `cf_tot_usaid` | 628 | 182 | 64.4% | 0.29 | 64.3% | 49.1% |
 | `hcfvisit_mdr` | 1,364 | 197 | 61.6% | 0.14 | 11.1% | 40.4% |
 | `hospd_prct_dstb` | 1,467 | 92 | 61.5% | 0.06 | 9.8% | 48.0% |
-
-Reported separately as categorical: `hosp_type_mdr` (n = 1,631; 4 distinct values).
 
 **Table 4. For contrast, the six least-repetitive variables in the budget and expenditure files.**
 
@@ -231,6 +231,10 @@ Two changes would settle this at source: a vintage flag for each value, which th
 ## Figure captions
 
 **Figure 1. Repetition by dataset, before and after excluding repeated zeros.** Each point is one continuous variable; the horizontal position is the share of that variable's adjacent country-year pairs holding an identical value. The vertical rule marks the dataset median. The left panel uses all adjacent pairs; the right panel uses only pairs in which at least one of the two values is non-zero, since a repeated zero is a stable absence rather than a carried-forward estimate. Laboratory diagnostic services, shown in a separate colour, separates from the other five datasets in both panels, and the separation is wider in the right panel. TPT, tuberculosis preventive treatment.
+
+**Figure 2. How each variable moves through the screen.** The 443 numeric variables with at least 100 observations, showing the two rules that set variables aside before classification and the four signatures on which the remainder are scored, with the count at each step. S0, categorical rule; S0b, untestable-on-repetition rule.
+
+*Alt text: A flow diagram beginning with 443 numeric variables. A first rule sets aside 42 categorical variables, a second sets aside 43 that cannot be tested for repetition, leaving 358 continuous variables scored on four signatures and classified as 206 measurement-like, 68 mixed and 84 estimate-like.*
 
 *Alt text: Two side-by-side dot plots of six WHO tuberculosis datasets. In the left panel most datasets cluster below 20% repetition while laboratory diagnostic services sits around 63%. In the right panel, excluding pairs where both values are zero, the other datasets fall to between 2% and 9% while laboratory diagnostic services remains at 48%, so the gap widens.*
 
