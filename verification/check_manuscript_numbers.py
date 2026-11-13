@@ -110,13 +110,55 @@ def main() -> int:
             check(f"Table 2 {label} zero-modal",
                   s["zero_modal"].replace("/", " / "), cells[3], errors)
 
+    errors += check_activity_counts()
+
     if errors:
-        print(f"FAILED: {len(errors)} mismatch(es) between paper B and the screen")
+        print(f"FAILED: {len(errors)} mismatch(es) between the papers and the code")
         print("\n".join(errors))
         return 1
     print(f"PASSED: all {len(LABELS)} rows of paper B's Tables 1 and 2 match "
-          f"the screen's current output")
+          f"the screen's current output, and every count of budget_prog's "
+          f"activities in paper A matches the collection form")
     return 0
+
+
+WORDS = {w: n for n, w in enumerate(
+    "zero one two three four five six seven eight nine ten eleven twelve thirteen "
+    "fourteen fifteen sixteen seventeen eighteen nineteen twenty".split())}
+
+
+def check_activity_counts() -> list[str]:
+    """Paper A says how many activities WHO's form pools into budget_prog,
+    in several phrasings. The count was typed as fourteen and was wrong --
+    the form lists fifteen -- and the error had reached the text, a figure
+    and the cover letter. The true count is read from the code, which counts
+    it from the form, and every phrasing must agree with it:
+      a total ("pools fifteen activities", "one of fifteen activities")
+      must equal the count;
+      "N other activities" must be the count less one (one intervention's
+      view) or less three (the three pooled interventions together)."""
+    sys.path.insert(0, str(ROOT / "src"))
+    from provenance.existence import BUDGET_PROG_ACTIVITIES as total
+    errs = []
+    files = [ROOT / "manuscript" / "manuscript_draft_v1.md",
+             ROOT / "manuscript" / "submission" / "paper_a" / "02_cover_letter.md"]
+    num = r"(\d+|" + "|".join(WORDS) + r")"
+    for f in files:
+        text = f.read_text(encoding="utf-8")
+        i = text.find("## Notes for the author")
+        text = text[:i] if i != -1 else text
+        for m in re.finditer(rf"(?i)\b{num} other activities\b", text):
+            n = int(m.group(1)) if m.group(1).isdigit() else WORDS[m.group(1).lower()]
+            if n not in (total - 1, total - 3):
+                errs.append(f"  {f.name}: '{m.group(0)}' -- expected {total - 1} or "
+                            f"{total - 3} (form lists {total})")
+        for m in re.finditer(rf"(?i)\b(?:pools?|pooling|one of|absorbs?|among)\s+{num}\s+(?:pooled\s+)?activities"
+                             rf"|\b{num}\s+(?:pooled\s+)?activities\s+(?:pooled|in one number)", text):
+            word = next(g for g in m.groups() if g)
+            n = int(word) if word.isdigit() else WORDS[word.lower()]
+            if n != total:
+                errs.append(f"  {f.name}: '{m.group(0)}' -- the form lists {total}")
+    return errs
 
 
 if __name__ == "__main__":

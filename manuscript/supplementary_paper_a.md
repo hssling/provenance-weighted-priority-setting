@@ -26,9 +26,9 @@ Table 2 of the main text classifies each intervention. This table gives the evid
 
 Notes on the pooled and commodity-only conditions, verbatim from the code:
 
-- **Airborne infection prevention and control** — budget_prog names 'infection control' among fourteen activities pooled in one figure, from staff supervision to drug procurement management.
-- **Active case finding** — budget_prog names 'active case-finding' among fourteen pooled activities.
-- **Private-sector engagement** — budget_prog names 'public-private mix activities' among fourteen pooled activities.
+- **Airborne infection prevention and control** — budget_prog names 'infection control' among 15 activities pooled in one figure, from staff supervision to drug procurement management.
+- **Active case finding** — budget_prog names 'active case-finding' among 15 pooled activities.
+- **Private-sector engagement** — budget_prog names 'public-private mix activities' among 15 pooled activities.
 - **TB preventive therapy** — budget_tpt covers TB preventive treatment drugs only. Delivery, contact tracing and adherence support are not covered; the form puts contact investigation in budget_prog, pooled.
 - **Shorter all-oral regimen rollout (BPaL/BPaL-M)** — budget_sld covers drugs to treat drug-resistant TB only. Rollout programme work is not covered; DR-TB programme costs sit in budget_mdrmgt, which no node maps to.
 - **Integrated TB-HIV-diabetes care** — budget_tbhiv covers collaborative TB/HIV activities. The diabetes arm is not covered.

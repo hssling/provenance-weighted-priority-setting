@@ -318,7 +318,7 @@ was found only by going to WHO's report repository.
 
 **What the finding becomes, and it is stronger.** Not absence but non-separability: **no intervention of the eleven
 has a budget line of its own**. Two have none; three (infection control, active case finding, private-sector
-engagement) are named inside `budget_prog`, one figure pooling fourteen activities; three are covered only as a drug
+engagement) are named inside `budget_prog`, one figure pooling fifteen activities; three are covered only as a drug
 or one arm; three sit in a line far broader than themselves. For none of the eleven can a published figure answer
 "what did this cost?" The division is procurement, not priority: lines name what a programme buys, and pool what it
 does.

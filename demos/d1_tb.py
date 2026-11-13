@@ -29,7 +29,7 @@ from provenance.evpr import (PRIORS, evpr_prior_sensitivity, observations_from_r
                              round_to_se)
 from provenance.existence import (NODE_LABELS, TB_BUDGET_MAPPING,  # noqa: E402
                                   TB_BUDGET_COMMODITY_ONLY, TB_BUDGET_POOLED,
-                                  existence_report)
+                                  BUDGET_PROG_ACTIVITIES, existence_report)
 from provenance.identity import identity_score                                    # noqa: E402
 from provenance.implausibility import derive_bound, implausibility_score          # noqa: E402
 from provenance.propagate import provenance_from_results, rank_changes            # noqa: E402
@@ -524,7 +524,7 @@ def build_summary(c: dict) -> str:
     P("")
     P(f"T5 existence: of {len(inv)} interventions, {len(none)} have no WHO budget line at all "
       f"(ranks {', '.join(map(str, none))}); {n('pooled')} are named by the data collection form "
-      f"inside budget_prog, a line pooling fourteen activities; {n('commodity')} map to a line "
+      f"inside budget_prog, a line pooling {BUDGET_PROG_ACTIVITIES} activities; {n('commodity')} map to a line "
       f"covering the commodity or one arm only; {n('dominant')} map to a line whose scope is "
       "largely theirs. None has a line of its own. Reported separately, not folded into any "
       "composite.")

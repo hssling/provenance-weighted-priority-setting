@@ -26,9 +26,15 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "src"))
 sys.path.insert(0, str(ROOT / "demos"))
 OUT = Path(__file__).resolve().parent
-DPI = 300
-WIDTH_IN = 15.5                        # tight bbox crops, so draw wider than
-                                       # 12 in and assert the result in save()
+# Drawn at about IJE's stated 300 mm width and rendered at 360 dpi, so the file
+# exceeds the 3600-pixel minimum while the text stays large relative to the
+# figure. An earlier 15.5 in canvas met the pixel rule but shrank 14 pt labels
+# to about 6 pt at a 170 mm print width -- the "large figures with tiny labels"
+# the journal's guidelines warn against. PRINT_MIN_PT is asserted in save().
+DPI = 400
+WIDTH_IN = 12.0
+PRINT_WIDTH_IN = 170 / 25.4            # full-page width in print
+PRINT_MIN_PT = 7.0
 
 # One restrained palette, colour-blind safe, used by both figures.
 INK = "#1a1a1a"
@@ -52,13 +58,36 @@ plt.rcParams.update({
 
 def save(fig, name: str) -> None:
     path = OUT / name
+    # Smallest text in the figure, in points, before it is saved.
+    fig.canvas.draw()
+    sizes = [t.get_fontsize() for t in fig.findobj(matplotlib.text.Text)
+             if t.get_text().strip() and t.get_visible()]
+    smallest = min(sizes) if sizes else 0
+    # No two pieces of text may overlap. Paper B's two panel axis labels once
+    # ran into each other and off the canvas; nothing caught it but a look.
+    r = fig.canvas.get_renderer()
+    texts = [(t, t.get_window_extent(renderer=r)) for t in fig.findobj(matplotlib.text.Text)
+             if t.get_text().strip() and t.get_visible()]
+    for i, (ta, a) in enumerate(texts):
+        for tb, b in texts[i + 1:]:
+            w_ = min(a.x1, b.x1) - max(a.x0, b.x0)
+            h_ = min(a.y1, b.y1) - max(a.y0, b.y0)
+            assert not (w_ > 2 and h_ > 2), (
+                f"{name}: text {ta.get_text()[:30]!r} overlaps {tb.get_text()[:30]!r}")
     fig.savefig(path, dpi=DPI, bbox_inches="tight", facecolor="white")
     plt.close(fig)
     from PIL import Image
     with Image.open(path) as im:
         w, h = im.size
     assert w >= 3600, f"{name}: {w}px wide, IJE requires at least 3600"
-    print(f"  {name}: {w} x {h} px at {DPI} dpi")
+    # The saved image is w/DPI inches wide; printed at full-page width every
+    # font scales by PRINT_WIDTH_IN / (w/DPI).
+    printed = smallest * PRINT_WIDTH_IN / (w / DPI)
+    assert printed >= PRINT_MIN_PT, (
+        f"{name}: smallest text prints at {printed:.1f} pt at 170 mm width; "
+        f"minimum is {PRINT_MIN_PT} pt")
+    print(f"  {name}: {w} x {h} px at {DPI} dpi; smallest text "
+          f"{smallest:.1f} pt prints at {printed:.1f} pt at 170 mm")
 
 
 # --------------------------------------------------------------------------
@@ -82,10 +111,20 @@ def figure_a1() -> None:
     ax.plot(years, [0] * len(years), marker="s", markersize=11, linewidth=3,
             color=BLUE, label="Funding gap as reported to WHO\n"
                               "(budget required minus funding expected)", zorder=3)
-    for x, y in zip(years, shortfall):
+    # Labels sit above their points. A label just above a local minimum lands
+    # on the segment climbing out of it, as "6.0%" did on the steep 2021-2022
+    # rise, so minima are lifted clear of both segments. They cannot go below:
+    # the WHO series runs along zero with a marker under every year.
+    # Endpoints are never minima -- they have only one neighbour.
+    for k, (x, y) in enumerate(zip(years, shortfall)):
+        is_min = (0 < k < len(shortfall) - 1
+                  and y < shortfall[k - 1] and y < shortfall[k + 1])
         ax.annotate(f"{y:.1f}%", (x, y), textcoords="offset points",
-                    xytext=(0, 13), ha="center", fontsize=13, color=ORANGE)
-    ax.set_ylabel("Shortfall, % of amount requested")
+                    xytext=(0, 34 if is_min else 13), ha="center",
+                    va="bottom", fontsize=13, color=ORANGE)
+    # The WHO series is a share of budget REQUIRED, the national series a share
+    # of the amount REQUESTED; the axis must not describe only one of them.
+    ax.set_ylabel("Gap, % of amount required or requested")
     ax.set_xlabel("Fiscal year")
     ax.set_ylim(-4, max(shortfall) + 12)
     ax.set_xticks(years)
@@ -120,11 +159,11 @@ def figure_b1() -> None:
         if r["repetition_nz"]:
             nz[r["dataset"]].append(float(r["repetition_nz"]) * 100)
 
-    fig, axes = plt.subplots(1, 2, figsize=(WIDTH_IN, WIDTH_IN * 0.50),
-                             sharey=True)
+    fig, axes = plt.subplots(1, 2, figsize=(WIDTH_IN, WIDTH_IN * 0.56),
+                             sharey=True, layout="constrained")
     for ax, data, title in (
-            (axes[0], allp, "All adjacent country-year pairs"),
-            (axes[1], nz, "Excluding pairs where both values are zero")):
+            (axes[0], allp, "All adjacent\ncountry-year pairs"),
+            (axes[1], nz, "Excluding pairs in which\nboth values are zero")):
         for i, key in enumerate(order):
             vals = data.get(key, [])
             if not vals:
@@ -136,16 +175,26 @@ def figure_b1() -> None:
                 sum(sorted(vals)[len(vals) // 2 - 1:len(vals) // 2 + 1]) / 2
             ax.plot([med], [i], marker="|", markersize=30, markeredgewidth=4,
                     color=INK, zorder=4)
+            # A median near zero puts a centred label on the axis spine, as
+            # "1.9%" was; set those to the right of the marker instead.
+            near_axis = med < 8
             ax.annotate(f"{med:.1f}%", (med, i), textcoords="offset points",
-                        xytext=(0, 16), ha="center", fontsize=13, color=INK)
+                        xytext=(14, 9) if near_axis else (0, 16),
+                        ha="left" if near_axis else "center", fontsize=13, color=INK)
         ax.set_yticks(range(len(order)))
         ax.set_yticklabels([labels[k] for k in order], fontsize=14)
         ax.set_xlim(-3, 103)
-        ax.set_xlabel("Variables repeating the previous year's value, %")
         ax.set_title(title, fontsize=15, pad=26)
         ax.grid(axis="x", color="#ededed", linewidth=0.8, zorder=0)
         ax.set_axisbelow(True)
     axes[0].set_ylim(-0.7, len(order) - 0.3)
+    # One shared axis label, and an accurate one. Each point is a variable and
+    # its position is the share of THAT variable's adjacent country-year pairs
+    # that are identical. The earlier per-panel label, "variables repeating the
+    # previous year's value, %", read as a share of variables -- the caption was
+    # right and the axis contradicted it -- and the two labels also collided.
+    fig.supxlabel("Adjacent country-year pairs holding an identical value, %\n"
+                  "(each point is one variable)", fontsize=14)
     save(fig, "figure_b2_repetition_by_dataset.png")
 
 
@@ -158,7 +207,8 @@ def figure_a2() -> None:
     them on the same one.
     """
     from provenance.existence import (NODE_LABELS, TB_BUDGET_MAPPING,
-                                      TB_BUDGET_COMMODITY_ONLY, TB_BUDGET_POOLED)
+                                      TB_BUDGET_COMMODITY_ONLY, TB_BUDGET_POOLED,
+                                      BUDGET_PROG_ACTIVITIES)
 
     short = {
         "molecular_dx": "Molecular diagnostics", "airborne_ipc": "Airborne infection control",
@@ -172,15 +222,20 @@ def figure_a2() -> None:
              "budget_patsup", "budget_tbhiv", None]
     line_label = {
         "budget_lab": "budget_lab\nall laboratory costs",
-        "budget_prog": "budget_prog\nfourteen activities pooled",
+        "budget_prog": f"budget_prog\n{BUDGET_PROG_ACTIVITIES} activities pooled",
         "budget_tpt": "budget_tpt\npreventive-treatment drugs",
         "budget_sld": "budget_sld\ndrug-resistant TB drugs",
         "budget_patsup": "budget_patsup\nall patient support",
         "budget_tbhiv": "budget_tbhiv\nTB/HIV activities",
         None: "no WHO budget line",
     }
-    style = {"pooled": (ORANGE, "-"), "commodity": (BLUE, "--"),
-             "dominant": (BLUE, "-"), "none": (GREY, ":")}
+    # Every condition gets its own line style, so the figure survives greyscale
+    # printing and colour-blind reading. Pooled and dominant were once both
+    # solid, told apart only by orange against blue -- two colours of nearly
+    # equal luminance, which print as the same grey. Pooled is also drawn
+    # heavier, since it carries the finding.
+    style = {"pooled": (ORANGE, "-", 3.6), "commodity": (BLUE, "--", 2.4),
+             "dominant": (BLUE, "-.", 2.4), "none": (GREY, ":", 2.4)}
 
     def cond(k):
         if TB_BUDGET_MAPPING[k] is None:
@@ -198,9 +253,9 @@ def figure_a2() -> None:
           for i, ln in enumerate(lines)}
 
     for k in keys:
-        c, ls = style[cond(k)]
+        c, ls, lw = style[cond(k)]
         ax.annotate("", xy=(0.62, ry[TB_BUDGET_MAPPING[k]]), xytext=(0.16, ly[k]),
-                    arrowprops=dict(arrowstyle="-|>", color=c, lw=2.4,
+                    arrowprops=dict(arrowstyle="-|>", color=c, lw=lw,
                                     linestyle=ls, alpha=0.85,
                                     connectionstyle="arc3,rad=0.12"), zorder=2)
         ax.text(0.15, ly[k], short[k], ha="right", va="center", fontsize=14)
@@ -211,10 +266,12 @@ def figure_a2() -> None:
 
     from matplotlib.lines import Line2D
     ax.legend(handles=[
-        Line2D([], [], color=ORANGE, lw=2.4, ls="-", label="Pooled: named by the form inside a line shared with others"),
-        Line2D([], [], color=BLUE, lw=2.4, ls="--", label="Commodity only: the drug or one arm, not the delivery"),
-        Line2D([], [], color=BLUE, lw=2.4, ls="-", label="Dominant: the line's scope is largely this activity"),
-        Line2D([], [], color=GREY, lw=2.4, ls=":", label="No line covers the activity"),
+        Line2D([], [], color=c, lw=lw, ls=ls, label=lab)
+        for (c, ls, lw), lab in (
+            (style["pooled"], "Pooled: named by the form inside a line shared with others"),
+            (style["commodity"], "Commodity only: the drug or one arm, not the delivery"),
+            (style["dominant"], "Dominant: the line's scope is largely this activity"),
+            (style["none"], "No line covers the activity"))
     ], frameon=False, loc="upper center", bbox_to_anchor=(0.5, -0.02),
         ncol=2, fontsize=13.5)
     ax.set_xlim(-0.52, 1.25)
@@ -239,7 +296,7 @@ def figure_b2() -> None:
                 for v in ("measurement-like", "mixed", "estimate-like")}
     n_cont = sum(verdicts.values())
 
-    fig, ax = plt.subplots(figsize=(WIDTH_IN, WIDTH_IN * 0.60))
+    fig, ax = plt.subplots(figsize=(WIDTH_IN, WIDTH_IN * 0.80))
 
     boxes = []
 
@@ -253,28 +310,39 @@ def figure_b2() -> None:
         ax.annotate("", xy=(x2, y2), xytext=(x1, y1),
                     arrowprops=dict(arrowstyle="-|>", color=c, lw=2.0), zorder=1)
 
-    box(0.5, 0.93, 0.52, 0.09,
+    box(0.5, 0.93, 0.64, 0.09,
         f"{n_all} numeric variables\nwith at least 100 observations")
     arrow(0.5, 0.885, 0.5, 0.80)
-    box(0.5, 0.755, 0.52, 0.085, "S0  five or fewer distinct values?")
-    arrow(0.76, 0.755, 0.90, 0.755, GREY)
-    box(1.06, 0.755, 0.30, 0.075, f"categorical\n({cat})", edge=GREY, face="#f4f4f4", fs=13.5)
+    # Branches are labelled. Unlabelled, the side arrows meant opposite things:
+    # "yes" at S0 (five or fewer values -> categorical) but "no" at S0b (no
+    # adjacent years -> untestable), which a reader could only guess.
+    def branch(x, y, word, ha="left"):
+        ax.text(x, y, word, ha=ha, va="bottom", fontsize=13, style="italic",
+                color=INK, zorder=3)
+
+    box(0.5, 0.755, 0.64, 0.085, "S0  five or fewer distinct values?")
+    arrow(0.82, 0.755, 0.94, 0.755, GREY)
+    branch(0.835, 0.762, "yes")
+    box(1.10, 0.755, 0.30, 0.075, f"categorical\n({cat})", edge=GREY, face="#f4f4f4", fs=13.5)
     arrow(0.5, 0.712, 0.5, 0.635)
-    box(0.5, 0.59, 0.52, 0.085, "S0b  any country with adjacent years?")
-    arrow(0.76, 0.59, 0.90, 0.59, GREY)
-    box(1.06, 0.59, 0.30, 0.075,
+    branch(0.515, 0.655, "no")
+    box(0.5, 0.59, 0.64, 0.085, "S0b  any country with adjacent years?")
+    arrow(0.82, 0.59, 0.94, 0.59, GREY)
+    branch(0.835, 0.597, "no")
+    box(1.10, 0.59, 0.30, 0.075,
         f"untestable\n({untestable})", edge=GREY, face="#f4f4f4", fs=13.5)
     arrow(0.5, 0.547, 0.5, 0.47)
-    box(0.5, 0.425, 0.74, 0.105,
+    branch(0.515, 0.49, "yes")
+    box(0.5, 0.425, 0.92, 0.105,
         f"{n_cont} continuous variables, each scored on four signatures:\n"
         "repetition  ·  distinct ratio  ·  modal share  ·  roundness")
     arrow(0.5, 0.372, 0.5, 0.30)
-    box(0.5, 0.255, 0.44, 0.075, "how many signatures does it trip?")
-    for x, lab, n, col in ((0.17, "none or one", verdicts["measurement-like"], BLUE),
+    box(0.5, 0.255, 0.58, 0.075, "how many signatures does it trip?")
+    for x, lab, n, col in ((0.16, "none or one", verdicts["measurement-like"], BLUE),
                            (0.5, "two", verdicts["mixed"], GREY),
-                           (0.83, "three or four", verdicts["estimate-like"], ORANGE)):
+                           (0.84, "three or four", verdicts["estimate-like"], ORANGE)):
         arrow(0.5, 0.217, x, 0.145, col)
-        box(x, 0.095, 0.30, 0.095,
+        box(x, 0.095, 0.32, 0.095,
             f"{lab}\n{'measurement-like' if col is BLUE else 'mixed' if col is GREY else 'estimate-like'}"
             f"\n({n})", edge=col, fs=13.5)
     ax.set_xlim(0.0, 1.30)
@@ -294,7 +362,7 @@ def figure_b2() -> None:
 
 
 if __name__ == "__main__":
-    print("writing figures at 300 dpi:")
+    print(f"writing figures at {DPI} dpi:")
     figure_a1()
     figure_a2()
     figure_b2()

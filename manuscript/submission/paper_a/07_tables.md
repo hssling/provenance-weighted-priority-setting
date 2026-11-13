@@ -21,13 +21,13 @@
 | Rank | Intervention | WHO budget line | Coverage |
 |---:|---|---|---|
 | 1 | Molecular diagnostic scale-up (Xpert MTB/RIF, MTB/XDR) | `budget_lab` | Dominant — shared with all laboratory costs |
-| 2 | Airborne infection prevention and control | `budget_prog` | **Pooled** — one of fourteen activities |
+| 2 | Airborne infection prevention and control | `budget_prog` | **Pooled** — one of fifteen activities |
 | 3 | TB preventive therapy | `budget_tpt` | Commodity only — *drugs* |
 | 4 | Whole-genome sequencing for DST prediction | `budget_lab` | Dominant — shared with all laboratory costs |
-| 5 | Active case finding | `budget_prog` | **Pooled** — one of fourteen activities |
+| 5 | Active case finding | `budget_prog` | **Pooled** — one of fifteen activities |
 | 6 | Shorter all-oral regimen rollout (BPaL/BPaL-M) | `budget_sld` | Commodity only — *drugs* |
 | 7 | Bovine tuberculosis control | — | **No line** |
-| 8 | Private-sector engagement | `budget_prog` | **Pooled** — one of fourteen activities |
+| 8 | Private-sector engagement | `budget_prog` | **Pooled** — one of fifteen activities |
 | 9 | Nutritional support | `budget_patsup` | Dominant — shared with all patient support |
 | 10 | Milk pasteurisation / dairy food chain | — | **No line** |
 | 11 | Integrated TB-HIV-diabetes care | `budget_tbhiv` | Commodity only — *TB/HIV arms* |

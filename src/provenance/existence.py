@@ -12,6 +12,7 @@ scored as absence, so it is not a TestResult.
 from __future__ import annotations
 
 import csv
+import re
 from dataclasses import dataclass
 
 from .series import BUDGET_CSV
@@ -73,6 +74,14 @@ DCF_DEFINITIONS: dict[str, str] = {
                     "HIV-related TB.",
 }
 
+# How many distinct activities the form pools into budget_prog, counted from its
+# own definition rather than typed. A typed "fourteen" was wrong by one -- the form
+# lists fifteen -- and had spread into the paper, a figure and the notes below
+# before anyone counted.
+BUDGET_PROG_ACTIVITIES: int = len(
+    [x for x in re.split(r",\s*(?:and\s+)?", DCF_DEFINITIONS["budget_prog"].rstrip("."))
+     if x.strip()])
+
 # Node key -> WHO TB budget column, or None when no line covers the activity at all. Judged
 # against DCF_DEFINITIONS, not against the column name and not against the dictionary's
 # abbreviation. check_mapping_targets() guards typos; it cannot catch a wrong-but-real column,
@@ -96,11 +105,13 @@ TB_BUDGET_MAPPING: dict[str, str | None] = {
 # number. This is a different condition from having no line, and from having a line that
 # covers only a commodity, so it is recorded separately rather than collapsed into either.
 TB_BUDGET_POOLED: dict[str, str] = {
-    "airborne_ipc": "budget_prog names 'infection control' among fourteen activities pooled in "
-                    "one figure, from staff supervision to drug procurement management.",
-    "acf": "budget_prog names 'active case-finding' among fourteen pooled activities.",
-    "private_sector": "budget_prog names 'public-private mix activities' among fourteen pooled "
-                      "activities.",
+    "airborne_ipc": f"budget_prog names 'infection control' among {BUDGET_PROG_ACTIVITIES} "
+                    "activities pooled in one figure, from staff supervision to drug procurement "
+                    "management.",
+    "acf": f"budget_prog names 'active case-finding' among {BUDGET_PROG_ACTIVITIES} pooled "
+           "activities.",
+    "private_sector": f"budget_prog names 'public-private mix activities' among "
+                      f"{BUDGET_PROG_ACTIVITIES} pooled activities.",
 }
 
 # Node keys mapped to a budget line that covers only part of the node. Mapped, so not invisible
