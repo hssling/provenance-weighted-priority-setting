@@ -93,10 +93,10 @@ Paper B was rebuilt on 14 November 2026 as a vintage analysis of WHO's archived 
 never revised*). Five tables and two figures, within IJE's eight. Its cover letter says the companion goes to
 IJTB and that IJTB-S-26-01305 is **under review**.
 
-**Before submitting Paper B: cut a new Zenodo release.** The cited deposit, v1.0.0, predates the vintage
-analysis and does not contain `demos/d3_vintages.py` or the fetch tools. Publish a GitHub release (v1.1.0)
-so Zenodo mints a new version DOI, then replace 10.5281/zenodo.24187367 with it in Paper B's manuscript,
-title page and cover letter. Paper A can keep v1.0.0, which contains everything it reports.
+**Deposit for Paper B: done.** Release v1.1.0 (14 November 2026) is archived at Zenodo as
+doi:10.5281/zenodo.24214490, which contains the vintage analysis and the fetch tools; Paper B's
+manuscript, title page and cover letter cite it. Paper A keeps v1.0.0 (doi:10.5281/zenodo.24187367),
+which contains everything it reports. Both resolve under the concept DOI 10.5281/zenodo.24187366.
 
 ---
 

@@ -30,7 +30,7 @@ ORCID 0000-0002-4771-8285
 
 **Ethical approval.** Not required. The study uses only published aggregate data, with no individual-level records and no patient-identifiable information.
 
-**Data and code availability.** The public WHO datasets, the analysis code and the verification suite are deposited at https://github.com/hssling/provenance-weighted-priority-setting and archived at Zenodo, doi:10.5281/zenodo.24187367 (release v1.0.0; the concept DOI doi:10.5281/zenodo.24187366 always resolves to the latest version). WHO's report-repository files carry no licence and are not redistributed; the deposited fetch script downloads them from pinned commits and verifies each against its recorded SHA-256 digest.
+**Data and code availability.** The public WHO datasets, the analysis code and the verification suite are deposited at https://github.com/hssling/provenance-weighted-priority-setting and archived at Zenodo, doi:10.5281/zenodo.24214490 (release v1.1.0; the concept DOI doi:10.5281/zenodo.24187366 always resolves to the latest version). WHO's report-repository files carry no licence and are not redistributed; the deposited fetch script downloads them from pinned commits and verifies each against its recorded SHA-256 digest.
 
 **Use of generative AI.** The author used a large language model as a drafting and analysis assistant. All analytical decisions, verification and conclusions are the author's, who takes full responsibility for the content.
 

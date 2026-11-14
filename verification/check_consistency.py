@@ -39,7 +39,9 @@ PAPERS = {
     "paper B": dict(src=M / "manuscript_b_draft_v1.md", supp=M / "supplementary_paper_b.md",
                     folder=S / "paper_b", intro="## 1. Background"),
 }
-DEPOSIT_DOIS = {"10.5281/zenodo.24187367", "10.5281/zenodo.24187366"}
+# v1.0.0 (paper A), v1.1.0 (paper B, adds the vintage analysis), and the concept DOI.
+DEPOSIT_DOIS = {"10.5281/zenodo.24187367", "10.5281/zenodo.24214490",
+                "10.5281/zenodo.24187366"}
 AUTHOR = {"name": "Siddalingaiah H S", "orcid": "0000-0002-4771-8285",
           "email": "hssling@yahoo.com"}
 

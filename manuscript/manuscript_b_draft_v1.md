@@ -64,7 +64,7 @@ To test whether the six inputs are exceptional among WHO's TB data, every numeri
 
 ### 2.4 Reproducibility and reporting
 
-All analyses are in Python with no third-party numerical dependency; R is used once, to convert WHO's R data files to text unchanged. One command regenerates every number and table from the fetched files [10]. A large language model was used as a drafting and analysis assistant; every analytical decision, the code and its verification are the author's. Code: https://github.com/hssling/provenance-weighted-priority-setting, doi:10.5281/zenodo.24187367. The study is reported following RECORD. Ethical approval was not required: the data are aggregated and public.
+All analyses are in Python with no third-party numerical dependency; R is used once, to convert WHO's R data files to text unchanged. One command regenerates every number and table from the fetched files [10]. A large language model was used as a drafting and analysis assistant; every analytical decision, the code and its verification are the author's. Code: https://github.com/hssling/provenance-weighted-priority-setting, doi:10.5281/zenodo.24214490. The study is reported following RECORD. Ethical approval was not required: the data are aggregated and public.
 
 ---
 
@@ -232,7 +232,7 @@ WHO never revises the TB country data it publishes, countries restate most of th
 
 **Funding.** None. **Competing interests.** None declared. **Ethical clearance.** Not required (§2.4).
 
-**Data availability.** The public WHO datasets are archived with the code at https://github.com/hssling/provenance-weighted-priority-setting and archived at Zenodo, doi:10.5281/zenodo.24187367 (release v1.0.0; the concept DOI doi:10.5281/zenodo.24187366 always resolves to the latest version). WHO's report-repository files carry no licence and are not redistributed; tools/fetch_vintages.py downloads them from pinned commits and verifies each against the SHA-256 digest recorded in data/vintages/vintage_manifest.csv.
+**Data availability.** The public WHO datasets are archived with the code at https://github.com/hssling/provenance-weighted-priority-setting and archived at Zenodo, doi:10.5281/zenodo.24214490 (release v1.1.0; the concept DOI doi:10.5281/zenodo.24187366 always resolves to the latest version). WHO's report-repository files carry no licence and are not redistributed; tools/fetch_vintages.py downloads them from pinned commits and verifies each against the SHA-256 digest recorded in data/vintages/vintage_manifest.csv.
 
 **Use of generative AI.** The author used a large language model as a drafting and analysis assistant. All analytical decisions, verification and conclusions are the author's, who takes full responsibility.
 
@@ -241,5 +241,5 @@ WHO never revises the TB country data it publishes, countries restate most of th
 ## Notes for the author — not for submission
 
 1. Rebuilt 14 November 2026 around a vintage analysis of WHO's archived releases (demos/d3_vintages.py). Tables 1-4 are rendered by manuscript/make_tables_b.py and checked verbatim; Table 5 is checked against demos/d2_who_data_screen.py.
-2. The Zenodo deposit (v1.0.0) predates the vintage analysis. Before submitting, cut a new release (v1.1.0) so the cited DOI contains demos/d3_vintages.py and the fetch tools, and update the version DOI here, in the title page and in the cover letter.
+2. [done 14 Nov 2026] Release v1.1.0 published; Zenodo version DOI 10.5281/zenodo.24214490 (contains demos/d3_vintages.py and the fetch tools) now cited here, on the title page and in the cover letter. Paper A keeps v1.0.0 (10.5281/zenodo.24187367), which contains everything it reports.
 3. Ho 2017 was read against the sentence it supports (decentralised care outcomes). Aruoba 2008 verified on Crossref; supports "revisions are large and not well behaved".

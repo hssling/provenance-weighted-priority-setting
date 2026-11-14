@@ -64,7 +64,7 @@ To test whether the six inputs are exceptional among WHO's TB data, every numeri
 
 ### 2.4 Reproducibility and reporting
 
-All analyses are in Python with no third-party numerical dependency; R is used once, to convert WHO's R data files to text unchanged. One command regenerates every number and table from the fetched files.^10^ A large language model was used as a drafting and analysis assistant; every analytical decision, the code and its verification are the author's. Code: https://github.com/hssling/provenance-weighted-priority-setting, doi:10.5281/zenodo.24187367. The study is reported following RECORD. Ethical approval was not required: the data are aggregated and public.
+All analyses are in Python with no third-party numerical dependency; R is used once, to convert WHO's R data files to text unchanged. One command regenerates every number and table from the fetched files.^10^ A large language model was used as a drafting and analysis assistant; every analytical decision, the code and its verification are the author's. Code: https://github.com/hssling/provenance-weighted-priority-setting, doi:10.5281/zenodo.24214490. The study is reported following RECORD. Ethical approval was not required: the data are aggregated and public.
 
 ---
 
@@ -186,7 +186,7 @@ WHO never revises the TB country data it publishes, countries restate most of th
 
 **Funding.** None. **Competing interests.** None declared. **Ethical clearance.** Not required (§2.4).
 
-**Data availability.** The public WHO datasets are archived with the code at https://github.com/hssling/provenance-weighted-priority-setting and archived at Zenodo, doi:10.5281/zenodo.24187367 (release v1.0.0; the concept DOI doi:10.5281/zenodo.24187366 always resolves to the latest version). WHO's report-repository files carry no licence and are not redistributed; tools/fetch_vintages.py downloads them from pinned commits and verifies each against the SHA-256 digest recorded in data/vintages/vintage_manifest.csv.
+**Data availability.** The public WHO datasets are archived with the code at https://github.com/hssling/provenance-weighted-priority-setting and archived at Zenodo, doi:10.5281/zenodo.24214490 (release v1.1.0; the concept DOI doi:10.5281/zenodo.24187366 always resolves to the latest version). WHO's report-repository files carry no licence and are not redistributed; tools/fetch_vintages.py downloads them from pinned commits and verifies each against the SHA-256 digest recorded in data/vintages/vintage_manifest.csv.
 
 **Use of generative AI.** The author used a large language model as a drafting and analysis assistant. All analytical decisions, verification and conclusions are the author's, who takes full responsibility.
 
