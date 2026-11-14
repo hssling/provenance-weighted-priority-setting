@@ -6,6 +6,18 @@ Every requirement below was read from the journal's own guidance, and for Paper 
 own IJTB upload set for IJTB-S-26-01305 (read-only, `manuscript_3_TB_BOPAS/IJTB_SUBMISSION/`). Publisher
 guideline PDFs are copyrighted and are never committed.
 
+## Status (14 November 2026)
+
+| Paper | Journal | Manuscript | Status |
+|---|---|---|---|
+| A — What a tuberculosis budget cannot see | Indian Journal of Tuberculosis | **IJTB-D-26-00779** (submitted 13 Nov 2026) | With Editor |
+| B — Restated, never revised | International Journal of Epidemiology | not yet submitted | ready; cites deposit v1.1.0 |
+| (TB-BOPAS, separate repository) | Indian Journal of Tuberculosis | IJTB-D-26-00777 (submitted 12 Nov 2026) | With Editor |
+
+The "IJTB-S-26-..." numbers seen during upload were submission-stage IDs; cite the D-numbers. Paper A's
+files in `paper_a/` are kept as the basis for any revision; the record of what was sent is the portal's
+own PDF under "View Submission".
+
 ---
 
 ## 0. Run the build and the checks

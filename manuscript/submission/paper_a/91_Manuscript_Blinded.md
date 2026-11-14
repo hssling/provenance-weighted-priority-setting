@@ -182,7 +182,7 @@ All inputs are publicly available: the WHO TB budget and expenditure datasets an
 
 9\. World Health Organization. WHO TB data collection form 2026, version 2026-03-25. Geneva: World Health Organization; 2026. Available from: https://github.com/GTB-TME/gtbreport2026 (file doc/who_tb_dcf2026.pdf) [accessed 13 November 2026].
 
-10\. [Author] Drug-resistant tuberculosis in India, 2017–2024: improving outcomes, no worsening axis, and a caution for NTEP trend analysis. Manuscript under review at the Indian Journal of Tuberculosis (IJTB-S-26-01305), submitted 13 November 2026.
+10\. [Author] Drug-resistant tuberculosis in India, 2017–2024: improving outcomes, no worsening axis, and a caution for NTEP trend analysis. Manuscript under review at the Indian Journal of Tuberculosis (IJTB-D-26-00777), submitted 12 November 2026.
 
 11\. Peng RD. Reproducible research in computational science. Science 2011;334(6060):1226–7. doi:10.1126/science.1213847
 

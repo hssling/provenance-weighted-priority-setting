@@ -35,7 +35,7 @@ PAPER_A = REPO / "manuscript" / "manuscript_draft_v1.md"
 PAPER_B = REPO / "manuscript" / "manuscript_b_draft_v1.md"
 
 PRIOR = [
-    ("TB-BOPAS, submitted IJTB-S-26-01305",
+    ("TB-BOPAS, under review IJTB-D-26-00777",
      OUTER / "manuscript_3_TB_BOPAS/IJTB_SUBMISSION/source/manuscript_IJTB_blinded.md"),
     ("OHB manuscript under review (R1)",
      OUTER / "submission_assets_OHB_bopas/REVISION_R1/01_OHB_Manuscript_BLINDED_R1_CLEAN.docx"),

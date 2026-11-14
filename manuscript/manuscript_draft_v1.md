@@ -219,7 +219,7 @@ All inputs are publicly available: the WHO TB budget and expenditure datasets an
 7. [dataset] World Health Organization. Global Tuberculosis Programme country data: TB budget (release of 12 November 2026) and TB expenditure and utilisation (release of 25 August 2026) datasets. Geneva: World Health Organization; 2026. Available from: https://extranet.who.int/tme/ [accessed 13 November 2026]. This data-collection system no longer accepts updates; the input files are archived with the analysis code.
 8. World Health Organization. Global Tuberculosis Programme data dictionary (file TB_dictionary_2026-08-25.csv). Geneva: World Health Organization; 2026. Available from: https://extranet.who.int/tme/ [accessed 13 November 2026].
 9. World Health Organization. WHO TB data collection form 2026, version 2026-03-25. Geneva: World Health Organization; 2026. Available from: https://github.com/GTB-TME/gtbreport2026 (file doc/who_tb_dcf2026.pdf) [accessed 13 November 2026].
-10. Siddalingaiah HS. Drug-resistant tuberculosis in India, 2017–2024: improving outcomes, no worsening axis, and a caution for NTEP trend analysis. Manuscript under review at the Indian Journal of Tuberculosis (IJTB-S-26-01305), submitted 13 November 2026.
+10. Siddalingaiah HS. Drug-resistant tuberculosis in India, 2017–2024: improving outcomes, no worsening axis, and a caution for NTEP trend analysis. Manuscript under review at the Indian Journal of Tuberculosis (IJTB-D-26-00777), submitted 12 November 2026.
 11. Peng RD. Reproducible research in computational science. Science 2011;334(6060):1226–7. doi:10.1126/science.1213847
 12. Benchimol EI, Smeeth L, Guttmann A, Harron K, Moher D, Petersen I, et al. The REporting of studies Conducted using Observational Routinely-collected health Data (RECORD) statement. PLoS Med 2015;12(10):e1001885. doi:10.1371/journal.pmed.1001885
 13. Piatti-Funfkirchen M, Barroy H, Pivodic F, Margini F. Budget execution in health. Washington, DC: World Bank; 2021. doi:10.1596/36583
@@ -243,6 +243,7 @@ All inputs are publicly available: the WHO TB budget and expenditure datasets an
 
 ## Notes for the author — not for submission
 
+0. SUBMITTED to the Indian Journal of Tuberculosis as IJTB-D-26-00779 (13 Nov 2026), status With Editor on 14 Nov. Ref 10 now carries TB-BOPAS's manuscript number IJTB-D-26-00777 for any revision.
 1. Journal history: *Health Policy and Planning* rejected by the author (fully open access with an APC); *Health Policy* not suitable (high-income scope); *Indian Journal of Tuberculosis* chosen 13 November 2026 (subscription journal; no charge unless open access is elected after acceptance).
 2. Ref 10 (TB-BOPAS) was submitted to IJTB on 13 November 2026 and is under review, not in press. Elsevier's guide says "in press" implies acceptance, so it is cited as under review. Update it to "in press" only on an acceptance letter, and to full citation on publication.
 3. Ref 16 (JSSTD) carries the DOI printed on the R14 proof; it returns 404 until publication. Add volume and pages when the issue is released.
