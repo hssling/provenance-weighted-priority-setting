@@ -286,10 +286,13 @@ def write_ijtb_extras(d: Path, lay: dict, src: str) -> None:
                       + m.group(0).strip())
     figures = len(re.findall(r"(?m)^\*\*Figure \d+\.", src))
     assert len(blocks) == figures, f"{len(blocks)} caption blocks for {figures} figures"
-    (d / lay["captions"]).write_text(
+    # Captions cite references too, and must match the manuscript's style:
+    # the IJTB-S-26-01306 portal PDF showed "[7]", "[2]", "[9]" here while the
+    # manuscript itself had superscripts.
+    (d / lay["captions"]).write_text(superscript_citations(
         f"# Figures\n\n**Manuscript.** {title}\n\n"
         "Figures are supplied separately as 600 dpi TIFF files for production; PNG "
-        "previews are embedded below.\n\n" + "\n\n".join(blocks) + "\n", encoding="utf-8")
+        "previews are embedded below.\n\n" + "\n\n".join(blocks) + "\n"), encoding="utf-8")
 
 
 def for_submission(text: str) -> str:

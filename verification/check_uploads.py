@@ -68,7 +68,9 @@ def main() -> int:
     # the source's "[n]". A bracketed citation left in an uploaded manuscript,
     # outside its reference list, means the conversion missed one.
     for key, lay in LAYOUT.items():
-        for role in ("manuscript", "blinded"):
+        for role in ("manuscript", "blinded", "captions"):
+            if role not in lay:
+                continue
             f = S / key / lay[role]
             if not f.exists():
                 continue
