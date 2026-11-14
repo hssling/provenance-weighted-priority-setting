@@ -96,6 +96,13 @@ Author-only steps, none of which can be done for you:
 
 ## 3. Paper B — upload to IJE
 
+Portal: <https://mc.manuscriptcentral.com/ije> (ScholarOne; address confirmed on IJE's own competing-interests form).
+
+IJE also requires two signed forms, filled and signed on 14 November 2026 and kept **local only** (they carry
+the author's signature and are gitignored): `IJE_Conflict_of_Interest_signed.pdf` (Section I, no competing
+interests) and `IJE_Authorship_signed.pdf`. Their manuscript-number boxes are blank because the number is
+assigned on submission; IJE asks for it only "if known".
+
 ```
 paper_b/  01_title_page  02_cover_letter  04_manuscript_unblinded (upload this)  03_manuscript_blinded
           05_RECORD_checklist  06_supplementary  07_tables  08_Figure_1.png  08_Figure_2.png

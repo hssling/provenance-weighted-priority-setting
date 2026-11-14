@@ -18,3 +18,8 @@ manuscript/submission/**/~$*
 # carry no licence, so the files are not redistributed here.
 data/vintages/raw/
 data/vintages/csv/
+
+# The author's signature image, and anything signed with it, never goes to the public repository.
+manuscript/submission/**/*sign*.png
+manuscript/submission/**/*sign*.jpg
+manuscript/submission/**/*_signed.*
