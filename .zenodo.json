@@ -1,6 +1,6 @@
 {
   "title": "Provenance screening for routine health-programme data: an instrument and two applications to WHO tuberculosis datasets",
-  "description": "<p>Reproducible screens that distinguish, from the published file alone, which variables in a country-reported health dataset carry annual measurements and which carry carried-forward estimates or categorical status flags.</p><p>Applied to 443 numeric variables across six WHO Global Tuberculosis Programme datasets (budget; expenditure and utilisation; notifications; treatment outcomes; laboratory diagnostic services; contact tracing and preventive treatment), and to India's national TB financing accounts from the India TB Report 2024.</p><p>Contains: the screening instrument and its five tests; a propagation and expected-value-of-audit module; the archived WHO input files as downloaded; a 255-test verification suite; and FINDINGS.md, a durable record of every verified result and every correction made during development, including four self-corrections found by replication.</p>",
+  "description": "<p>Reproducible screens that distinguish, from the published file alone, which variables in a country-reported health dataset carry annual measurements and which carry carried-forward estimates or categorical status flags, and a vintage analysis that measures revision, restatement and imputation directly across dated releases.</p><p>Applied to 443 numeric variables across six WHO Global Tuberculosis Programme datasets; to India's national TB financing accounts from the India TB Report 2024; and to three archived releases of WHO's TB finance and utilisation data (2024-2026) together with WHO's processed files and code, decomposing WHO's published estimate of TB care spending by the provenance of its inputs.</p><p>Contains: the screening instrument and its tests; the vintage analysis (demos/d3_vintages.py); the archived public WHO input files as downloaded; a fetch script that downloads WHO's report-repository files from pinned commits and verifies their SHA-256 digests (those files carry no licence and are not redistributed); the full verification suite; and FINDINGS.md, a record of every verified result and every correction made during development.</p>",
   "upload_type": "software",
   "license": "MIT",
   "creators": [
@@ -20,5 +20,6 @@
     "World Health Organization",
     "India"
   ],
-  "access_right": "open"
+  "access_right": "open",
+  "version": "v1.1.0"
 }

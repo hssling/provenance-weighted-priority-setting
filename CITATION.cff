@@ -4,10 +4,13 @@ title: "Provenance screening for routine health-programme data: an instrument an
 abstract: >-
   Reproducible screens that distinguish, from the published file alone, which
   variables in a country-reported health dataset carry annual measurements and
-  which carry carried-forward estimates or categorical status flags. Applied to
-  443 numeric variables across six WHO Global Tuberculosis Programme datasets,
-  and to India's national TB financing accounts. Includes the full verification
-  suite and the archived input files.
+  which carry carried-forward estimates or categorical status flags, and a
+  vintage analysis measuring revision, restatement and imputation across dated
+  releases. Applied to 443 numeric variables across six WHO Global Tuberculosis
+  Programme datasets, to India's national TB financing accounts, and to three
+  archived releases of WHO's TB finance and utilisation data with WHO's
+  processed files and code. Includes the verification suite and the archived
+  public input files.
 type: software
 authors:
   - family-names: "Siddalingaiah"
@@ -19,7 +22,7 @@ authors:
 license: MIT
 repository-code: "https://github.com/hssling/provenance-weighted-priority-setting"
 doi: "10.5281/zenodo.24187366"
-version: "v1.0.0"
+version: "v1.1.0"
 keywords:
   - data quality
   - data provenance
