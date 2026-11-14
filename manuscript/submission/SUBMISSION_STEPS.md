@@ -11,7 +11,7 @@ guideline PDFs are copyrighted and are never committed.
 | Paper | Journal | Manuscript | Status |
 |---|---|---|---|
 | A — What a tuberculosis budget cannot see | Indian Journal of Tuberculosis | **IJTB-D-26-00779** (submitted 13 Nov 2026) | With Editor |
-| B — Restated, never revised | International Journal of Epidemiology | not yet submitted | ready; cites deposit v1.1.0 |
+| B — Restated, never revised | International Journal of Epidemiology | **IJE-2026-11-2170** (submitted 14 Nov 2026) | Under consideration |
 | (TB-BOPAS, separate repository) | Indian Journal of Tuberculosis | IJTB-D-26-00777 (submitted 12 Nov 2026) | With Editor |
 
 The "IJTB-S-26-..." numbers seen during upload were submission-stage IDs; cite the D-numbers. Paper A's

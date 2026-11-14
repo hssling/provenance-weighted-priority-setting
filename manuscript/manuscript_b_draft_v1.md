@@ -240,6 +240,7 @@ WHO never revises the TB country data it publishes, countries restate most of th
 
 ## Notes for the author — not for submission
 
+0. SUBMITTED to the International Journal of Epidemiology as IJE-2026-11-2170 (14 Nov 2026), citing deposit v1.1.0 (doi:10.5281/zenodo.24214490). Signed competing-interests and authorship forms are kept locally only.
 1. Rebuilt 14 November 2026 around a vintage analysis of WHO's archived releases (demos/d3_vintages.py). Tables 1-4 are rendered by manuscript/make_tables_b.py and checked verbatim; Table 5 is checked against demos/d2_who_data_screen.py.
 2. [done 14 Nov 2026] Release v1.1.0 published; Zenodo version DOI 10.5281/zenodo.24214490 (contains demos/d3_vintages.py and the fetch tools) now cited here, on the title page and in the cover letter. Paper A keeps v1.0.0 (10.5281/zenodo.24187367), which contains everything it reports.
 3. Ho 2017 was read against the sentence it supports (decentralised care outcomes). Aruoba 2008 verified on Crossref; supports "revisions are large and not well behaved".
