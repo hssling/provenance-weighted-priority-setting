@@ -89,7 +89,14 @@ paper_b/  01_title_page  02_cover_letter  04_manuscript_unblinded (upload this) 
           05_RECORD_checklist  06_supplementary  07_tables  08_Figure_1.png  08_Figure_2.png
 ```
 
-Paper B's cover letter now says its companion goes to IJTB and that IJTB-S-26-01305 is **under review**.
+Paper B was rebuilt on 14 November 2026 as a vintage analysis of WHO's archived releases (title: *Restated,
+never revised*). Five tables and two figures, within IJE's eight. Its cover letter says the companion goes to
+IJTB and that IJTB-S-26-01305 is **under review**.
+
+**Before submitting Paper B: cut a new Zenodo release.** The cited deposit, v1.0.0, predates the vintage
+analysis and does not contain `demos/d3_vintages.py` or the fetch tools. Publish a GitHub release (v1.1.0)
+so Zenodo mints a new version DOI, then replace 10.5281/zenodo.24187367 with it in Paper B's manuscript,
+title page and cover letter. Paper A can keep v1.0.0, which contains everything it reports.
 
 ---
 

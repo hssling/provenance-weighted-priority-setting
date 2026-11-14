@@ -1,8 +1,8 @@
-# The label says what kind, not how old: a reproducible screen of 443 variables in six WHO tuberculosis datasets
+# Restated, never revised: a vintage analysis of WHO tuberculosis data and the spending estimate built on them
 
-**Running title:** Kind and vintage in WHO TB data
+**Running title:** Vintage of WHO tuberculosis data
 
-**Word count:** 2,935 words (main text, excluding abstract, key messages, tables, figures, references and declarations)
+**Word count:** 2,310 words (main text, excluding abstract, key messages, tables, figures, references and declarations)
 
 **Author:** Siddalingaiah H S
 Department of Community Medicine, Shridevi Institute of Medical Sciences and Research Hospital, Tumkur – 572106, Karnataka, India.
@@ -12,31 +12,33 @@ Correspondence: hssling@yahoo.com · ORCID 0000-0002-4771-8285
 
 ## Abstract
 
-**Background.** WHO publishes country-reported tuberculosis data as annual country-by-year tables, with definitions in a separate dictionary. That dictionary records the kind of quantity a variable holds, not the vintage of each value, and is not in the data file.
+**Background.** The World Health Organization (WHO) publishes country-reported tuberculosis (TB) data annually and uses them to estimate TB funding in low- and middle-income countries. Analysts treat each value as that year's report. Whether values are revised, restated or filled in has not been measured.
 
-**Methods.** We screened all 443 numeric variables having at least 100 observations across six WHO tuberculosis datasets, covering 217 countries, 1980 to 2026, and 25,181 country-year records. From the published files alone, variables with five or fewer distinct values were set aside as categorical; the rest were assessed on repetition (the share of consecutive country-year pairs with an identical value), granularity, identity and bounds, then compared with the dictionary's labels.
+**Methods.** We compared three archived releases of WHO's TB finance and utilisation data (2024-2026), WHO's processed files for its 2025 and 2026 reports, and the code that turns them into published estimates. We measured revision between releases, restatement of a country's previous-year value and values supplied by WHO, and apportioned WHO's estimate of inpatient and outpatient care spending by the provenance of its inputs. The reconstruction reproduced WHO's published totals.
 
-**Results.** Of 358 continuous variables, 206 screened as measurement-like, 68 as mixed and 84 as estimate-like. Median repetition was 13.0-15.6% for the budget, expenditure and notification files and 3.5% for contact tracing, against **63.0% for laboratory services**. None of the six dictionary-labelled variables screened as measurement-like (P = 0.006). For `hospd_prct_mdr`, 69.6% of consecutive pairs are identical and 42% of 178 countries never change their entry. Seventy of the 80 unlabelled flagged variables are zero-dominated; excluding pairs in which both values are zero, median repetition fell to 5.2-9.2% in the three large counted files but only to **48.0%** in laboratory services.
+**Results.** None of 16,521 utilisation values changed between releases. Within releases, 62.2-71.3% of utilisation values repeated the country's previous-year value, against 4.8-10.9% for expenditure lines, and none of 3,613 restated values was later revised. WHO filled gaps from up to four years earlier or later. Of WHO's US$ 1.08 billion care estimate for 2025, 16.4% of US$ 6.57 billion total funding, 32.6% rested on inputs newly reported that year, 42.4% on restated inputs and 25.0% on inputs supplied by WHO. India's US$ 182 million rested on values last reported for 2022 and unchanged since 2020.
 
-**Conclusions.** A trend analysis needs to know whether a value was revised, not only what kind of quantity it is. WHO's labels settle the second, not the first; a per-value vintage flag would settle both.
+**Conclusions.** A sixth of WHO's published TB funding figure is computed mostly from numbers that do not describe the year they are used for. A flag recording whether each value was re-measured, restated or imputed would make this visible.
 
-**Keywords:** Data Accuracy; Datasets as Topic; Health Services Research; Reproducibility of Results; Tuberculosis; World Health Organization
+**Keywords:** Data Accuracy; Datasets as Topic; Health Expenditures; Reproducibility of Results; Tuberculosis; World Health Organization
 
 ## Key messages
 
-- WHO's tuberculosis data dictionary records what kind of quantity each variable holds but no field in any published file records whether a given value was re-measured for that year or carried forward unchanged from the previous one.
-- Screening all 443 numeric variables across six datasets separates quantities a programme counts from its own records, which repeat in 13.0-15.6% of consecutive country-year pairs, from quantities that characterise its standing configuration, which repeat in 63.0%.
-- The separation is not an artefact of repeated zeros, because excluding pairs in which both values are zero widens it rather than closing it, and the file with the highest repetition holds the fewest zero-dominated variables.
+- Across three archived releases, WHO never revised a published tuberculosis utilisation value, so a figure restated or filled in once remains in the record unchanged.
+- Countries repeat their own previous-year value for 62-71% of hospital and clinic utilisation entries but for only 5-11% of expenditure lines, and these utilisation entries are the inputs to WHO's estimate of TB care spending.
+- Only a third of WHO's US$ 1.08 billion estimate of TB care spending for 2025 rests on inputs reported for that year; the rest repeats earlier years or was supplied by WHO's own pipeline.
 
 ---
 
 ## 1. Background
 
-WHO's Global Tuberculosis Programme collects and republishes country-reported data on TB financing and service delivery.^1,2^ They are used in investment cases, cross-country comparisons and modelling studies, and are distributed as flat annual tables carrying column names only, with definitions in a separate dictionary. In practice the variables are treated as equivalent — each a country's report for that year.
+WHO's Global Tuberculosis Programme collects country returns every year and republishes them as country-by-year tables.^1,2^ They are used for cross-country comparison, investment cases and modelling, and WHO uses them to estimate how much is spent on TB in low- and middle-income countries: US$ 5.9 billion in 2024 in its 2025 report^1^ and US$ 6.6 billion in 2025 in its 2026 report.^2^ Part of that figure is not reported spending at all. WHO estimates the cost of inpatient and outpatient care from each country's reported share of patients hospitalised, days in hospital and outpatient visits per patient, priced at unit costs, and counts it as domestic funding.^1^
 
-This paper asks a prior question. A number in an annual return may be a measurement taken that year, or an estimate entered once and repeated because no one revised it. Only a value that is re-established each year supports inference about change over time. WHO's dictionary does say, for some variables, that the quantity is an estimate; for example the share of patients hospitalised is defined as an "Estimated percentage". Two things remain unsaid. The label is in a different file from the data. And it describes the kind of quantity, not the vintage of each value: whether this year's entry was revised from last year's, or simply restated. The term comes from economics, where a vintage is a series as published on a given date and results are tested for robustness to it.^3^
+Any such figure assumes that each annual value describes its year. Economics has a vocabulary for testing that assumption. A data vintage is a series as published on a given date; comparing vintages shows how much published history is revised, and whether conclusions survive the revisions.^3,4^ National accounts are revised routinely, and the revisions are large enough to change inference.^4^
 
-The quality of routine health data has been assessed in other settings,^4,5^ but, to our knowledge, not for vintage in these datasets. The question is tractable because signatures of restatement are computable from the published file alone. Comparing the screen's verdicts with the dictionary's labels gives it a partial external check.
+Two features of country-reported health data make the question sharper. A value can be restated, entered unchanged from the previous return because nothing prompted a new measurement; and a value can be missing and filled in downstream. Routine health data have been audited for completeness and consistency,^5,6^ but, to our knowledge, not for vintage. WHO's archives make this testable: each annual report's repository holds a dated snapshot of the country data it used, the processed file it published from, and the code connecting them.
+
+We asked four questions. Are published values revised between releases? How often does a country restate its previous value? What does WHO's pipeline do where a country reported nothing? And how much of WHO's published estimate of TB care spending rests on inputs reported for the year it describes?
 
 ---
 
@@ -44,185 +46,147 @@ The quality of routine health data has been assessed in other settings,^4,5^ but
 
 ### 2.1 Data
 
-Six files from WHO's tuberculosis programme, retrieved in November 2026 and archived with the analysis code; file versions are WHO's own release dates, 12 November 2026 for the budget file and 25 August 2026 for the other five and the dictionary. Together they hold 25,181 country-year records for 217 countries and areas, 1980 to 2026; Supplementary Note 1 lists each file's rows, years and columns. The budget and expenditure files were screened first (77 variables) and the other four afterwards, as a replication.
+Three releases of WHO's TB finance and utilisation data were compared: the snapshots dated 29 July 2024 and 30 July 2025 in WHO's report repositories for 2024 and 2025, and the public release of 25 August 2026, which matches the 2026 report's snapshot date.^7,8^ WHO's processed finance files for its 2025 and 2026 reports, and the R code that produced them, came from the same repositories.^8^ Each file was downloaded from a pinned commit and is identified by its SHA-256 digest (Supplementary Note 1); the repositories carry no licence, so the files are not redistributed, but the fetch is reproducible byte for byte. Variable definitions are from WHO's data dictionary.^9^
 
-WHO's published data dictionary^6^ supplied every variable definition and is the comparison standard in §3.4. Definitions are used rather than column names, because the two diverge: `budget_prog` reads as programme costs generally but is defined as *"programme costs to treat drug-susceptible TB"*.
+The six utilisation inputs are outpatient visits per patient, share of patients hospitalised and days in hospital, each for drug-susceptible and for multidrug- or rifampicin-resistant (MDR/RR) TB. Four expenditure lines reported in every release (first-line drugs, laboratory, staff, programme management) serve as comparators: they are counted from a programme's own accounts each year.
 
-### 2.2 The screens
+### 2.2 Measures
 
-Each screen is computable from the published file alone (Figure 1); the full specification, with the convention chosen for every threshold, is in Supplementary Note 2. **S0** sets aside as *categorical* any variable with five or fewer distinct values, because a status flag legitimately repeats, takes few values and sits on round numbers for reasons unrelated to estimation. **S0b** sets aside as *untestable* any continuous variable for which no country has an adjacent pair of observations, since a test that could not run is not evidence of cleanliness. The remaining continuous variables are assessed on four signatures: **repetition**, the share of consecutive country-year pairs holding an identical value; **granularity**, the distinct-value ratio, the share held by the single most common value, and the share falling on round numbers; **identity**, whether published components sum to their published total; and **bounds**, whether values respect a range implied by the definition. A variable is classified *measurement-like* (trips none or one), *mixed* (two) or *estimate-like* (three or four). No single screen condemns a variable: a small count is legitimately round and a stable quantity legitimately repeats. Thresholds are conventions, stated in the code. Finally, **S5** compares each verdict with the variable's dictionary definition, counting a variable as labelled if that definition contains "estimat" or "typical".
+*Revision* compares the same country-year value of the same variable in two releases. *Restatement* is a value identical to the same country's value for the previous year in the same release. Both are computed for reporting years 2018 onwards, the first year every release can classify: the 2026 release starts in 2017, so earlier years have no previous year within it.
 
-These screens are our own operationalisation of non-measurement, justified by face validity; we know of no published validation of them for country-reported programme data. The nearest framework, WHO's data quality assurance toolkit,^7^ assesses completeness and internal and external consistency of facility data; our screens are of that general kind but were designed for published country returns and are not an implementation of it.
+*WHO-supplied* values were identified by comparing each utilisation value in WHO's processed file with the country's reported value for that year. A reported value used unchanged is classed newly reported or restated; a reported value replaced is classed overridden; a value used where none was reported is classed by the year it matches. WHO's code fills a gap with the same country's value from up to four years earlier and then up to four years later (Supplementary Note 2), and matching was searched in that order.
 
-### 2.3 Reproducibility
+*Consequence.* WHO's care estimate is the sum of four components per country-year: inpatient care (patients × share hospitalised × days × cost per bed-day) and outpatient care (patients × visits per patient × cost per visit), each for drug-susceptible and MDR/RR-TB. Each component was classed by its own inputs: WHO-supplied if any input was filled or overridden, restated if any other input repeated the previous year, otherwise newly reported. A sensitivity analysis counted a component as current if any one of its inputs was newly reported. Where WHO sets the care estimate to zero because a country's reported spending is believed to include it, nothing was apportioned. Total funding was reconstructed as WHO computes it, funding received by national programmes plus the care estimate, and checked against WHO's published totals.
 
-The screen is a single pure-Python script with no third-party dependency. It regenerates every number in this paper from the raw files in one command,^8^ including the counterfactual without rule S0 (Supplementary Note 3), and writes a per-variable results table; the figures are drawn from those outputs separately. A large language model was used as a drafting and analysis assistant; every analytical decision, the code and its verification are the author's. Code, archived inputs and the results table: https://github.com/hssling/provenance-weighted-priority-setting, doi:10.5281/zenodo.24187367.
+### 2.3 Locating the affected variables
 
-### 2.4 Ethics
+To test whether the six inputs are exceptional among WHO's TB data, every numeric variable with at least 100 observations in six public WHO TB datasets (443 variables, 217 countries and areas, 1980-2026) was screened for signatures of restatement: repetition of the previous year's value, few distinct values, a dominant modal value and round numbers. Variables with five or fewer distinct values were set aside as categorical and those with no adjacent years as untestable; the rest were classed measurement-like, mixed or estimate-like by how many signatures they showed. The screen is specified in full in Supplementary Note 3, with two failure modes it exhibits (Supplementary Note 4), and its verdicts were compared with the dictionary's own labels of estimation.
 
-Not required: aggregated, publicly available programme data with no individual-level records.
+### 2.4 Reproducibility and reporting
+
+All analyses are in Python with no third-party numerical dependency; R is used once, to convert WHO's R data files to text unchanged. One command regenerates every number and table from the fetched files.^10^ A large language model was used as a drafting and analysis assistant; every analytical decision, the code and its verification are the author's. Code: https://github.com/hssling/provenance-weighted-priority-setting, doi:10.5281/zenodo.24187367. The study is reported following RECORD. Ethical approval was not required: the data are aggregated and public.
 
 ---
 
 ## 3. Results
 
-### 3.1 Six datasets: the division is counted versus characterised
+### 3.1 Published values are never revised
 
-Of 443 variables meeting the inclusion threshold across the six files, **42 are categorical (S0)** and **43 are untestable on repetition**. Of the remaining 358 continuous variables, **206 screen as measurement-like, 68 as mixed and 84 as estimate-like**, and the proportions differ sharply by file (Table 1).
+Between the July 2024 and July 2025 releases, and again between July 2025 and August 2026, no utilisation value changed: none of 16,521 compared (Table 1). Of 8,024 expenditure values compared, three changed, all for one country-year, each by less than 0.1%. The history grows as late returns arrive but is otherwise fixed: a value published once stays as first published.
 
 [Table 1 about here]
 
-**Repeated zeros do not produce the division (Figure 2).** A repeated zero is a stable absence, not a carried-forward estimate, and most variables in these files are zero-dominated (§3.4). Repetition was therefore recomputed over the subset of adjacent pairs in which at least one of the two values is non-zero (Table 2). Every file falls, but not equally: the three large counted files converge on 5.2-9.2% while laboratory diagnostic services remains at 48.0%, a 5.2 to 9.2-fold gap, wider than the unrestricted 4.0 to 4.8-fold one. The potential confound also runs the wrong way to explain the finding. Laboratory diagnostic services has the **lowest** share of zero-dominated variables of any file (24 of 41, 59%) and the highest repetition; treatment outcomes has the highest share (65 of 66, 98%) and, once zero-to-zero pairs are removed, ordinary repetition. The restricted statistic is reported only; it does not feed the classification in Table 1.
+### 3.2 Utilisation values are mostly restated
+
+In every release, 62.2-71.3% of utilisation values were identical to the same country's value for the previous year, against 4.8-10.9% for the expenditure lines (Table 2). Share hospitalised with MDR/RR-TB was the most repetitive input in each release. Restated values persisted: none of the 3,613 utilisation values restated in the July 2024 release had been revised by August 2026.
 
 [Table 2 about here]
 
-**Treatment outcomes appear intermediate (33.0%), but the appearance is repeated zeros.** Sixty-five of its 66 continuous variables are zero-modal -- they are counts of rare outcomes in disaggregated categories, mostly zero in most countries -- and excluding zero-to-zero pairs the file falls to 6.5%, the lowest of the three large files (Table 2). It is a counted file whose counts are usually zero, not a third kind. It also has the highest proportion of untestable variables (24 of 91), which we note and do not rely on.
+### 3.3 WHO fills what countries do not report
 
-The variables driving this are identifiable individually. Table 3 lists the five estimate-like variables of the budget and expenditure files, all of them hospitalisation or visit quantities; Table 4 lists the six least repetitive variables of the same two files for contrast, all of them counts or amounts.
+In the 2026 report, 784 of the 6,272 utilisation values WHO used for 2018-2025 (12.5%) were supplied by WHO rather than reported for that year (Table 3). Most were filled from an earlier year (602); 49 came from a later year, so that a value reported for one year was used for an earlier one; 72 replaced a reported value. The 2025 report shows the same pattern at a lower level.
 
 [Table 3 about here]
 
+### 3.4 What the published care estimate rests on
+
+WHO's care estimate was 11.4-21.5% of total funding in 2018-2025 (Table 4). For 2025 it was US$ 1.08 billion of US$ 6.57 billion. Of that, 32.6% was computed from inputs newly reported for 2025, 42.4% from inputs restated from 2024 and 25.0% from inputs WHO supplied (Figure 1). Across 2018-2025 the newly reported share ranged from 13.0% to 53.7% (Figure 2). Counting a component as current if any one of its inputs was newly reported raised it only to 14.5-56.8%.
+
 [Table 4 about here]
 
-### 3.2 The financial data is internally immaculate
+The largest single contribution, India's US$ 182 million in 2025 (16.9% of the care estimate), illustrates the mechanism. India last reported its utilisation inputs for 2022; its 2020, 2021 and 2022 entries were identical; and WHO's pipeline carried the 2022 values into 2023, 2024 and 2025. Every year of India's care estimate from 2020 to 2025 is therefore computed from one set of ratios, entered in the first year of the COVID-19 pandemic.
 
-Four of the five component-to-total identities reconcile in **100%** of testable country-years, and the fifth in **98.9%** (Table 5).
+### 3.5 The six inputs are the most estimate-like variables WHO labels
+
+Of the 443 variables screened, 42 were categorical and 43 untestable; of the 358 continuous variables, 206 screened as measurement-like, 68 as mixed and 84 as estimate-like (Table 5). WHO's dictionary labels exactly six variables as "Estimated" or "Typical",^9^ and they are the six inputs to the care estimate. None screened as measurement-like: four were estimate-like and two mixed. WHO's own documentation thus marks these inputs as estimates, while its pipeline uses them as annual values.
 
 [Table 5 about here]
-
-This matters for interpretation. The financial variables are not merely more variable than the characterised ones; they are demonstrably coherent. Whatever process produces them enforces arithmetic consistency across eleven line items in every reporting country. No comparable constraint operates on the characterised variables, which have no total to reconcile against.
-
-### 3.3 What the characterised variables cannot support
-
-`hospd_prct_mdr`, the share of drug-resistant TB patients hospitalised, illustrates the practical consequence. It covers **199 countries** and **1,421 country-years** — coverage that invites a cross-country or trend analysis.
-
-Hospitalised versus ambulatory or decentralised management is a substantive model-of-care choice, reviewed systematically^9,10^ and addressed in WHO's current guidance.^11^
-
-It has **81 distinct values**. **35.3%** of observations are exactly 100; **11.6%** are exactly 0; **70.5%** fall on multiples of ten. Among the 178 countries with four or more years of data, **42% report an identical value in their first and last year**.
-
-A "global trend in DR-TB hospitalisation, 2017–2025" from this variable would be driven by whichever minority of countries revised their entry, and when. It would describe revision behaviour, not clinical practice. The same applies to duration of hospitalisation (66.5% repetition) and facility visits per patient (61.6%).
-
-### 3.4 The screen's verdicts against the dictionary's labels
-
-Of the 443 variables, the dictionary labels **six** as estimated or typical (S5), all in the expenditure file: `hospd_prct_dstb`, `hospd_prct_mdr`, `hospd_dur_dstb`, `hospd_dur_mdr`, `hcfvisit_dstb` and `hcfvisit_mdr`. Table 6 cross-tabulates them against the screen.
-
-[Table 6 about here]
-
-**Where they agree.** All six labelled variables are classified non-measurement-like, four estimate-like and two mixed, and none measurement-like. Of the 358 continuous variables 152 are non-measurement-like, so six labelled variables falling there by chance has probability 0.006. We read this as agreement, not proof: six variables, one file, and the six come in related pairs, so they are not independent.
-
-**Where they disagree.** The screen flags 80 estimate-like variables that the dictionary does not label. Most are not evidence of estimation. Seventy of the 80 have zero as their most common value; in the notifications and outcomes files all 48 of the estimate-like variables do, mostly small counts of rare events. A repeated zero is what a stable absence of events looks like. The one financial variable among the 80, `cf_tot_usaid`, is defined as "Expected funding from USAID (US Dollars)", with no hint of estimation, yet screens estimate-like (64.4% repetition; 64.3% of values held by a single number). That number is zero. Among consecutive-year pairs with either value non-zero, 11.7% are identical, against 2.4-6.8% for the other expected-funding sources (§4.2). The screen therefore picked out a real difference between USAID and the other sources, but most of what it flagged is a repeated zero, and we do not call `cf_tot_usaid` an unlabelled estimate.
-
-**What the comparison does and does not show.** The dictionary and the screen answer different questions. The dictionary says what a variable is; the screen says whether its values move. They agree where an estimate is labelled and moves rarely. The hospitalisation variables are the clearest case: they are labelled, and the screen shows the label's practical consequence, which the label itself does not state.
 
 ---
 
 ## 4. Discussion
 
-### 4.1 What the dictionary settles, and what it does not
+### 4.1 Principal findings
 
-WHO's dictionary does distinguish kind: `hospd_prct_dstb`, `hospd_prct_mdr`, `hospd_dur_dstb` and `hospd_dur_mdr` are defined as "Estimated" quantities and `hcfvisit_dstb` and `hcfvisit_mdr` as "Typical" ones. The files are therefore not silent about what these variables are, and any claim that they are is wrong.
+WHO's TB country data are a record of first submissions. Nothing published is revised, most utilisation values are restated from the previous year, and gaps are filled from neighbouring years. Each practice is reasonable on its own. Together they mean that WHO's estimate of TB care spending, a sixth of its headline funding figure, is computed largely from ratios that were not measured for the year they are used for, and the published data carry no mark of which values those are.
 
-What no document settles is vintage. "Estimated percentage hospitalised" tells a reader the kind of quantity; it does not tell them that 69.6% of consecutive country-year pairs are identical, or that 42% of the 178 countries with four or more years never change their entry. That is what determines whether a trend analysis is possible, and no field in any file records it. Two things limit how far the label helps: it sits in a separate file, so an analyst joining on the expenditure file's 46 bare column names never meets the word "Estimated"; and only six of 443 variables are labelled.
+This is a statement about information, not error. A restated share hospitalised may be correct; models of care change slowly. But a figure entered unchanged for six years cannot record a change if one occurred, and change was expected over this period: decentralised, largely ambulatory care for MDR/RR-TB achieves outcomes at least as good as hospital-based care.^11^ Year-on-year movement in WHO's care estimate is then driven almost entirely by notifications and unit costs, with utilisation held fixed, which a reader of the published trend cannot see.
 
-### 4.1.1 Counted and characterised: an alternative explanation ruled out by replication
+### 4.2 Comparison with other work
 
-The obvious reading of the first two files is that the division runs between financial and utilisation variables. In those two files every high-repetition variable is a utilisation variable, so the two explanations cannot be told apart, and a study of the budget and expenditure files alone would be unable to distinguish them. Four further datasets from the same programme and the same countries separate them. Notifications and contact tracing are service-delivery data, not financial, and repeat 15.6% and 3.5% of the time, at or below the financial files; laboratory diagnostic services repeats 63.0% of the time. A financial/utilisation boundary predicts none of that.
+Real-time data research treats the vintage of a value as part of its meaning and shows that revisions to official statistics are large and not well behaved.^3,4^ WHO's TB data show the opposite failure: the history is never revised, so a value carried forward is never replaced by a measurement. Audits of routine health data have concentrated on completeness, timeliness and internal consistency;^5,6,12^ the expenditure data examined here are internally consistent, and the problem lies elsewhere, in when each value was last measured. Modelled estimates of TB spending by source and function^13^ inherit these inputs.
 
-What the replication supports instead is a distinction of kind. Quantities a programme **counts from its own records** (money spent, cases notified, contacts screened) are re-derived each year and repeat 13.0-15.6% of the time in the three large files and 3.5% in contact tracing. Quantities that **characterise the system's standing configuration** (laboratory infrastructure, typical share hospitalised and typical stay, visits per patient) repeat at 63.0% in laboratory diagnostic services and at 61.5-69.6% for the hospitalisation and visit variables. A programme cannot count its way to the second kind; it can only describe it, and describes it the same way until something changes. This is a post hoc reading of six datasets, not a tested hypothesis.
+### 4.3 Implications
 
-Distributing both kinds under one schema, one dictionary and no provenance field invites the inference that they are the same kind of thing. They are not, and the difference determines which analyses are possible.
+**For WHO.** The pipeline already knows which values it filled; publishing that flag with the processed data would cost nothing. Asking countries to state, for each utilisation input, the year it was last measured would turn restatement from an invisible default into a recorded fact. Provenance metadata of this kind is a recognised element of data stewardship,^14^ and documentation shipped with datasets has precedent.^15^
 
-### 4.2 Why the characterised variables are probably not errors
+**For analysts.** The six utilisation inputs should be treated as slowly updated structural parameters, not annual observations. Trends in the care estimate, and in the domestic share of TB funding that includes it,^1^ warrant a sensitivity analysis holding utilisation at its last newly reported value or varying it across plausible ranges.
 
-We do not read the repetition as carelessness. A programme asked every year for its laboratory configuration will reasonably restate its standing answer; a hospitalisation share and average stay are properties of a service-delivery model that does not change annually. The reporting behaviour is sensible; what is missing is the flag that would let an analyst see it. This is inference from the shape of the data, not from any account of how countries completed the return (§5).
-
-The one financial variable the screen flags, `cf_tot_usaid`, is a different case. Its definition carries no label of estimation, but 64.3% of its values are zero: the repetition is largely countries repeatedly reporting no USAID funding. Over pairs in which either value is non-zero, 11.7% are identical (24 of 206), above the other expected-funding sources (2.4% Global Fund, 3.2% other grants, 6.8% domestic) but far below the 61-70% of the hospitalisation variables. That is a real difference between sources, not evidence of a restated estimate.
-
-### 4.3 Implications for analysis and programme evaluation
-
-**Trend claims from characterised variables need a vintage check first**; the screen in §2.2 takes seconds.
-
-**Cross-sectional comparison is weaker than it looks.** With 81 distinct values over 199 countries, much apparent between-country variation is variation between conventional answers.
-
-**Internal consistency is not validity.** The financial variables reconcile at 98.9-100% yet remain subject to definitional change and reporting convention; arithmetic cannot show that a line item means the same thing in two countries, a distinction WHO's data quality framework also draws.^7^
-
-**Programme evaluation inherits the same blind spot.** Strategic-plan reviews track laboratory capacity and models of care over time. An unchanged characterised variable may record an unchanged system or a figure nobody re-measured; only the reporting programme can say which, and an evaluation that does not ask will read restatement as stability.
-
-**Published coverage is not evidential weight.** 1,421 observations across 199 countries reads as a strong dataset; after accounting for repetition the independent information is a small fraction of that.
-
-### 4.4 What would fix it
-
-**A vintage flag per value.** Because the kind of quantity is often already labelled (§4.1), the remedy is not to add a kind field. It is to record, for each variable-year, whether the value was newly established, re-confirmed or restated unchanged from the previous return, or the year in which it was last revised. Only the national programme completing the return knows which applies, and recording it costs nothing. Provenance metadata is a recognised element of data stewardship,^12^ with a substantial technical literature.^13^
-
-**Ship the labels with the data.** The dictionary's "Estimated" and "Typical" labels would reach analysts if carried in the data file or its column metadata, rather than in a separate download that a join on column names bypasses.
-
-**Publish the screen with the data.** The tests here are generic. Running them at release and shipping the results table would let every user see, before analysis, which variables carry annual information; until a vintage flag exists, this is a stand-in for it. Documentation shipped with a dataset has precedent in the datasheet proposal.^14^
+**For national programmes.** A programme that last measured its hospitalisation share years ago is represented in global estimates by that old figure. Periodic re-measurement through facility-based costing studies, and an explicit statement of the reference year in the annual return, would let the global figure reflect current practice.
 
 ---
 
 ## 5. Limitations
 
-The screens detect signatures consistent with non-measurement; they cannot prove any particular value was carried forward rather than re-measured and found unchanged. A genuinely stable quantity is indistinguishable, on internal evidence, from an unrevised one, which is precisely the ambiguity a provenance flag would remove. The thresholds are conventions chosen before the results were examined and stated in the code; the bimodality of the underlying distribution means moderate changes do not move variables between classes, but a reader preferring different cut-points can recompute. We screened six files from one programme at one point in time, and the counted/characterised division was found post hoc, so whether it generalises to other WHO disease programmes is an open and directly testable question. The 43 untestable variables are unclassified, not clean, and are concentrated in treatment outcomes and laboratory data. Supplementary Notes 3 and 4 demonstrate two failure modes the method itself exhibits on these data, and Supplementary Note 5 states these limitations in full.
+Restatement is not evidence of error: a stable practice yields identical values honestly, and the analysis cannot distinguish a re-confirmed value from one carried forward unexamined, which is precisely the information a vintage flag would supply. Only three dated releases of the finance data are archived, from 2024 onwards, so revision of older releases cannot be assessed. The source year of a WHO-supplied value is inferred by matching values in WHO's fill order; a value matching no reported year may result from a chained fill or a manual override in WHO's code. The classification of a cost component by "any input" is a convention, and the sensitivity analysis shows the conclusion does not depend on it. WHO's unit costs are themselves estimates and were not assessed. The screen in §2.3 has its own conventions and failure modes, stated in Supplementary Notes 3-5.
 
 ## 6. Conclusions
 
-WHO's dictionary tells an analyst what kind of quantity a variable is: that the share of drug-resistant TB patients hospitalised, for example, is an estimate. It sits in a separate file from the data, and it does not say how often any value is revised. Across six WHO tuberculosis datasets, variables a programme counts from its own records repeat in 15.6% of consecutive country-year pairs or fewer, while the hospitalisation and visit variables repeat in 61.5-69.6% and, for 42% of countries with four or more years, never change at all. The screen agrees with every one of the dictionary's six labels and flags 80 variables it does not label, although most of those are dominated by repeated zeros, which bounds what the screen can claim about them.
-
-Two changes would settle this at source: a vintage flag for each value, which the reporting country is already in a position to supply, and the dictionary's labels carried inside the data file rather than beside it. Until then, the screen costs seconds and tells an analyst which of these numbers can support a question about change, and which cannot.
+WHO never revises the TB country data it publishes, countries restate most of their hospital and clinic utilisation figures from one year to the next, and WHO fills the remaining gaps from other years. As a result, only about a third of WHO's US$ 1.08 billion estimate of TB care spending for 2025 rests on inputs reported for 2025. Recording, for each value, whether it was re-measured, restated or imputed would let every user of these data see what each year's figure actually describes.
 
 ## References
 
-1\. World Health Organization. Global Tuberculosis Programme country data: budget, expenditure and utilisation, notifications, treatment outcomes, laboratory diagnostic services, and contact tracing and preventive treatment datasets. Geneva: World Health Organization; 2026. Available from: https://extranet.who.int/tme/ [cited 2026 Nov 13] [data files dated 25 August and 12 November 2026]. This data-collection system no longer accepts updates; the archived input files are deposited with the analysis code.
+1\. World Health Organization. Global tuberculosis report 2025. Geneva: World Health Organization; 2025. Section 4.1, Financing for TB prevention, diagnostic and treatment services. Available from: https://www.who.int/teams/global-programme-on-tuberculosis-and-lung-health/tb-reports/global-tuberculosis-report-2025/tb-financing/4-1-financing-for-tb-prevention--diagnostic-and-treatment-services [cited 2026 Nov 14].
 
-2\. World Health Organization. Global tuberculosis report 2025. Geneva: World Health Organization; 2025. Available from: https://www.who.int/teams/global-programme-on-tuberculosis-and-lung-health/tb-reports/global-tuberculosis-report-2025 [cited 2026 Nov 13].
+2\. World Health Organization. Global tuberculosis report 2026. Geneva: World Health Organization; 2026. Available from: https://iris.who.int/server/api/core/bitstreams/726b4727-ac22-432d-96e7-563210b8fb32/content [cited 2026 Nov 14].
 
 3\. Croushore D, Stark T. A real-time data set for macroeconomists: does the data vintage matter? Rev Econ Stat. 2003;85(3):605-17. doi:10.1162/003465303322369759
 
-4\. Maiga A, Jiwani SS, Mutua MK, Porth TA, Taylor CM, Asiki G, et al. Generating statistics from health facility data: the state of routine health information systems in Eastern and Southern Africa. BMJ Glob Health. 2019;4(5):e001849. doi:10.1136/bmjgh-2019-001849
+4\. Aruoba SB. Data revisions are not well behaved. J Money Credit Bank. 2008;40(2-3):319-40. doi:10.1111/j.1538-4616.2008.00115.x
 
-5\. Lundin R, Mariani I, Peven K, Day LT, Lazzerini M. Quality of routine health facility data used for newborn indicators in low- and middle-income countries: a systematic review. J Glob Health. 2022;12:04019. doi:10.7189/jogh.12.04019
+5\. Maiga A, Jiwani SS, Mutua MK, Porth TA, Taylor CM, Asiki G, et al. Generating statistics from health facility data: the state of routine health information systems in Eastern and Southern Africa. BMJ Glob Health. 2019;4(5):e001849. doi:10.1136/bmjgh-2019-001849
 
-6\. World Health Organization. Global Tuberculosis Programme data dictionary [file TB_dictionary_2026-08-25.csv]. Geneva: World Health Organization; 2026. Available from: https://extranet.who.int/tme/ [cited 2026 Nov 13]. Archived with the analysis code.
+6\. Lundin R, Mariani I, Peven K, Day LT, Lazzerini M. Quality of routine health facility data used for newborn indicators in low- and middle-income countries: a systematic review. J Glob Health. 2022;12:04019. doi:10.7189/jogh.12.04019
 
-7\. World Health Organization. Data quality assurance: module 1: framework and metrics. Geneva: World Health Organization; 2023. ISBN 978-92-4-004735-8. Available from: https://www.who.int/publications/i/item/9789240047365 [cited 2026 Nov 13].
+7\. World Health Organization. Global Tuberculosis Programme country data: expenditure and utilisation, budget, notifications, treatment outcomes, laboratory diagnostic services, and contact tracing and preventive treatment datasets. Geneva: World Health Organization; 2026. Available from: https://extranet.who.int/tme/ [cited 2026 Nov 13] [data files dated 25 August and 12 November 2026].
 
-8\. Peng RD. Reproducible research in computational science. Science. 2011;334(6060):1226-7. doi:10.1126/science.1213847
+8\. World Health Organization Global Tuberculosis Programme. Global tuberculosis report repositories gtbreport2024, gtbreport2025 and gtbreport2026 (commits afbe537, 666088c and 11ebd9b). GitHub; 2024-2026. Available from: https://github.com/GTB-TME [cited 2026 Nov 14].
 
-9\. Bassili A, Fitzpatrick C, Qadeer E, Fatima R, Floyd K, Jaramillo E. A systematic review of the effectiveness of hospital- and ambulatory-based management of multidrug-resistant tuberculosis. Am J Trop Med Hyg. 2013;89(2):271-80. doi:10.4269/ajtmh.13-0004
+9\. World Health Organization. Global Tuberculosis Programme data dictionary [file TB_dictionary_2026-08-25.csv]. Geneva: World Health Organization; 2026. Available from: https://extranet.who.int/tme/ [cited 2026 Nov 13].
 
-10\. Ho J, Byrne AL, Linh NN, Jaramillo E, Fox GJ. Decentralized care for multidrug-resistant tuberculosis: a systematic review and meta-analysis. Bull World Health Organ. 2017;95(8):584-93. doi:10.2471/BLT.17.193375
+10\. Peng RD. Reproducible research in computational science. Science. 2011;334(6060):1226-7. doi:10.1126/science.1213847
 
-11\. World Health Organization. WHO consolidated guidelines on tuberculosis. Module 4: treatment and care. 2nd ed. Geneva: World Health Organization; 2026. ISBN 978-92-4-012512-4. Available from: https://www.who.int/publications/i/item/9789240125124 [cited 2026 Nov 13].
+11\. Ho J, Byrne AL, Linh NN, Jaramillo E, Fox GJ. Decentralized care for multidrug-resistant tuberculosis: a systematic review and meta-analysis. Bull World Health Organ. 2017;95(8):584-93. doi:10.2471/BLT.17.193375
 
-12\. Wilkinson MD, Dumontier M, Aalbersberg IJ, Appleton G, Axton M, Baak A, et al. The FAIR Guiding Principles for scientific data management and stewardship. Sci Data. 2016;3:160018. doi:10.1038/sdata.2016.18
+12\. World Health Organization. Data quality assurance: module 1: framework and metrics. Geneva: World Health Organization; 2023. ISBN 978-92-4-004735-8. Available from: https://www.who.int/publications/i/item/9789240047365 [cited 2026 Nov 13].
 
-13\. Herschel M, Diestelkamper R, Ben Lahmar H. A survey on provenance: what for? What form? What from? VLDB J. 2017;26(6):881-906. doi:10.1007/s00778-017-0486-1
+13\. Su Y, Garcia Baena I, Harle AC, Crosby SW, Micah AE, Siroka A, et al. Tracking total spending on tuberculosis by source and function in 135 low-income and middle-income countries, 2000-17: a financial modelling study. Lancet Infect Dis. 2020;20(8):929-42. doi:10.1016/S1473-3099(20)30124-9
 
-14\. Gebru T, Morgenstern J, Vecchione B, Vaughan JW, Wallach H, Daume H 3rd, et al. Datasheets for datasets. Commun ACM. 2021;64(12):86-92. doi:10.1145/3458723
+14\. Wilkinson MD, Dumontier M, Aalbersberg IJ, Appleton G, Axton M, Baak A, et al. The FAIR Guiding Principles for scientific data management and stewardship. Sci Data. 2016;3:160018. doi:10.1038/sdata.2016.18
 
-15\. Benchimol EI, Smeeth L, Guttmann A, Harron K, Moher D, Petersen I, et al. The REporting of studies Conducted using Observational Routinely-collected health Data (RECORD) Statement. PLOS Med. 2015;12(10):e1001885. doi:10.1371/journal.pmed.1001885
+15\. Gebru T, Morgenstern J, Vecchione B, Vaughan JW, Wallach H, Daume H 3rd, et al. Datasheets for datasets. Commun ACM. 2021;64(12):86-92. doi:10.1145/3458723
+
+16\. Benchimol EI, Smeeth L, Guttmann A, Harron K, Moher D, Petersen I, et al. The REporting of studies Conducted using Observational Routinely-collected health Data (RECORD) Statement. PLOS Med. 2015;12(10):e1001885. doi:10.1371/journal.pmed.1001885
 
 ## Figure captions
 
-**Figure 1. How each variable moves through the screen.** The 443 numeric variables with at least 100 observations, showing the two rules that set variables aside before classification and the four signatures on which the remainder are scored, with the count at each step. S0, categorical rule; S0b, untestable-on-repetition rule.
+**Figure 1. From a country's annual return to WHO's published TB funding figure.** The utilisation inputs reported by a country, their restatement, the absence of revision between WHO releases, WHO's filling of gaps from neighbouring years, the cost model that converts them into an estimate of inpatient and outpatient care spending, and the provenance of that estimate for 2025 in WHO's 2026 report. Each number is computed by the analysis code from WHO's archived files.
 
-*Alt text: A flow diagram beginning with 443 numeric variables. A first rule sets aside 42 categorical variables, a second sets aside 43 that cannot be tested for repetition, leaving 358 continuous variables scored on four signatures and classified as 206 measurement-like, 68 mixed and 84 estimate-like.*
+*Alt text: A vertical flow diagram. A country's annual return feeds WHO's published data, then WHO's gap-filling pipeline, then a cost model, then the published 2025 TB funding total of US$ 6.57 billion, of which the care estimate is US$ 1.08 billion. Three boxes at the bottom split the care estimate: 32.6% from new inputs, 42.4% from restated inputs and 25.0% from inputs supplied by WHO.*
 
-*Alt text: Two side-by-side dot plots of six WHO tuberculosis datasets. In the left panel most datasets cluster below 20% repetition while laboratory diagnostic services sits around 63%. In the right panel, excluding pairs where both values are zero, the other datasets fall to between 2% and 9% while laboratory diagnostic services remains at 48%, so the gap widens.*
+**Figure 2. WHO's estimate of TB care spending, 2018-2025, by provenance of its inputs.** Stacked bars show the care estimate in each year of WHO's 2026 report, divided by whether the inputs to each cost component were newly reported that year (solid), restated from the previous year (diagonal hatching) or supplied by WHO's pipeline (cross-hatching). The label above each bar is the newly reported share.
 
----
-
-**Figure 2. Repetition by dataset, before and after excluding repeated zeros.** Each point is one continuous variable; the horizontal position is the share of that variable's adjacent country-year pairs holding an identical value. The vertical rule marks the dataset median. The left panel uses all adjacent pairs; the right panel uses only pairs in which at least one of the two values is non-zero, since a repeated zero is a stable absence rather than a carried-forward estimate. Laboratory diagnostic services, shown in a separate colour, separates from the other five datasets in both panels, and the separation is wider in the right panel. TPT, tuberculosis preventive treatment.
+*Alt text: A stacked bar chart for 2018 to 2025. Each bar is between about 0.7 and 1.5 billion US dollars. The solid newly reported portion is a minority in most years, between 13% and 54%; the hatched restated portion is the largest in most years; the cross-hatched WHO-supplied portion grows from 2023 onwards.*
 
 ## Declarations
 
-**Reporting.** This study is reported in accordance with the RECORD statement for studies using routinely collected health data;^15^ the completed checklist accompanies this submission.
+**Reporting.** This study is reported in accordance with the RECORD statement for studies using routinely collected health data;^16^ the completed checklist accompanies this submission.
 
 **Contributors.** Sole author: conception, analysis, code, verification, manuscript.
 
 **Funding.** None. **Competing interests.** None declared. **Ethical clearance.** Not required (§2.4).
 
-**Data availability.** Inputs are public WHO datasets; the archived copies, the screening script and the per-variable results table are deposited at https://github.com/hssling/provenance-weighted-priority-setting and archived at Zenodo, doi:10.5281/zenodo.24187367 (release v1.0.0; the concept DOI doi:10.5281/zenodo.24187366 always resolves to the latest version). Every input file is listed in `data/raw_file_manifest.csv` with its SHA-256 digest, so the archived copies can be checked byte for byte against the ones analysed. The manifest also records what is not known: for six of the nine files the download route was not noted at acquisition, and it says so rather than reconstructing a plausible one.
+**Data availability.** The public WHO datasets are archived with the code at https://github.com/hssling/provenance-weighted-priority-setting and archived at Zenodo, doi:10.5281/zenodo.24187367 (release v1.0.0; the concept DOI doi:10.5281/zenodo.24187366 always resolves to the latest version). WHO's report-repository files carry no licence and are not redistributed; tools/fetch_vintages.py downloads them from pinned commits and verifies each against the SHA-256 digest recorded in data/vintages/vintage_manifest.csv.
 
 **Use of generative AI.** The author used a large language model as a drafting and analysis assistant. All analytical decisions, verification and conclusions are the author's, who takes full responsibility.
 

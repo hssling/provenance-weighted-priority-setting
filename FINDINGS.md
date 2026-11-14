@@ -552,6 +552,34 @@ unseeded fit gives `RRMDR_notif_100k` [-0.1156, 0.2903], not the published [-0.1
 
 ---
 
+## 4b. D3: a vintage analysis of WHO's own archived releases (14 November 2026)
+
+Paper B was rebuilt around this after an honest desk-review assessment: the 443-variable screen *inferred*
+restatement and showed no consequence. WHO's report repositories (github.com/GTB-TME/gtbreport2024-2026)
+hold dated snapshots of the country data, WHO's processed finance files and the R code between them, which
+let vintage be *measured*. `demos/d3_vintages.py` (stdlib), fed by `tools/fetch_vintages.py` (pinned commits,
+SHA-256) and `tools/convert_vintages.R` (R used once, to convert .rda to CSV unchanged). The files carry no
+licence and are not committed.
+
+- **Never revised.** 0 of 16,521 utilisation values changed between the Jul 2024, Jul 2025 and Aug 2026
+  releases; 3 of 8,024 expenditure values did (Russian Federation 2024, each under 0.1%).
+- **Mostly restated.** 62.2-71.3% of utilisation values equal the country's previous year (2018 onwards),
+  against 4.8-10.9% of expenditure lines. 0 of 3,613 values restated in 2024 were revised by 2026.
+- **WHO fills gaps** from the same country's value up to 4 years earlier, then up to 4 years LATER (code:
+  lag 1-4 then lead 1-4). 784 of 6,272 values used for 2018-2025 in the 2026 report were WHO-supplied.
+- **Consequence.** WHO's care estimate (bed-days and visits x unit costs) is counted as domestic funding.
+  2025: US$ 1.08 bn of US$ 6.57 bn total; 32.6% from newly reported inputs, 42.4% restated, 25.0% WHO-
+  supplied; lenient sensitivity 35.6%. India: US$ 182 m (16.9%), values last reported for 2022, identical
+  since 2020, carried into 2023-2025.
+- **Validation.** Total = rcvd_tot + c_ghs over WHO's included countries reproduces WHO's published
+  US$ 5.9 bn (2024, 2025 report), US$ 6.03 bn (2024, 2026 report) and US$ 6.6 bn (2025).
+- **Traps hit and fixed.** (1) The public 2026 download starts at 2017, so 2017 cannot be "restated" and a
+  first pass called 99% of it "new"; all provenance measures now start at WINDOW_START = 2018. (2) WHO sets
+  the care estimate to zero for 13 countries "where it is believed to be already reported" while still
+  computing its components; only cost reaching the published total is apportioned. (3) The public 2026
+  download prints 0 where the snapshot has no total expenditure or receipts; comparisons use snapshots.
+- The six cost inputs are exactly the six variables WHO's dictionary labels "Estimated"/"Typical".
+
 ## 5. Limitations and open questions
 
 ### 5.1 Limitations the instrument carries

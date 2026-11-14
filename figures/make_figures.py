@@ -150,68 +150,6 @@ def figure_a1() -> None:
 
 
 # --------------------------------------------------------------------------
-def figure_b1() -> None:
-    """Paper B: every variable's repetition, by dataset, with and without
-    zero-to-zero pairs. The table gives medians; this shows the distribution
-    the medians summarise, which is where the separation is visible."""
-    import d2_who_data_screen as d2
-
-    labels = {"budget": "Budget", "expenditure": "Expenditure\nand utilisation",
-              "notifications": "Notifications", "outcomes": "Treatment\noutcomes",
-              "laboratory": "Laboratory\ndiagnostic services",
-              "contact_tpt": "Contact tracing\nand TPT"}
-    order = ["budget", "expenditure", "notifications", "outcomes",
-             "contact_tpt", "laboratory"]
-
-    rows = list(csv.DictReader((ROOT / "outputs" / "d2_variable_screen.csv")
-                               .open(encoding="utf-8")))
-    allp, nz = defaultdict(list), defaultdict(list)
-    for r in rows:
-        if r["dataset"] not in labels or not r["repetition"]:
-            continue
-        allp[r["dataset"]].append(float(r["repetition"]) * 100)
-        if r["repetition_nz"]:
-            nz[r["dataset"]].append(float(r["repetition_nz"]) * 100)
-
-    fig, axes = plt.subplots(1, 2, figsize=(WIDTH_IN, WIDTH_IN * 0.56),
-                             sharey=True, layout="constrained")
-    for ax, data, title in (
-            (axes[0], allp, "All adjacent\ncountry-year pairs"),
-            (axes[1], nz, "Excluding pairs in which\nboth values are zero")):
-        for i, key in enumerate(order):
-            vals = data.get(key, [])
-            if not vals:
-                continue
-            colour = ORANGE if key == "laboratory" else BLUE
-            ax.scatter(vals, [i] * len(vals), s=55, alpha=0.45,
-                       color=colour, edgecolors="none", zorder=2)
-            med = sorted(vals)[len(vals) // 2] if len(vals) % 2 else \
-                sum(sorted(vals)[len(vals) // 2 - 1:len(vals) // 2 + 1]) / 2
-            ax.plot([med], [i], marker="|", markersize=30, markeredgewidth=4,
-                    color=INK, zorder=4)
-            # A median near zero puts a centred label on the axis spine, as
-            # "1.9%" was; set those to the right of the marker instead.
-            near_axis = med < 8
-            ax.annotate(f"{med:.1f}%", (med, i), textcoords="offset points",
-                        xytext=(14, 9) if near_axis else (0, 16),
-                        ha="left" if near_axis else "center", fontsize=13, color=INK)
-        ax.set_yticks(range(len(order)))
-        ax.set_yticklabels([labels[k] for k in order], fontsize=14)
-        ax.set_xlim(-3, 103)
-        ax.set_title(title, fontsize=15, pad=26)
-        ax.grid(axis="x", color="#ededed", linewidth=0.8, zorder=0)
-        ax.set_axisbelow(True)
-    axes[0].set_ylim(-0.7, len(order) - 0.3)
-    # One shared axis label, and an accurate one. Each point is a variable and
-    # its position is the share of THAT variable's adjacent country-year pairs
-    # that are identical. The earlier per-panel label, "variables repeating the
-    # previous year's value, %", read as a share of variables -- the caption was
-    # right and the axis contradicted it -- and the two labels also collided.
-    fig.supxlabel("Adjacent country-year pairs holding an identical value, %\n"
-                  "(each point is one variable)", fontsize=14)
-    save(fig, "figure_b2_repetition_by_dataset.png")
-
-
 # --------------------------------------------------------------------------
 def figure_a2() -> None:
     """Paper A: which WHO budget line, if any, each intervention falls into.
@@ -299,75 +237,75 @@ def figure_a2() -> None:
 
 
 # --------------------------------------------------------------------------
-def figure_b2() -> None:
-    """Paper B: how a variable moves through the screen, with the counts."""
-    import csv as _csv
-    rows = list(_csv.DictReader((ROOT / "outputs" / "d2_variable_screen.csv")
-                                .open(encoding="utf-8")))
-    n_all = len(rows)
-    # A row with no repetition was set aside by S0 or S0b; the two are told
-    # apart by distinct values, exactly as screen_column decides them.
-    aside = [r for r in rows if r["repetition"] == ""]
-    cat = sum(1 for r in aside if int(r["n_distinct"]) <= 5)
-    untestable = len(aside) - cat
-    verdicts = {v: sum(1 for r in rows if r["verdict"] == v)
-                for v in ("measurement-like", "mixed", "estimate-like")}
-    n_cont = sum(verdicts.values())
+def _d3_results():
+    import d3_vintages as d3
+    return d3, d3.results()
 
-    fig, ax = plt.subplots(figsize=(WIDTH_IN, WIDTH_IN * 0.80))
 
+def figure_b1() -> None:
+    """Paper B: from a country's annual return to WHO's published total, with
+    the measured share at each step. Every number is read from d3."""
+    d3, R = _d3_results()
+    util_rst = [r for r in R["restatement"] if r["group"] == "util"]
+    lo = min(100 * r["identical"] / r["pairs"] for r in util_rst)
+    hi = max(100 * r["identical"] / r["pairs"] for r in util_rst)
+    rev = [r for r in R["revision"] if r["group"] == "util"]
+    n_pairs, n_changed = sum(r["pairs"] for r in rev), sum(r["changed"] for r in rev)
+    f = R["filling"]["2026"]
+    used = sum(n for s, n in f.items() if s != "absent")
+    supplied = f["filled_earlier"] + f["filled_later"] + f["filled_other"] + f["overridden"]
+    last = R["latest"]["2026"]
+    c = next(r for r in R["consequence"]["2026"] if r["year"] == last)
+
+    fig, ax = plt.subplots(figsize=(WIDTH_IN, WIDTH_IN * 0.86))
     boxes = []
 
-    def box(x, y, w, h, text, edge=INK, face="white", fs=14.5):
+    def box(x, y, w, h, text, edge=INK, face="white", fs=13.5, hatch=None):
         ax.add_patch(plt.Rectangle((x - w / 2, y - h / 2), w, h, facecolor=face,
-                                   edgecolor=edge, linewidth=1.8, zorder=2))
-        t = ax.text(x, y, text, ha="center", va="center", fontsize=fs, zorder=3)
+                                   edgecolor=edge, linewidth=1.8, zorder=2, hatch=hatch))
+        t = ax.text(x, y, text, ha="center", va="center", fontsize=fs, zorder=3,
+                    bbox=dict(facecolor=face, edgecolor="none", pad=1.5) if hatch else None)
         boxes.append((t, x, y, w, h))
 
-    def arrow(x1, y1, x2, y2, c=INK):
+    def arrow(x1, y1, x2, y2, col=INK):
         ax.annotate("", xy=(x2, y2), xytext=(x1, y1),
-                    arrowprops=dict(arrowstyle="-|>", color=c, lw=2.0), zorder=1)
+                    arrowprops=dict(arrowstyle="-|>", color=col, lw=2.0), zorder=1)
 
-    box(0.5, 0.93, 0.64, 0.09,
-        f"{n_all} numeric variables\nwith at least 100 observations")
-    arrow(0.5, 0.885, 0.5, 0.80)
-    # Branches are labelled. Unlabelled, the side arrows meant opposite things:
-    # "yes" at S0 (five or fewer values -> categorical) but "no" at S0b (no
-    # adjacent years -> untestable), which a reader could only guess.
-    def branch(x, y, word, ha="left"):
-        ax.text(x, y, word, ha=ha, va="bottom", fontsize=13, style="italic",
-                color=INK, zorder=3)
+    def note(x, y, text):
+        t = ax.text(x, y, text, ha="left", va="center", fontsize=13, color=INK,
+                    style="italic", zorder=3)
+        return t
 
-    box(0.5, 0.755, 0.64, 0.085, "S0  five or fewer distinct values?")
-    arrow(0.82, 0.755, 0.94, 0.755, GREY)
-    branch(0.835, 0.762, "yes")
-    box(1.10, 0.755, 0.30, 0.075, f"categorical\n({cat})", edge=GREY, face="#f4f4f4", fs=13.5)
-    arrow(0.5, 0.712, 0.5, 0.635)
-    branch(0.515, 0.655, "no")
-    box(0.5, 0.59, 0.64, 0.085, "S0b  any country with adjacent years?")
-    arrow(0.82, 0.59, 0.94, 0.59, GREY)
-    branch(0.835, 0.597, "no")
-    box(1.10, 0.59, 0.30, 0.075,
-        f"untestable\n({untestable})", edge=GREY, face="#f4f4f4", fs=13.5)
-    arrow(0.5, 0.547, 0.5, 0.47)
-    branch(0.515, 0.49, "yes")
-    box(0.5, 0.425, 0.92, 0.105,
-        f"{n_cont} continuous variables, each scored on four signatures:\n"
-        "repetition  ·  distinct ratio  ·  modal share  ·  roundness")
-    arrow(0.5, 0.372, 0.5, 0.30)
-    box(0.5, 0.255, 0.58, 0.075, "how many signatures does it trip?")
-    for x, lab, n, col in ((0.16, "none or one", verdicts["measurement-like"], BLUE),
-                           (0.5, "two", verdicts["mixed"], GREY),
-                           (0.84, "three or four", verdicts["estimate-like"], ORANGE)):
-        arrow(0.5, 0.217, x, 0.145, col)
-        box(x, 0.095, 0.32, 0.095,
-            f"{lab}\n{'measurement-like' if col is BLUE else 'mixed' if col is GREY else 'estimate-like'}"
-            f"\n({n})", edge=col, fs=13.5)
-    ax.set_xlim(0.0, 1.30)
-    ax.set_ylim(0.02, 1.0)
+    X, W = 0.38, 0.74
+    box(X, 0.94, W, 0.085, "A country's annual return to WHO:\n"
+        "visits per patient, share hospitalised, days in hospital", fs=13)
+    note(0.78, 0.94, f"{lo:.0f}–{hi:.0f}% of values identical to the\n"
+                     "country's own previous year (Table 2)")
+    arrow(X, 0.897, X, 0.832)
+    box(X, 0.79, W, 0.085, "WHO's published country data,\nrelease after release")
+    note(0.78, 0.79, f"{n_changed} of {n_pairs:,} values changed\nbetween releases (Table 1)")
+    arrow(X, 0.747, X, 0.682)
+    box(X, 0.64, W, 0.085, "WHO's finance pipeline fills each gap from\n"
+        "the nearest year: up to 4 earlier, then 4 later")
+    note(0.78, 0.64, f"{100 * supplied / used:.1f}% of the values used were\n"
+                     f"supplied by WHO, {d3.WINDOW_START}–{last} (Table 3)")
+    arrow(X, 0.597, X, 0.532)
+    box(X, 0.47, W, 0.115, "Cost model, priced at WHO unit costs:\n"
+        "bed-days = patients × share hospitalised × days\n"
+        "visits = patients × visits per patient")
+    arrow(X, 0.412, X, 0.347)
+    box(X, 0.30, W, 0.085, f"Published TB funding, {last}: US$ {c['total'] / 1e9:.2f} billion,\n"
+        f"of which care estimate US$ {c['ghs'] / 1e9:.2f} billion ({100 * c['ghs'] / c['total']:.1f}%)")
+    shares = (("new inputs", c["new"], BLUE, None), ("restated inputs", c["restated"], ORANGE, "//"),
+              ("WHO-supplied inputs", c["WHO-supplied"], GREY, "xx"))
+    for x, (lab, val, col, hatch) in zip((0.05, 0.38, 0.71), shares):
+        arrow(X, 0.257, x, 0.175, col)
+        box(x, 0.12, 0.30, 0.10, f"{lab}\n{100 * val / c['ghs']:.1f}% of care,\n"
+                                 f"US$ {val / 1e9:.2f} billion", edge=col, fs=13, hatch=hatch,
+            face="white")
+    ax.set_xlim(-0.14, 1.24)
+    ax.set_ylim(0.04, 1.0)
     ax.axis("off")
-    # Text that spills past its own rectangle is the most common defect in a
-    # hand-laid-out diagram and is invisible until someone looks. Checked.
     fig.canvas.draw()
     inv = ax.transData.inverted()
     for t, x, y, w, h in boxes:
@@ -376,7 +314,36 @@ def figure_b2() -> None:
         assert abs(x1 - x0) <= w * 0.97 and abs(y1 - y0) <= h * 0.97, (
             f"text overflows its box: {t.get_text()[:40]!r} "
             f"needs {abs(x1 - x0):.3f}x{abs(y1 - y0):.3f}, box is {w}x{h}")
-    save(fig, "figure_b1_screen_flow.png")
+    save(fig, "figure_b1_from_return_to_published_total.png")
+
+
+def figure_b2() -> None:
+    """Paper B: WHO's care estimate each year, split by where its inputs came
+    from. Hatching, not colour alone, separates the classes in greyscale."""
+    d3, R = _d3_results()
+    last = R["latest"]["2026"]
+    rows = [r for r in R["consequence"]["2026"] if d3.WINDOW_START <= r["year"] <= last]
+    years = [r["year"] for r in rows]
+    fig, ax = plt.subplots(figsize=(WIDTH_IN, WIDTH_IN * 0.52), layout="constrained")
+    bottom = [0.0] * len(rows)
+    for key, lab, col, hatch in (("new", "Inputs newly reported that year", BLUE, None),
+                                 ("restated", "Inputs restated from the previous year", ORANGE, "//"),
+                                 ("WHO-supplied", "Inputs supplied by WHO", GREY, "xx")):
+        vals = [r[key] / 1e9 for r in rows]
+        ax.bar(years, vals, bottom=bottom, color="white" if hatch else col, edgecolor=col,
+               hatch=hatch, linewidth=1.6, label=lab, width=0.68, zorder=2)
+        bottom = [b + v for b, v in zip(bottom, vals)]
+    for y, r, top in zip(years, rows, bottom):
+        ax.annotate(f"{100 * r['new'] / r['ghs']:.0f}%\nnew", (y, top), textcoords="offset points",
+                    xytext=(0, 6), ha="center", va="bottom", fontsize=14, color=BLUE)
+    ax.set_ylabel("WHO's care estimate, US$ billion", fontsize=14)
+    ax.set_xticks(years)
+    ax.set_xticklabels([str(y) for y in years], fontsize=14)
+    ax.set_ylim(0, max(bottom) * 1.32)
+    ax.grid(axis="y", color="#ededed", linewidth=0.8, zorder=0)
+    ax.legend(frameon=False, fontsize=14, loc="upper center", ncol=1,
+              bbox_to_anchor=(0.5, 1.0))
+    save(fig, "figure_b2_care_estimate_by_provenance.png")
 
 
 if __name__ == "__main__":

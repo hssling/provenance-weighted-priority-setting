@@ -5,7 +5,7 @@ text overlap between them is stated in each cover letter and rechecked by `verif
 
 | | Paper A | Paper B |
 |---|---|---|
-| title | What a tuberculosis budget cannot see | The label says what kind, not how old |
+| title | What a tuberculosis budget cannot see | Restated, never revised |
 | target | *Indian Journal of Tuberculosis*, Original Article | *International Journal of Epidemiology*, Original Article |
 | layout | IJTB house set (as IJTB-S-26-01305) | generic set |
 
@@ -16,7 +16,10 @@ run, and are deliberately not repeated here. How to upload: `SUBMISSION_STEPS.md
 ## What is generated and what is hand-written
 
 Generated on every build (never edit by hand): both manuscripts, the blinded copies, Paper A's highlights,
-figure captions and supplement, Paper B's tables file and supplement, all figures, and every `.docx`.
+figure captions and supplement, Paper B's tables file and supplement (from `make_supplementary_b.py`
+and its template), Paper B's Tables 1-4 (from `make_tables_b.py`, checked verbatim), all figures, and
+every `.docx`. Paper B's vintage analysis needs WHO's archived files: run `tools/fetch_vintages.py`, then
+`Rscript tools/convert_vintages.R`; both are verified by digest on every `check_all.py` run.
 
 Hand-written, and checked by the suite: cover letters, title pages, Paper A's declarations, declaration of
 interests and copyright transfer, and both RECORD checklists.

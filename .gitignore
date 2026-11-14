@@ -12,3 +12,9 @@ manuscript/submission/*.pdf
 manuscript/submission/**/*.pdf
 manuscript/submission/**/declarationStatement*
 manuscript/submission/**/~$*
+
+# WHO report-repository snapshots: fetched at pinned commits by tools/fetch_vintages.py,
+# verified by SHA-256 against data/vintages/vintage_manifest.csv. The source repositories
+# carry no licence, so the files are not redistributed here.
+data/vintages/raw/
+data/vintages/csv/

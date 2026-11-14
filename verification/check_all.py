@@ -38,6 +38,12 @@ def main() -> int:
     results.append(run("demos/d1_tb.py", [sys.executable, str(ROOT / "demos" / "d1_tb.py")]))
     results.append(run("demos/d2_who_data_screen.py",
                        [sys.executable, str(ROOT / "demos" / "d2_who_data_screen.py")]))
+    # Paper B's vintage analysis: WHO's archived files must match their recorded
+    # digests, and the reconstruction must reproduce WHO's published totals.
+    results.append(run("tools/fetch_vintages.py",
+                       [sys.executable, "-I", str(ROOT / "tools" / "fetch_vintages.py")]))
+    results.append(run("demos/d3_vintages.py",
+                       [sys.executable, "-I", str(ROOT / "demos" / "d3_vintages.py")]))
     # Self-similarity gates on a factual condition (a long verbatim run), not a
     # percentage, so it is safe in the suite. It skips cleanly if a comparison
     # document is missing from this machine.

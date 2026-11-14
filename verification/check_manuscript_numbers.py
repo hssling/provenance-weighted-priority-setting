@@ -90,26 +90,19 @@ def main() -> int:
     screen = run_screen()
     errors: list[str] = []
 
-    t1 = paper_rows("Budget", 9)      # Table 1, nine columns
-    t2 = paper_rows("Budget", 4)      # Table 2, four columns
+    t5 = paper_rows("Budget", 9)      # Table 5, the screen, nine columns
     for key, label in LABELS.items():
         s = screen[key]
-        if label not in t1:
-            errors.append(f"  Table 1: no row for {label!r}")
+        if label not in t5:
+            errors.append(f"  Table 5: no row for {label!r}")
         else:
-            cells = t1[label]
+            cells = t5[label]
             for i, field in enumerate(
                     ("cont", "cat", "untst", "median", "meas", "mixed", "est", "incl"), start=1):
-                check(f"Table 1 {label} col {i}", s[field], cells[i], errors)
-        if label not in t2:
-            errors.append(f"  Table 2: no row for {label!r}")
-        else:
-            cells = t2[label]
-            check(f"Table 2 {label} median", s["median"], cells[1], errors)
-            check(f"Table 2 {label} excl 0-0", s["nz"], cells[2], errors)
-            check(f"Table 2 {label} zero-modal",
-                  s["zero_modal"].replace("/", " / "), cells[3], errors)
+                check(f"Table 5 {label} col {i}", s[field], cells[i], errors)
 
+    errors += check_vintage_tables()
+    errors += check_vintage_prose()
     errors += check_activity_counts()
     errors += check_dictionary_count()
 
@@ -117,10 +110,91 @@ def main() -> int:
         print(f"FAILED: {len(errors)} mismatch(es) between the papers and the code")
         print("\n".join(errors))
         return 1
-    print(f"PASSED: all {len(LABELS)} rows of paper B's Tables 1 and 2 match "
-          f"the screen's current output, and every count of budget_prog's "
-          f"activities in paper A matches the collection form")
+    print(f"PASSED: paper B's Tables 1-4 and Supplementary Table S1 match a fresh rendering "
+          f"from the vintage analysis, every derived number in its text matches the code, "
+          f"all {len(LABELS)} rows of Table 5 match the screen, and every count of "
+          f"budget_prog's activities in paper A matches the collection form")
     return 0
+
+
+def check_vintage_tables() -> list[str]:
+    """Paper B's Tables 1-4 are rendered by manuscript/make_tables_b.py. The
+    manuscript must carry each block exactly as a fresh rendering gives it,
+    and the supplement must carry Supplementary Table S1."""
+    sys.path.insert(0, str(ROOT / "manuscript"))
+    import make_tables_b as mt
+    blocks = mt.render()
+    paper = PAPER_B.read_text(encoding="utf-8")
+    supp = (ROOT / "manuscript" / "supplementary_paper_b.md").read_text(encoding="utf-8")
+    errs = []
+    for name, block in blocks.items():
+        where, text = ("supplement", supp) if name.endswith("S1") else ("manuscript", paper)
+        if block not in text:
+            errs.append(f"  {name}: the {where} differs from a fresh rendering; "
+                        f"rerun manuscript/make_tables_b.py and paste the block")
+    return errs
+
+
+def check_vintage_prose() -> list[str]:
+    """Each derived number paper B states in its running text, as the code
+    computes it now. A sentence carrying a stale figure fails here."""
+    sys.path.insert(0, str(ROOT / "demos"))
+    import d3_vintages as d3
+    R = d3.results()
+    paper = PAPER_B.read_text(encoding="utf-8")
+    pct = lambda a, b: f"{100 * a / b:.1f}%"
+
+    def span(group: str) -> str:
+        v = [100 * r["identical"] / r["pairs"] for r in R["restatement"] if r["group"] == group]
+        return f"{min(v):.1f}-{max(v):.1f}%"
+
+    util_rev = [r for r in R["revision"] if r["group"] == "util"]
+    cnt_rev = [r for r in R["revision"] if r["group"] == "counted"]
+    rr = R["restated_then_revised"]
+    f = R["filling"]["2026"]
+    used = sum(n for s, n in f.items() if s != "absent")
+    sup = f["filled_earlier"] + f["filled_later"] + f["filled_other"] + f["overridden"]
+    last = R["latest"]["2026"]
+    cons = [r for r in R["consequence"]["2026"] if d3.WINDOW_START <= r["year"] <= last]
+    c = cons[-1]
+    ind = R["india"]
+    share = lambda k: [100 * r[k] / r["ghs"] for r in cons]
+    care = [100 * r["ghs"] / r["total"] for r in cons]
+    want = {
+        "utilisation values never revised": f"None of {sum(r['pairs'] for r in util_rev):,} utilisation values",
+        "expenditure values compared": f"Of {sum(r['pairs'] for r in cnt_rev):,} expenditure values compared, "
+                                       f"{['zero', 'one', 'two', 'three', 'four'][sum(r['changed'] for r in cnt_rev)]} changed",
+        "restatement, utilisation": span("util"),
+        "restatement, expenditure": span("counted"),
+        "restated then revised": f"none of the {sum(r['restated_2024'] for r in rr):,} utilisation values",
+        "WHO-supplied share": f"{sup:,} of the {used:,} utilisation values WHO used for "
+                              f"{d3.WINDOW_START}-{last} ({pct(sup, used)})",
+        "filled earlier": f"from an earlier year ({f['filled_earlier']:,})",
+        "filled later": f"{f['filled_later']:,} came from a later year",
+        "overridden": f"{f['overridden']:,} replaced a reported value",
+        "care share of total": f"{min(care):.1f}-{max(care):.1f}% of total funding",
+        "care estimate": f"US$ {c['ghs'] / 1e9:.2f} billion of US$ {c['total'] / 1e9:.2f} billion",
+        "new share": f"{pct(c['new'], c['ghs'])} was computed from inputs newly reported",
+        "restated share": f"{pct(c['restated'], c['ghs'])} from inputs restated",
+        "WHO share": f"{pct(c['WHO-supplied'], c['ghs'])} from inputs WHO supplied",
+        "new range": f"from {min(share('new')):.1f}% to {max(share('new')):.1f}%",
+        "lenient range": f"{min(share('new_any')):.1f}-{max(share('new_any')):.1f}%",
+        "India amount": f"US$ {ind['care_latest'] / 1e6:.0f} million in {last} "
+                        f"({pct(ind['care_latest'], c['ghs'])} of the care estimate)",
+        "India last year": f"last reported its utilisation inputs for {ind['last_reported']}",
+        "India first year": f"its {ind['first_year_of_values']}, {ind['first_year_of_values'] + 1} "
+                            f"and {ind['last_reported']} entries were identical",
+    }
+    errs = []
+    for label, s in want.items():
+        if s not in paper:
+            errs.append(f"  paper B text: expected {label} as {s!r}")
+    # India must be the largest single contribution, as the text says
+    top = max(((d3.num(r["c_ghs"]) or 0.0), r["iso3"]) for r in d3.rows("proc2026")
+              if int(r["year"]) == last)
+    if top[1] != "IND" and "largest single contribution, India" in paper:
+        errs.append(f"  paper B text: India is not the largest contributor in {last} ({top[1]} is)")
+    return errs
 
 
 WORDS = {w: n for n, w in enumerate(
