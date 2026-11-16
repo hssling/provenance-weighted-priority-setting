@@ -39,9 +39,12 @@ PAPERS = {
     "paper B": dict(src=M / "manuscript_b_tmih.md", supp=M / "supplementary_paper_b_tmih.md",
                     folder=S / "paper_b_tmih", intro="## 1. Background"),
 }
-# v1.0.0 (paper A), v1.1.0 (paper B, adds the vintage analysis), and the concept DOI.
+# v1.0.0 (paper A), v1.1.0 (paper B at IJE, adds the vintage analysis), v1.2.0 (paper B at
+# TMIH, adds demos/d3_strengthen.py), and the concept DOI.
 DEPOSIT_DOIS = {"10.5281/zenodo.24187367", "10.5281/zenodo.24214490",
-                "10.5281/zenodo.24187366"}
+                "10.5281/zenodo.24286016", "10.5281/zenodo.24187366"}
+# The version a paper must cite: the first one containing all the code its numbers come from.
+REQUIRED_DOI = {"paper B": "10.5281/zenodo.24286016"}
 AUTHOR = {"name": "Siddalingaiah H S", "orcid": "0000-0002-4771-8285",
           "email": "hssling@yahoo.com"}
 
@@ -163,6 +166,13 @@ def main() -> int:
             for d in set(re.findall(r"10\.5281/zenodo\.\d+", text)):
                 if d not in DEPOSIT_DOIS:
                     errs.append(f"  {name}: {label} cites {d}, not the deposit's DOI")
+            need = REQUIRED_DOI.get(name)
+            public = text.split("## Notes for the author")[0]
+            if need and label != "supplement" and need not in public:
+                errs.append(f"  {name}: {label} does not cite {need}, the release holding its code")
+            if need:
+                for d in set(re.findall(r"10\.5281/zenodo\.\d+", public)) - {need, "10.5281/zenodo.24187366"}:
+                    errs.append(f"  {name}: {label} cites {d}, an older release lacking its code")
 
         # 5. title-page counts against a fresh count ---------------------------
         fresh = {"Tables": len(re.findall(r"(?m)^\*\*Table \d+\.", src)),
