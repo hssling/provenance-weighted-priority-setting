@@ -35,7 +35,7 @@ PAPERS = {
 }
 # Submitted upload sets are never rebuilt. Name the papers to build:
 #   python -I manuscript/build_submission.py paper_b_tmih
-FROZEN = {"paper_a", "paper_b"}
+FROZEN = {"paper_a", "paper_b", "paper_b_tmih"}  # submitted sets: IJTB 13 Nov, IJE 14 Nov, TMIH 16 Nov 2026
 
 # Lines identifying the author. Removed from the blinded copy; each must be
 # found, or the blinding is silently incomplete.
