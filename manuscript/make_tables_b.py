@@ -3,7 +3,7 @@
 Tables 1-4 of paper B are rendered here from demos/d3_vintages.py and written
 to manuscript/tables_paper_b.md. The manuscript carries the same blocks, and
 verification/check_manuscript_numbers.py fails if any block in the manuscript
-differs from a fresh rendering. Table 5 (the 443-variable screen) is checked
+differs from a fresh rendering. Table 6 (the 443-variable screen) is checked
 against demos/d2_who_data_screen.py as before.
 
 Usage: python -I manuscript/make_tables_b.py
@@ -17,7 +17,7 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "demos"))
 import d3_vintages as d3                                       # noqa: E402
 
-OUT = ROOT / "manuscript" / "tables_paper_b.md"
+OUT = ROOT / "manuscript" / "tables_paper_b_tmih.md"   # TMIH version
 RELEASE_NAME = {"2024": "Jul 2024", "2025": "Jul 2025", "2026": "Aug 2026"}
 LABEL = {
     "hcfvisit_dstb": "Outpatient visits per patient, drug-susceptible TB",
@@ -151,10 +151,62 @@ def table4(R: dict, release: str = "2026", label: str = "Table 4") -> str:
     return "\n".join(rows)
 
 
+def table5() -> str:
+    """Age of the inputs behind the care estimate, and the estimate adjusted for re-measurement
+    (docs/paper_b_strengthening_plan.md, S1-S3), 2026 report, 2024 and 2025."""
+    import d3_strengthen as ds
+    S = {y: ds.summary(y) for y in (2024, 2025)}
+    bn = lambda x: f"{x / 1e9:.2f}"
+    sh = lambda s, k: f"{100 * s['age_share'].get(k, 0.0) / s['care']:.1f}%"
+    rows = ["**Table 5. Age of the inputs behind WHO's care estimate, and the estimate adjusted for "
+            "re-measurement, 2026 report.** Age is the number of years since an input's value last changed in "
+            "the country's reported series; a cost component takes the age of its oldest input.", "",
+            "| | 2024 | 2025 |", "|---|---:|---:|",
+            f"| Care estimate, US$ bn | {bn(S[2024]['care'])} | {bn(S[2025]['care'])} |"]
+    labels = {"0": "Inputs reported for the year (age 0)", "1": "Age 1 year", "2": "Age 2 years",
+              "3": "Age 3 years", "4": "Age 4 years", "5+": "Age 5 years or more", "unknown": "Age not established"}
+    for k in ds.AGE_BINS:
+        rows.append(f"| {labels[k]} | {sh(S[2024], k)} | {sh(S[2025], k)} |")
+    adj = lambda s: f"{bn(s['adjusted']['median'])} ({100 * (s['adjusted']['median'] / s['care'] - 1):+.1f}%)".replace("-", "−")
+    rows.append(f"| Adjusted at the median re-measurement rate, US$ bn | {adj(S[2024])} | {adj(S[2025])} |")
+    cty = lambda s: f"{len(s['old'])} of {s['countries']} ({100 * s['old_care'] / s['care']:.1f}%)"
+    rows.append(f"| Countries with less than half of their estimate on inputs reported for the year "
+                f"(share of the estimate) | {cty(S[2024])} | {cty(S[2025])} |")
+    rows.append(f"| Of these, flagged high TB burden by WHO | {len(S[2024]['hb_old'])} of {len(S[2024]['hb'])} | "
+                f"{len(S[2025]['hb_old'])} of {len(S[2025]['hb'])} |")
+    rows += ["", "*Shares are of the care estimate in US dollars. The adjustment moves every input that was not "
+             "reported for the year by the median annual rate of change observed when countries re-measure that "
+             "input, for each year of its age; newly reported inputs are unchanged. High TB burden: the flag in "
+             "WHO's processed file for the 2026 report, counted among countries with a care estimate.*"]
+    return "\n".join(rows)
+
+
+def table_s2() -> str:
+    """Per high-burden country, 2025 (plan S3)."""
+    import d3_strengthen as ds
+    s = ds.summary(2025)
+    names = {r["iso3"]: r["country"] for r in d3.rows("proc2026")}
+    rows = ["**Supplementary Table S2. WHO's 2025 care estimate in the countries WHO flags as high TB burden, "
+            "by the provenance of its inputs.**", "",
+            "| Country | Care estimate, US$ million | Share on inputs reported for 2025 | "
+            "Adjusted at the median rate | Adjusted at the 25th and 75th percentile rates |",
+            "|---|---:|---:|---:|---:|"]
+    for c in sorted(s["hb"], key=lambda c: -s["hb"][c]["care"]):
+        d, a = s["hb"][c], s["adj_hb"][c]
+        p = lambda x: f"{100 * (x / d['care'] - 1):+.1f}%".replace("-", "−")
+        rows.append(f"| {names.get(c, c)} | {d['care'] / 1e6:.1f} | {100 * d['new'] / d['care']:.1f}% | {p(a['median'])} | "
+                    f"{p(a['q25'])} to {p(a['q75'])} |")
+    rows += ["", "*The percentile columns apply the 25th or 75th percentile rate to every non-current input at "
+             "once; compounded over ages of five years or more they span a range too wide to bound the estimate "
+             "and are shown to convey how uncertain a value is once it stops being re-measured.*"]
+    return "\n".join(rows)
+
+
 def render() -> dict[str, str]:
     R = d3.results()
     return {"Table 1": table1(R), "Table 2": table2(R), "Table 3": table3(R), "Table 4": table4(R),
-            "Table S1": table4(R, "2025", "Supplementary Table S1")}
+            "Table 5": table5(),
+            "Table S1": table4(R, "2025", "Supplementary Table S1"), "Table S2": table_s2()}
 
 
 def main() -> int:

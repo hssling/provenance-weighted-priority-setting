@@ -34,6 +34,7 @@ LAYOUT: dict[str, dict] = {
                              "excluding abstract, tables, figure legends, declarations "
                              "and references"),
     },
+    # Paper B as submitted to IJE (14 Nov 2026, declined 16 Nov): frozen, never rebuilt.
     "paper_b": {
         "journal": "International Journal of Epidemiology",
         "cover": "02_cover_letter.md",
@@ -49,5 +50,28 @@ LAYOUT: dict[str, dict] = {
         "body_end": "## References",
         "word_count_basis": ("words (main text, excluding abstract, key messages, tables, "
                              "figures, references and declarations)"),
+    },
+    # Paper B for Tropical Medicine & International Health (hybrid; no page charges).
+    "paper_b_tmih": {
+        "journal": "Tropical Medicine & International Health",
+        "source": "manuscript_b_tmih.md",
+        "supplement_source": "supplementary_paper_b_tmih.md",
+        "figure_letter": "b",
+        "cover": "02_cover_letter.md",
+        "title_page": "01_title_page.md",
+        "manuscript": "03_manuscript.md",          # TMIH extracts metadata from one manuscript file
+        "blinded": "91_manuscript_blinded.md",     # kept for safety; TMIH review is not double-blind
+        "supplement": "04_supplementary.md",
+        "record": "05_RECORD_checklist.md",
+        "tables_file": "06_tables.md",
+        "figure": "07_Figure_{k}.png",
+        "figure_glob": "07_Figure_*.png",
+        "tables_in_manuscript": False,            # TMIH: tables uploaded as their own file
+        "body_end": "## References",
+        "word_count_basis": ("words (main body, excluding abstract, tables, figure legends, "
+                             "references and declarations)"),
+        "word_count_anchor": r"(?m)^\*\*Conflict of interest and funding:\*\*.*$",
+        # Kept out of the public repository; build_submission.py appends it to the uploads.
+        "reviewers": "private/suggested_reviewers_paper_b_tmih.md",
     },
 }

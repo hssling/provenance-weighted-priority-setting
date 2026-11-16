@@ -32,7 +32,7 @@ FLAG_PCT = 15.0  # a single source above this share warrants attention
 LONG_RUN = 40    # verbatim words: the condition the exit code gates on
 
 PAPER_A = REPO / "manuscript" / "manuscript_draft_v1.md"
-PAPER_B = REPO / "manuscript" / "manuscript_b_draft_v1.md"
+PAPER_B = REPO / "manuscript" / "manuscript_b_tmih.md"
 
 PRIOR = [
     ("TB-BOPAS, under review IJTB-D-26-00777",

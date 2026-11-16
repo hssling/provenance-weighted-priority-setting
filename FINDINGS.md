@@ -580,6 +580,28 @@ licence and are not committed.
   download prints 0 where the snapshot has no total expenditure or receipts; comparisons use snapshots.
 - The six cost inputs are exactly the six variables WHO's dictionary labels "Estimated"/"Typical".
 
+### 4b.1 Strengthening after the IJE desk decision (16 November 2026)
+
+IJE declined paper B without review on 16 Nov 2026 (IJE-2026-11-2170). The author declined a transfer to an
+APC journal; the paper is retargeted to *Tropical Medicine & International Health* (no page charges, OnlineOpen
+not taken). Three analyses were added. `docs/paper_b_strengthening_plan.md` was committed (77a1d31) before
+`demos/d3_strengthen.py` computed anything (a44b77a). Its clarifications are logged in the plan.
+
+- **Age.** 52.4% of the 2025 care estimate rests on components whose oldest input has not changed for five
+  years or more; 32.6% has age 0.
+- **Re-measurement adjustment.** Where countries re-measure an input, its median annual change is -3.1% to
+  -18.2% across the six inputs. Moving each non-current input at its variable's median rate per year of age
+  lowers the 2025 estimate from US$ 1.08 bn to US$ 0.84 bn (-21.7%), and the 2024 estimate by 23.4%.
+  Applying the quartile rates to every input at once gives a band too wide to bound anything (-59%/+934%).
+  The plan expected this; the paper reports it as uncertainty growing with age, not as an interval.
+- **Concentration.** In 77 of 115 countries (66.3% of the estimate), less than half rests on current inputs.
+  This includes 22 of the 31 high-burden countries with a care estimate (WHO's `g_hb_tb` flag). In 13 of them,
+  led by India, Viet Nam, Indonesia and Brazil and together holding 41.9%, none does.
+- Every number above is checked against the code by `verification/check_manuscript_numbers.py`. A mutation
+  test changed each of 11 numbers in turn, and the check failed on all 11.
+- The suggested reviewers named in the TMIH manuscript are held in git-ignored `manuscript/private/` and
+  merged in by the build, so they never reach this public repository.
+
 ## 5. Limitations and open questions
 
 ### 5.1 Limitations the instrument carries

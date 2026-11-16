@@ -36,8 +36,8 @@ S = M / "submission"
 PAPERS = {
     "paper A": dict(src=M / "manuscript_draft_v1.md", supp=M / "supplementary_paper_a.md",
                     folder=S / "paper_a", intro="## 1. Introduction"),
-    "paper B": dict(src=M / "manuscript_b_draft_v1.md", supp=M / "supplementary_paper_b.md",
-                    folder=S / "paper_b", intro="## 1. Background"),
+    "paper B": dict(src=M / "manuscript_b_tmih.md", supp=M / "supplementary_paper_b_tmih.md",
+                    folder=S / "paper_b_tmih", intro="## 1. Background"),
 }
 # v1.0.0 (paper A), v1.1.0 (paper B, adds the vintage analysis), and the concept DOI.
 DEPOSIT_DOIS = {"10.5281/zenodo.24187367", "10.5281/zenodo.24214490",
@@ -106,7 +106,7 @@ def check_stated_overlap() -> list[str]:
           for k, v in (("A", a_src), ("B", b_src))}
     measured = {"A": 100 * len(sh["A"] & sh["B"]) / len(sh["A"]),
                 "B": 100 * len(sh["B"] & sh["A"]) / len(sh["B"])}
-    for key, folder in (("A", S / "paper_a"), ("B", S / "paper_b")):
+    for key, folder in (("A", S / "paper_a"), ("B", S / "paper_b_tmih")):
         m = re.search(r"overlap screen between them returns (\d+\.\d)%",
                       read(folder / LAYOUT[folder.name]["cover"]))
         if not m:

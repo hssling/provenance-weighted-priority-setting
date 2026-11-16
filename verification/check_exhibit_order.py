@@ -23,7 +23,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 PAPERS = {
     "paper A": ROOT / "manuscript" / "manuscript_draft_v1.md",
-    "paper B": ROOT / "manuscript" / "manuscript_b_draft_v1.md",
+    "paper B": ROOT / "manuscript" / "manuscript_b_tmih.md",
 }
 
 

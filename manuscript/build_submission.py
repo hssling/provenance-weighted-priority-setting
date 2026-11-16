@@ -30,8 +30,12 @@ OUT = HERE / "submission"
 
 PAPERS = {
     "paper_a": ("manuscript_draft_v1.md", "## 1. Introduction"),
-    "paper_b": ("manuscript_b_draft_v1.md", "## 1. Background"),
+    "paper_b": ("manuscript_b_draft_v1.md", "## 1. Background"),          # IJE, frozen
+    "paper_b_tmih": ("manuscript_b_tmih.md", "## 1. Background"),
 }
+# Submitted upload sets are never rebuilt. Name the papers to build:
+#   python -I manuscript/build_submission.py paper_b_tmih
+FROZEN = {"paper_a", "paper_b"}
 
 # Lines identifying the author. Removed from the blinded copy; each must be
 # found, or the blinding is silently incomplete.
@@ -100,7 +104,12 @@ def blind(text: str) -> tuple[str, int]:
 def main() -> int:
     OUT.mkdir(exist_ok=True)
     print(f"{'paper':<9}{'abstract':>10}{'body':>8}{'refs':>6}{'tables':>8}  journal")
-    for key, (fname, intro) in PAPERS.items():
+    chosen = [k for k in sys.argv[1:] if k in PAPERS] or [k for k in PAPERS if k not in FROZEN]
+    frozen = [k for k in chosen if k in FROZEN]
+    if frozen:
+        raise SystemExit(f"{frozen}: submitted upload sets are frozen and are not rebuilt")
+    for key in chosen:
+        fname, intro = PAPERS[key]
         lay = LAYOUT[key]
         src = (HERE / fname).read_text(encoding="utf-8")
         abstract = count_words(section(src, "## Abstract", "**Keywords")
@@ -130,9 +139,10 @@ def main() -> int:
             assert leak not in text, f"{key}: blinded copy still contains {leak!r}"
 
         basis = lay["word_count_basis"]
-        blinded_body, table_blocks = split_tables(add_word_count(text, body, basis))
+        anchor = [lay["word_count_anchor"]] if "word_count_anchor" in lay else []
+        blinded_body, table_blocks = split_tables(add_word_count(text, body, basis, *anchor))
         unblinded_body, unblinded_tables = split_tables(
-            add_word_count(for_submission(src), body, basis))
+            add_word_count(for_submission(src), body, basis, *anchor))
         assert len(table_blocks) == tables == len(unblinded_tables), (
             f"{key}: {tables} table captions but {len(table_blocks)} tables split out")
         if lay["tables_in_manuscript"]:
@@ -150,6 +160,16 @@ def main() -> int:
                 "# Tables\n\n" + "\n\n---\n\n".join(table_blocks) + "\n", encoding="utf-8")
         blinded_body = literal_reference_numbers(superscript_citations(blinded_body))
         unblinded_body = literal_reference_numbers(superscript_citations(unblinded_body))
+        if "reviewers" in lay:
+            # Suggested reviewers belong in the uploaded manuscript but not in a public
+            # repository, so they live in a git-ignored file and are appended here.
+            rev = HERE / lay["reviewers"]
+            if rev.exists():
+                extra = "\n\n" + rev.read_text(encoding="utf-8").strip() + "\n"
+                blinded_body = blinded_body.rstrip() + extra
+                unblinded_body = unblinded_body.rstrip() + extra
+            else:
+                print(f"WARNING {key}: {lay['reviewers']} not found; built without suggested reviewers")
         (d / lay["blinded"]).write_text(blinded_body, encoding="utf-8")
         # The unblinded source goes in too: a single-anonymized journal wants
         # that one, and having both means the choice is made at upload, not here.
@@ -158,14 +178,14 @@ def main() -> int:
 
         stamp_counts(d / lay["title_page"], abstract, body, tables, refs, figures)
         copy_figures(key, d, lay, figures)
-        supp = HERE / f"supplementary_paper_{key[-1]}.md"
+        supp = HERE / lay.get("supplement_source", f"supplementary_paper_{key[-1]}.md")
         if supp.exists():
             (d / lay["supplement"]).write_text(supp.read_text(encoding="utf-8"),
                                                encoding="utf-8")
 
     print("\nThese counts are written into the title pages by this script. Type them "
           "into the portal from here, not from memory.")
-    print(f"\n{to_docx()}")
+    print(f"\n{to_docx(chosen)}")
     return 0
 
 
@@ -173,7 +193,7 @@ def copy_figures(key: str, d: Path, lay: dict, figures: int) -> None:
     """Each folder is the complete upload for its journal, named by the
     figure number the text cites. Paper A takes the 600 dpi TIFF masters,
     with PNG previews as the author's IJTB uploads carried; paper B takes PNG."""
-    letter = key[-1]
+    letter = lay.get("figure_letter", key[-1])
     figdir = HERE.parent / "figures"
     ext = ".tif" if lay["figure"].endswith(".tif") else ".png"
     figs = sorted(figdir.glob(f"figure_{letter}*{ext}"))
@@ -310,13 +330,16 @@ def for_submission(text: str) -> str:
     return re.sub(r"\n{3,}", "\n\n", text)
 
 
-def add_word_count(text: str, body: int, basis: str) -> str:
+def add_word_count(text: str, body: int, basis: str,
+                   anchor: str = r"(?m)^\*\*Running title:\*\*.*$") -> str:
     """IJE: "The main document should include a title page with author names
     and affiliations. The word count should be included on the title page."
+    TMIH lists it last in the front matter, after the conflict-of-interest and
+    funding statement, so the anchor is set per journal in LAYOUT.
     The count is the one the build derived, never typed."""
     line = f"**Word count:** {body:,} {basis}"
-    m = re.search(r"(?m)^\*\*Running title:\*\*.*$", text)
-    assert m, "no running title to anchor the word count"
+    m = re.search(anchor, text)
+    assert m, f"no {anchor!r} to anchor the word count"
     return text[:m.end()] + "\n\n" + line + text[m.end():]
 
 
@@ -380,7 +403,7 @@ def stamp_counts(page: Path, abstract: int, body: int, tables: int,
     page.write_text(s, encoding="utf-8")
 
 
-def to_docx() -> str:
+def to_docx(folders: list[str]) -> str:
     """Convert every .md under submission/ to .docx. Optional by design."""
     import style_docx_tables as style_tables
     pandoc = shutil.which("pandoc")
@@ -388,7 +411,7 @@ def to_docx() -> str:
         return ("pandoc not on PATH: wrote Markdown only. Neither journal accepts "
                 "Markdown, so convert before uploading.")
     made, failed = [], []
-    for md in sorted(OUT.rglob("*.md")):
+    for md in sorted(p for f in folders for p in (OUT / f).glob("*.md")):
         if md.name == "README.md" or md.name == "SUBMISSION_STEPS.md":
             continue                      # working documents, not uploads
         docx = md.with_suffix(".docx")

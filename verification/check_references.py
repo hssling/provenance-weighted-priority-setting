@@ -32,7 +32,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 A = ROOT / "manuscript" / "manuscript_draft_v1.md"
-B = ROOT / "manuscript" / "manuscript_b_draft_v1.md"
+B = ROOT / "manuscript" / "manuscript_b_tmih.md"
 
 
 def split(text: str) -> tuple[str, list[str], str]:
@@ -173,7 +173,7 @@ def check_supplement_citations(main_text: str, supp: Path,
 def main() -> int:
     errs: list[str] = []
     for name, path, supp in (("paper A", A, "supplementary_paper_a.md"),
-                             ("paper B", B, "supplementary_paper_b.md")):
+                             ("paper B", B, "supplementary_paper_b_tmih.md")):
         text = path.read_text(encoding="utf-8")
         errs += check_numbered(text, name)
         errs += check_supplement_citations(text, ROOT / "manuscript" / supp, name)

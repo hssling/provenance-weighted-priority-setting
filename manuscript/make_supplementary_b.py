@@ -9,6 +9,7 @@ that are facts about files or code are generated here, so they cannot drift:
                    to zero, and the number of hand-coded substitutions, read
                    from WHO's own R code
   {{TABLE_S1}}     Table 4 repeated on the 2025 report, from make_tables_b.py
+  {{TABLE_S2}}     the high-burden countries' care estimates by input provenance (make_tables_b.py)
 
 Usage: python -I manuscript/make_supplementary_b.py
 """
@@ -21,8 +22,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 HERE = ROOT / "manuscript"
-TEMPLATE = HERE / "supplementary_paper_b_template.md"
-OUT = HERE / "supplementary_paper_b.md"
+TEMPLATE = HERE / "supplementary_paper_b_tmih_template.md"
+OUT = HERE / "supplementary_paper_b_tmih.md"   # TMIH version; the IJE supplement is frozen
 MANIFEST = ROOT / "data" / "vintages" / "vintage_manifest.csv"
 RAW = ROOT / "data" / "vintages" / "raw"
 
@@ -79,7 +80,8 @@ def main() -> int:
     import make_tables_b as mt
     text = TEMPLATE.read_text(encoding="utf-8")
     parts = {"{{NOTE1_TABLE}}": note1(), "{{NOTE2_FACTS}}": note2(),
-             "{{TABLE_S1}}": mt.render()["Table S1"]}
+             "{{TABLE_S1}}": mt.render()["Table S1"],
+             "{{TABLE_S2}}": mt.render()["Table S2"]}
     for k, v in parts.items():
         assert k in text, k
         text = text.replace(k, v)

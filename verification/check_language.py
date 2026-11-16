@@ -25,8 +25,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 M = ROOT / "manuscript"
 
-FILES = [M / "manuscript_draft_v1.md", M / "manuscript_b_draft_v1.md",
-         M / "supplementary_paper_a.md", M / "supplementary_paper_b.md"]
+FILES = [M / "manuscript_draft_v1.md", M / "manuscript_b_tmih.md",
+         M / "supplementary_paper_a.md", M / "supplementary_paper_b_tmih.md"]
 # Every hand-written upload: title page, cover letter, checklist, and the
 # IJTB declarations. Generated uploads repeat the sources checked above.
 sys.path.insert(0, str(M))

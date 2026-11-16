@@ -23,7 +23,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 SCREEN = ROOT / "demos" / "d2_who_data_screen.py"
-PAPER_B = ROOT / "manuscript" / "manuscript_b_draft_v1.md"
+PAPER_B = ROOT / "manuscript" / "manuscript_b_tmih.md"
 
 # The screen's internal keys, and the row labels paper B uses for them.
 LABELS = {
@@ -90,16 +90,16 @@ def main() -> int:
     screen = run_screen()
     errors: list[str] = []
 
-    t5 = paper_rows("Budget", 9)      # Table 5, the screen, nine columns
+    t5 = paper_rows("Budget", 9)      # Table 6 (TMIH; Table 5 in the IJE version), the screen, nine columns
     for key, label in LABELS.items():
         s = screen[key]
         if label not in t5:
-            errors.append(f"  Table 5: no row for {label!r}")
+            errors.append(f"  Table 6: no row for {label!r}")
         else:
             cells = t5[label]
             for i, field in enumerate(
                     ("cont", "cat", "untst", "median", "meas", "mixed", "est", "incl"), start=1):
-                check(f"Table 5 {label} col {i}", s[field], cells[i], errors)
+                check(f"Table 6 {label} col {i}", s[field], cells[i], errors)
 
     errors += check_vintage_tables()
     errors += check_vintage_prose()
@@ -110,25 +110,25 @@ def main() -> int:
         print(f"FAILED: {len(errors)} mismatch(es) between the papers and the code")
         print("\n".join(errors))
         return 1
-    print(f"PASSED: paper B's Tables 1-4 and Supplementary Table S1 match a fresh rendering "
+    print(f"PASSED: paper B's Tables 1-5 and Supplementary Tables S1-S2 match a fresh rendering "
           f"from the vintage analysis, every derived number in its text matches the code, "
-          f"all {len(LABELS)} rows of Table 5 match the screen, and every count of "
+          f"all {len(LABELS)} rows of Table 6 match the screen, and every count of "
           f"budget_prog's activities in paper A matches the collection form")
     return 0
 
 
 def check_vintage_tables() -> list[str]:
-    """Paper B's Tables 1-4 are rendered by manuscript/make_tables_b.py. The
+    """Paper B's Tables 1-5 and Supplementary Tables S1-S2 are rendered by manuscript/make_tables_b.py. The
     manuscript must carry each block exactly as a fresh rendering gives it,
-    and the supplement must carry Supplementary Table S1."""
+    and the supplement must carry Tables S1-S2."""
     sys.path.insert(0, str(ROOT / "manuscript"))
     import make_tables_b as mt
     blocks = mt.render()
     paper = PAPER_B.read_text(encoding="utf-8")
-    supp = (ROOT / "manuscript" / "supplementary_paper_b.md").read_text(encoding="utf-8")
+    supp = (ROOT / "manuscript" / "supplementary_paper_b_tmih.md").read_text(encoding="utf-8")
     errs = []
     for name, block in blocks.items():
-        where, text = ("supplement", supp) if name.endswith("S1") else ("manuscript", paper)
+        where, text = ("supplement", supp) if name.startswith("Table S") else ("manuscript", paper)
         if block not in text:
             errs.append(f"  {name}: the {where} differs from a fresh rendering; "
                         f"rerun manuscript/make_tables_b.py and paste the block")
@@ -185,6 +185,34 @@ def check_vintage_prose() -> list[str]:
         "India first year": f"its {ind['first_year_of_values']}, {ind['first_year_of_values'] + 1} "
                             f"and {ind['last_reported']} entries were identical",
     }
+    # Strengthening analyses (docs/paper_b_strengthening_plan.md), computed by demos/d3_strengthen.py
+    import math
+    import d3_strengthen as ds
+    S, S24 = ds.summary(2025), ds.summary(2024)
+    rt = ds.rates()
+    med = sorted(100 * (math.exp(ds.quartiles(rt[v])[1]) - 1) for v in d3.UTIL)
+    adj = lambda s: 100 * (1 - s["adjusted"]["median"] / s["care"])
+    zero = [c for c, d in S["hb"].items() if d["new"] == 0]
+    big = sorted(zero, key=lambda c: -S["hb"][c]["care"])[:4]
+    names = {r["iso3"]: r["country"] for r in d3.rows("proc2026")}
+    want.update({
+        "age 5+ share": f"Over half of WHO's 2025 care estimate ({100 * S['age_share']['5+'] / S['care']:.1f}%)",
+        "age 0 share": f"and {100 * S['age_share']['0'] / S['care']:.1f}% on components whose inputs were all reported for 2025",
+        "median rate range": f"the median annual change was {med[-1]:.1f}% to {med[0]:.1f}%".replace("-", "−"),
+        "adjusted 2025": f"from US$ {S['care'] / 1e9:.2f} billion to US$ {S['adjusted']['median'] / 1e9:.2f} billion "
+                         f"(−{adj(S):.1f}%)",
+        "adjusted 2024": f"and the 2024 estimate by {adj(S24):.1f}%",
+        "countries mostly old": f"In {len(S['old'])} of {S['countries']} countries, holding "
+                                f"{100 * S['old_care'] / S['care']:.1f}% of the 2025 care estimate",
+        "high burden": f"They included {len(S['hb_old'])} of the {len(S['hb'])} countries flagged as high TB burden",
+        "high burden none": f"In {len(zero)} of these, led by {', '.join(names[c] for c in big[:3])} and {names[big[3]]} "
+                            f"and together holding {100 * sum(S['hb'][c]['care'] for c in zero) / S['care']:.1f}% of the global estimate",
+        "abstract rate range": f"(median {med[-1]:.1f}% to {med[0]:.1f}% a year)".replace("-", "−"),
+        "abstract adjusted": f"lowered the estimate by {adj(S):.1f}%, to US$ {S['adjusted']['median'] / 1e9:.2f} billion",
+        "abstract countries": f"In {len(S['old'])} of {S['countries']} countries, holding {100 * S['old_care'] / S['care']:.1f}% "
+                              f"of the estimate and including {len(S['hb_old'])} of {len(S['hb'])} high TB burden countries",
+        "abstract age": f"{100 * S['age_share']['5+'] / S['care']:.1f}% rested on inputs unchanged for five years or more",
+    })
     errs = []
     for label, s in want.items():
         if s not in paper:

@@ -24,7 +24,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 PAPERS = {
     "paper A": ROOT / "manuscript" / "manuscript_draft_v1.md",
-    "paper B": ROOT / "manuscript" / "manuscript_b_draft_v1.md",
+    "paper B": ROOT / "manuscript" / "manuscript_b_tmih.md",
 }
 # Assigned by the publisher, registered only at publication: expected to 404.
 NOT_YET_REGISTERED = {"10.25259/jsstd_120_2026"}
