@@ -73,5 +73,8 @@ LAYOUT: dict[str, dict] = {
         "word_count_anchor": r"(?m)^\*\*Conflict of interest and funding:\*\*.*$",
         # Kept out of the public repository; build_submission.py appends it to the uploads.
         "reviewers": "private/suggested_reviewers_paper_b_tmih.md",
+        # Front matter in the paragraph layout TMIH's metadata extraction expects.
+        "identifying": [r"^Siddalingaiah H S, MD, Professor$", r"^Department of Community Medicine.*$",
+                        r"^\*\*Corresponding author:\*\*.*$", r"^\*\*Target journal:\*\*.*$"],
     },
 }

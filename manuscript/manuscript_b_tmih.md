@@ -2,13 +2,13 @@
 
 **Running title:** Vintage of WHO tuberculosis data
 
-**Author:** Siddalingaiah H S
-Department of Community Medicine, Shridevi Institute of Medical Sciences and Research Hospital, Tumkur – 572106, Karnataka, India.
-Correspondence: hssling@yahoo.com · ORCID 0000-0002-4771-8285
+Siddalingaiah H S, MD, Professor
+
+Department of Community Medicine, Shridevi Institute of Medical Sciences and Research Hospital, Tumkur – 572106, Karnataka, India
+
+**Corresponding author:** Siddalingaiah H S, Department of Community Medicine, Shridevi Institute of Medical Sciences and Research Hospital, Tumkur – 572106, Karnataka, India. Email: hssling@yahoo.com. ORCID: 0000-0002-4771-8285
 
 **Target journal:** *Tropical Medicine & International Health* (research article; no page charges; OnlineOpen not to be selected). Declined by the International Journal of Epidemiology without review, 16 Nov 2026.
-
----
 
 ## Abstract
 
@@ -33,8 +33,6 @@ Any such figure assumes that each annual value describes its year. Economics has
 Two features of country-reported health data make the question sharper. A value can be restated, entered unchanged from the previous return because nothing prompted a new measurement; and a value can be missing and filled in downstream. Routine health data have been audited for completeness and consistency [5,6], but, to our knowledge, not for vintage. WHO's archives make this testable: each annual report's repository holds a dated snapshot of the country data it used, the processed file it published from, and the code connecting them.
 
 We asked four questions. Are published values revised between releases? How often does a country restate its previous value? What does WHO's pipeline do where a country reported nothing? And how much of WHO's published estimate of TB care spending rests on inputs reported for the year it describes?
-
----
 
 ## 2. Methods
 
@@ -61,8 +59,6 @@ To test whether the six inputs are exceptional among WHO's TB data, every numeri
 ### 2.4 Reproducibility and reporting
 
 All analyses are in Python with no third-party numerical dependency; R is used once, to convert WHO's R data files to text unchanged. One command regenerates every number and table from the fetched files [10]. A large language model was used as a drafting and analysis assistant; every analytical decision, the code and its verification are the author's. Code: https://github.com/hssling/provenance-weighted-priority-setting, doi:10.5281/zenodo.24286016. The study is reported following RECORD. Ethical approval was not required: the data are aggregated and public.
-
----
 
 ## 3. Results
 
@@ -123,7 +119,7 @@ In the 2026 report, 784 of the 6,272 utilisation values WHO used for 2018-2025 (
 
 ### 3.4 What the published care estimate rests on
 
-WHO's care estimate was 11.4-21.5% of total funding in 2018-2025 (Table 4). For 2025 it was US$ 1.08 billion of US$ 6.57 billion. Of that, 32.6% was computed from inputs newly reported for 2025, 42.4% from inputs restated from 2024 and 25.0% from inputs WHO supplied (Figure 1). Across 2018-2025 the newly reported share ranged from 13.0% to 53.7% (Figure 2). Counting a component as current if any one of its inputs was newly reported raised it only to 14.5-56.8%.
+WHO's care estimate was 11.4-21.5% of total funding in 2018-2025 (Table 4). For 2025 it was US$ 1.08 billion of US$ 6.57 billion. Of that, US$ 352 million (32.6%) was computed from inputs newly reported for 2025, US$ 457 million (42.4%) from inputs restated from 2024 and US$ 269 million (25.0%) from inputs WHO supplied (Figure 1). Across 2018-2025 the newly reported share ranged from 13.0% to 53.7% (Figure 2). Counting a component as current if any one of its inputs was newly reported raised it only to 14.5-56.8%.
 
 **Table 4. WHO's estimate of spending on inpatient and outpatient TB care, by provenance of the inputs it was computed from, 2026 report.** Each cost component (bed-days and outpatient visits, for drug-susceptible and MDR/RR-TB) is classed by its own inputs: WHO-supplied if any input was filled or replaced by WHO, restated if any other input repeats the previous year, otherwise newly reported.
 
@@ -144,9 +140,9 @@ The largest single contribution, India's US$ 182 million in 2025 (16.9% of the c
 
 ### 3.5 How much the estimate depends on old inputs
 
-Over half of WHO's 2025 care estimate (52.4%) rested on cost components whose inputs had not changed for five years or more, and 32.6% on components whose inputs were all reported for 2025 (Table 5). Where countries did re-measure an input, it usually fell: the median annual change was −3.1% to −18.2% across the six inputs, consistent with the shift from hospital to ambulatory care. Moving every non-current input at those rates for each year of its age lowered the 2025 care estimate from US$ 1.08 billion to US$ 0.84 billion (−21.7%), and the 2024 estimate by 23.4%. The 25th and 75th percentile rates, applied to every input at once and compounded over five years or more, gave a range too wide to bound anything, which is itself the point: a value that is not re-measured carries uncertainty that grows with its age.
+Over half of WHO's 2025 care estimate (US$ 565 million, 52.4%) rested on cost components whose inputs had not changed for five years or more, and US$ 352 million (32.6%) on components whose inputs were all reported for 2025 (Table 5). Where countries did re-measure an input, it usually fell: the median annual change was −3.1% to −18.2% across the six inputs, consistent with the shift from hospital to ambulatory care. Moving every non-current input at those rates for each year of its age lowered the 2025 care estimate from US$ 1.08 billion to US$ 0.84 billion (−21.7%), and the 2024 estimate by 23.4%. The 25th and 75th percentile rates, applied to every input at once and compounded over five years or more, gave a range too wide to bound anything, which is itself the point: a value that is not re-measured carries uncertainty that grows with its age.
 
-In 77 of 115 countries, holding 66.3% of the 2025 care estimate, less than half of the estimate rested on inputs reported for the year. They included 22 of the 31 countries flagged as high TB burden that have a care estimate. In 13 of these, led by India, Viet Nam, Indonesia and Brazil and together holding 41.9% of the global estimate, none of it did (Supplementary Table S2).
+In 77 of 115 countries, holding US$ 715 million (66.3%) of the 2025 care estimate, less than half of the estimate rested on inputs reported for the year. They included 22 of the 31 countries flagged as high TB burden that have a care estimate. In 13 of these, led by India, Viet Nam, Indonesia and Brazil and together holding US$ 452 million (41.9%) of the global estimate, none of it did (Supplementary Table S2).
 
 **Table 5. Age of the inputs behind WHO's care estimate, and the estimate adjusted for re-measurement, 2026 report.** Age is the number of years since an input's value last changed in the country's reported series; a cost component takes the age of its oldest input.
 
@@ -183,8 +179,6 @@ Of the 443 variables screened, 42 were categorical and 43 untestable; of the 358
 
 *Median repetition is the median, across a dataset's continuous variables, of the share of consecutive country-year pairs holding an identical value. Most estimate-like variables outside the expenditure file are dominated by repeated zeros (Supplementary Note 4). TPT, TB preventive treatment.*
 
----
-
 ## 4. Discussion
 
 ### 4.1 Principal findings
@@ -204,8 +198,6 @@ Real-time data research treats the vintage of a value as part of its meaning and
 **For analysts.** The six utilisation inputs should be treated as slowly updated structural parameters, not annual observations. Trends in the care estimate, and in the domestic share of TB funding that includes it [1], warrant a sensitivity analysis of the kind reported here, which moved a fifth of the 2025 estimate.
 
 **For national programmes.** A programme that last measured its hospitalisation share years ago is represented in global estimates by that old figure. Periodic re-measurement through facility-based costing studies, and an explicit statement of the reference year in the annual return, would let the global figure reflect current practice.
-
----
 
 ## 5. Limitations
 
@@ -252,11 +244,9 @@ WHO never revises the TB country data it publishes, countries restate most of th
 
 **Ethical clearance.** Not required (§2.4).
 
-**Data accessibility.** The public WHO datasets are archived with the code at https://github.com/hssling/provenance-weighted-priority-setting and archived at Zenodo, doi:10.5281/zenodo.24286016 (release v1.2.0; the concept DOI doi:10.5281/zenodo.24187366 always resolves to the latest version). WHO's report-repository files carry no licence and are not redistributed; tools/fetch_vintages.py downloads them from pinned commits and verifies each against the SHA-256 digest recorded in data/vintages/vintage_manifest.csv.
+**Data accessibility.** The public WHO datasets are deposited with the code at https://github.com/hssling/provenance-weighted-priority-setting and archived at Zenodo, doi:10.5281/zenodo.24286016 (release v1.2.0; the concept DOI doi:10.5281/zenodo.24187366 always resolves to the latest version). WHO's report-repository files carry no licence and are not redistributed; tools/fetch_vintages.py downloads them from pinned commits and verifies each against the SHA-256 digest recorded in data/vintages/vintage_manifest.csv.
 
 **Use of generative AI.** The author used a large language model as a drafting and analysis assistant. All analytical decisions, verification and conclusions are the author's, who takes full responsibility.
-
----
 
 ## Notes for the author — not for submission
 

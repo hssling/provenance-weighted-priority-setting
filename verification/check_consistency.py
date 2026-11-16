@@ -109,7 +109,10 @@ def check_stated_overlap() -> list[str]:
           for k, v in (("A", a_src), ("B", b_src))}
     measured = {"A": 100 * len(sh["A"] & sh["B"]) / len(sh["A"]),
                 "B": 100 * len(sh["B"] & sh["A"]) / len(sh["B"])}
-    for key, folder in (("A", S / "paper_a"), ("B", S / "paper_b_tmih")):
+    # Paper A's letter is frozen as submitted (13 Nov 2026); its figure was measured against
+    # paper B as it stood then, and cannot follow later edits to paper B. Only letters still
+    # to be sent are held to the current measurement.
+    for key, folder in (("B", S / "paper_b_tmih"),):
         m = re.search(r"overlap screen between them returns (\d+\.\d)%",
                       read(folder / LAYOUT[folder.name]["cover"]))
         if not m:

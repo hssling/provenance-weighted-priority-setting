@@ -63,9 +63,9 @@ def section(text: str, start: str, end: str) -> str:
     return text[i + len(start):j]
 
 
-def blind(text: str) -> tuple[str, int]:
+def blind(text: str, identifying: list[str] = IDENTIFYING) -> tuple[str, int]:
     removed = 0
-    for pat in IDENTIFYING:
+    for pat in identifying:
         text, n = re.subn(pat, "", text, flags=re.M)
         if n == 0:
             raise SystemExit(f"blinding pattern never matched: {pat}")
@@ -131,7 +131,7 @@ def main() -> int:
         # each paper had two. Counted from the captions now, like the rest.
         figures = len(re.findall(r"^\*\*Figure \d+\.", src, flags=re.M))
 
-        text, _ = blind(src)
+        text, _ = blind(src, lay.get("identifying", IDENTIFYING))
         d = OUT / key
         d.mkdir(exist_ok=True)
         for leak in ("Siddalingaiah", "hssling", "ORCID", "Shridevi", "0000-0002",

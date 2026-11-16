@@ -174,9 +174,9 @@ def check_vintage_prose() -> list[str]:
         "overridden": f"{f['overridden']:,} replaced a reported value",
         "care share of total": f"{min(care):.1f}-{max(care):.1f}% of total funding",
         "care estimate": f"US$ {c['ghs'] / 1e9:.2f} billion of US$ {c['total'] / 1e9:.2f} billion",
-        "new share": f"{pct(c['new'], c['ghs'])} was computed from inputs newly reported",
-        "restated share": f"{pct(c['restated'], c['ghs'])} from inputs restated",
-        "WHO share": f"{pct(c['WHO-supplied'], c['ghs'])} from inputs WHO supplied",
+        "new share": f"US$ {c['new'] / 1e6:.0f} million ({pct(c['new'], c['ghs'])}) was computed from inputs newly reported",
+        "restated share": f"US$ {c['restated'] / 1e6:.0f} million ({pct(c['restated'], c['ghs'])}) from inputs restated",
+        "WHO share": f"US$ {c['WHO-supplied'] / 1e6:.0f} million ({pct(c['WHO-supplied'], c['ghs'])}) from inputs WHO supplied",
         "new range": f"from {min(share('new')):.1f}% to {max(share('new')):.1f}%",
         "lenient range": f"{min(share('new_any')):.1f}-{max(share('new_any')):.1f}%",
         "India amount": f"US$ {ind['care_latest'] / 1e6:.0f} million in {last} "
@@ -196,17 +196,20 @@ def check_vintage_prose() -> list[str]:
     big = sorted(zero, key=lambda c: -S["hb"][c]["care"])[:4]
     names = {r["iso3"]: r["country"] for r in d3.rows("proc2026")}
     want.update({
-        "age 5+ share": f"Over half of WHO's 2025 care estimate ({100 * S['age_share']['5+'] / S['care']:.1f}%)",
-        "age 0 share": f"and {100 * S['age_share']['0'] / S['care']:.1f}% on components whose inputs were all reported for 2025",
+        "age 5+ share": f"Over half of WHO's 2025 care estimate (US$ {S['age_share']['5+'] / 1e6:.0f} million, "
+                        f"{100 * S['age_share']['5+'] / S['care']:.1f}%)",
+        "age 0 share": f"and US$ {S['age_share']['0'] / 1e6:.0f} million ({100 * S['age_share']['0'] / S['care']:.1f}%) "
+                       f"on components whose inputs were all reported for 2025",
         "median rate range": f"the median annual change was {med[-1]:.1f}% to {med[0]:.1f}%".replace("-", "−"),
         "adjusted 2025": f"from US$ {S['care'] / 1e9:.2f} billion to US$ {S['adjusted']['median'] / 1e9:.2f} billion "
                          f"(−{adj(S):.1f}%)",
         "adjusted 2024": f"and the 2024 estimate by {adj(S24):.1f}%",
         "countries mostly old": f"In {len(S['old'])} of {S['countries']} countries, holding "
-                                f"{100 * S['old_care'] / S['care']:.1f}% of the 2025 care estimate",
+                                f"US$ {S['old_care'] / 1e6:.0f} million ({100 * S['old_care'] / S['care']:.1f}%) of the 2025 care estimate",
         "high burden": f"They included {len(S['hb_old'])} of the {len(S['hb'])} countries flagged as high TB burden",
         "high burden none": f"In {len(zero)} of these, led by {', '.join(names[c] for c in big[:3])} and {names[big[3]]} "
-                            f"and together holding {100 * sum(S['hb'][c]['care'] for c in zero) / S['care']:.1f}% of the global estimate",
+                            f"and together holding US$ {sum(S['hb'][c]['care'] for c in zero) / 1e6:.0f} million "
+                            f"({100 * sum(S['hb'][c]['care'] for c in zero) / S['care']:.1f}%) of the global estimate",
         "abstract rate range": f"(median {med[-1]:.1f}% to {med[0]:.1f}% a year)".replace("-", "−"),
         "abstract adjusted": f"lowered the estimate by {adj(S):.1f}%, to US$ {S['adjusted']['median'] / 1e9:.2f} billion",
         "abstract countries": f"In {len(S['old'])} of {S['countries']} countries, holding {100 * S['old_care'] / S['care']:.1f}% "

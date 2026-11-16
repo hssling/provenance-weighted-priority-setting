@@ -4,7 +4,7 @@ To the Editors, *Tropical Medicine & International Health*
 
 Dear Editors,
 
-I am submitting for your consideration, as an original research article, "Restated, never revised: a vintage analysis of WHO tuberculosis data and the spending estimate built on them".
+I am submitting for your consideration, as a research article, "Restated, never revised: a vintage analysis of WHO tuberculosis data and the spending estimate built on them".
 
 **What the paper reports.** The World Health Organization's country-reported tuberculosis data are the standard source for comparing TB programmes in low- and middle-income countries. WHO also uses them to estimate how much those countries spend on TB. Each value is read as that year's report. Using WHO's own archived releases and the code behind its published estimates, the paper tests that assumption.
 - None of 16,521 utilisation values changed between releases.
@@ -31,7 +31,7 @@ These utilisation values feed WHO's estimate of inpatient and outpatient care sp
 - I do not wish to take up the OnlineOpen option.
 
 **Related manuscripts by the same author, disclosed in full.**
-- A companion paper on India's tuberculosis financing uses one of the same WHO datasets and is under review at the Indian Journal of Tuberculosis (IJTB-D-26-00779). The two are written to stand alone, and a text-overlap screen between them returns 0.4%.
+- A companion paper on India's tuberculosis financing uses one of the same WHO datasets and is under review at the Indian Journal of Tuberculosis (IJTB-D-26-00779). The two are written to stand alone, and a text-overlap screen between them returns 0.3%.
 - A manuscript on drug-resistant tuberculosis outcomes in India is under review at the same journal (IJTB-D-26-00777).
 - Two manuscripts on tuberculosis financing after the 2025 cuts in donor funding are under review: one at the Bulletin of the World Health Organization (BLT/2026/298045), the other at the International Journal of Tuberculosis and Lung Disease (IJTLD-11-26-0773). They ask different questions; the first cites this paper's archived software.
 
@@ -43,6 +43,6 @@ I can provide any of these manuscripts on request and will inform you of any cha
 
 Yours sincerely,
 
-Siddalingaiah H S
+Siddalingaiah H S, MD, Professor
 Department of Community Medicine, Shridevi Institute of Medical Sciences and Research Hospital, Tumkur, Karnataka, India
 hssling@yahoo.com · ORCID 0000-0002-4771-8285

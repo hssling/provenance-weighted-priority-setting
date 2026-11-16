@@ -6,7 +6,7 @@
 
 **Article type.** Original research article
 
-**Author.** Siddalingaiah H S
+**Author.** Siddalingaiah H S, MD, Professor
 Department of Community Medicine, Shridevi Institute of Medical Sciences and Research Hospital, Tumkur – 572106, Karnataka, India.
 ORCID 0000-0002-4771-8285
 
@@ -18,12 +18,12 @@ ORCID 0000-0002-4771-8285
 
 **Conflict of interest and funding.** The author declares no conflict of interest. This study received no funding.
 
-**Counts** (derived by `manuscript/build_submission.py`; do not retype)
+**Counts**
 
 | item | count |
 |---|---:|
 | Abstract (structured) | 294 words |
-| Main text, Background to Conclusions, excluding tables and references | 2,905 words |
+| Main text, Background to Conclusions, excluding tables and references | 2,922 words |
 | Tables | 6 |
 | Figures | 2 |
 | References | 16 |
