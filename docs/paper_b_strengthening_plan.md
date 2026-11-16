@@ -52,3 +52,13 @@ in WHO's *Global tuberculosis report 2026*.
 ## Deviations
 
 (Recorded here, dated, if any decision above changes after results are seen.)
+
+- **16 November 2026, clarification (S3).** The report text does not list its 30 high TB burden countries;
+  WHO's processed file for the same report carries the flag `g_hb_tb`, which marks 33 countries for 2025
+  (31 with a care estimate). S3 uses that flag and describes it as such, not as "the 30 countries".
+- **16 November 2026, clarification (S2).** Inputs whose age cannot be established (overridden, or filled
+  from no matching year; 1.5% of the 2025 care estimate) are left unchanged in the adjustment.
+- **16 November 2026, interpretation (S2), stated before drafting.** Applying the 25th or 75th percentile
+  rate to every non-current input at once, compounded over ages of five years or more, gives a band
+  (−59% to +934% in 2025) too wide to bound anything. It is reported as evidence of how uncertain a stale
+  value is, not as a plausible range; the median-rate adjustment is the reported sensitivity estimate.
