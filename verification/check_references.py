@@ -33,6 +33,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 A = ROOT / "manuscript" / "manuscript_draft_v1.md"
 B = ROOT / "manuscript" / "manuscript_b_tmih.md"
+# The Journal of Clinical Epidemiology version, kept local; checked where it exists.
+B_JCE = ROOT / "manuscript" / "manuscript_b_jce.md"
 
 
 def split(text: str) -> tuple[str, list[str], str]:
@@ -50,7 +52,10 @@ def metadata(name: str, entries: list[str]) -> list[str]:
     errs = []
     for e in entries:
         short = e[:70]
-        if "http" in e and not re.search(r"accessed \d{1,2} \w+ \d{4}|\[cited \d{4} \w{3} \d{1,2}\]", e):
+        # A DOI written as a URL (https://doi.org/...), the Elsevier style, is a
+        # persistent identifier, not a web page, and needs no access date.
+        web = re.sub(r"https?://doi\.org/\S+", "", e)
+        if "http" in web and not re.search(r"accessed \d{1,2} \w+ \d{4}|\[cited \d{4} \w{3} \d{1,2}\]", e):
             errs.append(f"  {name}: URL without an access date: {short}")
         is_article = bool(re.search(r"\*\*\d+\*\*:|\d{4};\d+(\(\d+\))?:", e))
         pending = re.search(r"in press|in production|online ahead of print", e, re.I)
@@ -173,7 +178,10 @@ def check_supplement_citations(main_text: str, supp: Path,
 def main() -> int:
     errs: list[str] = []
     for name, path, supp in (("paper A", A, "supplementary_paper_a.md"),
-                             ("paper B", B, "supplementary_paper_b_tmih.md")):
+                             ("paper B", B, "supplementary_paper_b_tmih.md"),
+                             ("paper B (JCE)", B_JCE, "supplementary_paper_b_jce.md")):
+        if name == "paper B (JCE)" and not path.exists():
+            continue
         text = path.read_text(encoding="utf-8")
         errs += check_numbered(text, name)
         errs += check_supplement_citations(text, ROOT / "manuscript" / supp, name)
@@ -181,7 +189,7 @@ def main() -> int:
         print(f"FAILED: {len(errs)} reference problem(s)")
         print("\n".join(errs))
         return 1
-    print("PASSED: both papers' numbered citations resolve, every reference is cited, "
+    print("PASSED: every paper's numbered citations resolve, every reference is cited, "
           "both lists are in first-citation order, each supplement's citations point at "
           "the right reference, every URL has an access date and every journal article a DOI")
     return 0

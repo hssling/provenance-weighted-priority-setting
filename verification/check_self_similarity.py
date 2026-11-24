@@ -33,6 +33,10 @@ LONG_RUN = 40    # verbatim words: the condition the exit code gates on
 
 PAPER_A = REPO / "manuscript" / "manuscript_draft_v1.md"
 PAPER_B = REPO / "manuscript" / "manuscript_b_tmih.md"
+# The Journal of Clinical Epidemiology version of paper B, kept local; screened where it
+# exists, against paper A and the prior work (not against its own TMIH text, which is the
+# same unpublished paper).
+PAPER_B_JCE = REPO / "manuscript" / "manuscript_b_jce.md"
 
 PRIOR = [
     ("TB-BOPAS, under review IJTB-D-26-00777",
@@ -135,6 +139,10 @@ def main() -> int:
                                                [("Paper B (this repo)", PAPER_B)] + PRIOR)]
     serious += [("B", n, t) for n, t in report("Paper B, WHO variable screen", PAPER_B,
                                                [("Paper A (this repo)", PAPER_A)] + PRIOR)]
+    if PAPER_B_JCE.exists():
+        serious += [("B (JCE)", n, t) for n, t in report(
+            "Paper B, Journal of Clinical Epidemiology version", PAPER_B_JCE,
+            [("Paper A (this repo)", PAPER_A)] + PRIOR)]
 
     print(f"\n{'=' * 78}\nREADING")
     print("  A composite self-match in the teens is normal for a paper that reuses a")

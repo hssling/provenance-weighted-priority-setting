@@ -24,6 +24,11 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 SCREEN = ROOT / "demos" / "d2_who_data_screen.py"
 PAPER_B = ROOT / "manuscript" / "manuscript_b_tmih.md"
+SUPP_B = ROOT / "manuscript" / "supplementary_paper_b_tmih.md"
+# The Journal of Clinical Epidemiology version (kept local; checked where it exists). Its
+# tables use the "jce" numbering of make_tables_b.py, and the screen is Supplementary Table S4.
+PAPER_B_JCE = ROOT / "manuscript" / "manuscript_b_jce.md"
+SUPP_B_JCE = ROOT / "manuscript" / "supplementary_paper_b_jce.md"
 
 # The screen's internal keys, and the row labels paper B uses for them.
 LABELS = {
@@ -65,9 +70,9 @@ def run_screen() -> dict[str, dict[str, str]]:
     return rows
 
 
-def paper_rows(start_label: str, n_cols: int) -> dict[str, list[str]]:
+def paper_rows(start_label: str, n_cols: int, path: Path = PAPER_B) -> dict[str, list[str]]:
     """Pull the table whose first data row is `start_label`, as plain cells."""
-    text = PAPER_B.read_text(encoding="utf-8")
+    text = path.read_text(encoding="utf-8")
     out: dict[str, list[str]] = {}
     for line in text.splitlines():
         if not line.startswith("| "):
@@ -90,19 +95,29 @@ def main() -> int:
     screen = run_screen()
     errors: list[str] = []
 
-    t5 = paper_rows("Budget", 9)      # Table 6 (TMIH; Table 5 in the IJE version), the screen, nine columns
-    for key, label in LABELS.items():
-        s = screen[key]
-        if label not in t5:
-            errors.append(f"  Table 6: no row for {label!r}")
-        else:
-            cells = t5[label]
-            for i, field in enumerate(
-                    ("cont", "cat", "untst", "median", "meas", "mixed", "est", "incl"), start=1):
-                check(f"Table 6 {label} col {i}", s[field], cells[i], errors)
+    # The screen: Table 6 of the TMIH version (Table 5 in the IJE version), Supplementary
+    # Table S4 of the JCE version, nine columns each.
+    screens = [("Table 6", PAPER_B)]
+    jce = PAPER_B_JCE.exists()
+    if jce:
+        screens.append(("JCE Supplementary Table S4", SUPP_B_JCE))
+    for tname, path in screens:
+        t5 = paper_rows("Budget", 9, path)
+        for key, label in LABELS.items():
+            s = screen[key]
+            if label not in t5:
+                errors.append(f"  {tname}: no row for {label!r}")
+            else:
+                cells = t5[label]
+                for i, field in enumerate(
+                        ("cont", "cat", "untst", "median", "meas", "mixed", "est", "incl"), start=1):
+                    check(f"{tname} {label} col {i}", s[field], cells[i], errors)
 
     errors += check_vintage_tables()
     errors += check_vintage_prose()
+    if jce:
+        errors += check_vintage_tables(PAPER_B_JCE, SUPP_B_JCE, "jce", "JCE ")
+        errors += check_vintage_prose(PAPER_B_JCE, "paper B (JCE)")
     errors += check_activity_counts()
     errors += check_dictionary_count()
 
@@ -113,35 +128,38 @@ def main() -> int:
     print(f"PASSED: paper B's Tables 1-5 and Supplementary Tables S1-S2 match a fresh rendering "
           f"from the vintage analysis, every derived number in its text matches the code, "
           f"all {len(LABELS)} rows of Table 6 match the screen, and every count of "
-          f"budget_prog's activities in paper A matches the collection form")
+          f"budget_prog's activities in paper A matches the collection form"
+          + ("; the JCE version's Tables 1-4, Supplementary Tables S1-S4 and text match too"
+             if jce else ""))
     return 0
 
 
-def check_vintage_tables() -> list[str]:
+def check_vintage_tables(paper_path: Path = PAPER_B, supp_path: Path = SUPP_B,
+                         profile: str = "tmih", label: str = "") -> list[str]:
     """Paper B's Tables 1-5 and Supplementary Tables S1-S2 are rendered by manuscript/make_tables_b.py. The
     manuscript must carry each block exactly as a fresh rendering gives it,
     and the supplement must carry Tables S1-S2."""
     sys.path.insert(0, str(ROOT / "manuscript"))
     import make_tables_b as mt
-    blocks = mt.render()
-    paper = PAPER_B.read_text(encoding="utf-8")
-    supp = (ROOT / "manuscript" / "supplementary_paper_b_tmih.md").read_text(encoding="utf-8")
+    blocks = mt.render(profile)
+    paper = paper_path.read_text(encoding="utf-8")
+    supp = supp_path.read_text(encoding="utf-8")
     errs = []
     for name, block in blocks.items():
         where, text = ("supplement", supp) if name.startswith("Table S") else ("manuscript", paper)
         if block not in text:
-            errs.append(f"  {name}: the {where} differs from a fresh rendering; "
-                        f"rerun manuscript/make_tables_b.py and paste the block")
+            errs.append(f"  {label}{name}: the {where} differs from a fresh rendering; "
+                        f"rerun manuscript/make_tables_b.py {profile} and paste the block")
     return errs
 
 
-def check_vintage_prose() -> list[str]:
+def check_vintage_prose(paper_path: Path = PAPER_B, paper_label: str = "paper B") -> list[str]:
     """Each derived number paper B states in its running text, as the code
     computes it now. A sentence carrying a stale figure fails here."""
     sys.path.insert(0, str(ROOT / "demos"))
     import d3_vintages as d3
     R = d3.results()
-    paper = PAPER_B.read_text(encoding="utf-8")
+    paper = paper_path.read_text(encoding="utf-8")
     pct = lambda a, b: f"{100 * a / b:.1f}%"
 
     def span(group: str) -> str:
@@ -219,12 +237,12 @@ def check_vintage_prose() -> list[str]:
     errs = []
     for label, s in want.items():
         if s not in paper:
-            errs.append(f"  paper B text: expected {label} as {s!r}")
+            errs.append(f"  {paper_label} text: expected {label} as {s!r}")
     # India must be the largest single contribution, as the text says
     top = max(((d3.num(r["c_ghs"]) or 0.0), r["iso3"]) for r in d3.rows("proc2026")
               if int(r["year"]) == last)
     if top[1] != "IND" and "largest single contribution, India" in paper:
-        errs.append(f"  paper B text: India is not the largest contributor in {last} ({top[1]} is)")
+        errs.append(f"  {paper_label} text: India is not the largest contributor in {last} ({top[1]} is)")
     return errs
 
 

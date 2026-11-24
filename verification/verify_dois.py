@@ -25,6 +25,8 @@ ROOT = Path(__file__).resolve().parent.parent
 PAPERS = {
     "paper A": ROOT / "manuscript" / "manuscript_draft_v1.md",
     "paper B": ROOT / "manuscript" / "manuscript_b_tmih.md",
+    # The Journal of Clinical Epidemiology version, kept local; verified where it exists.
+    "paper B (JCE)": ROOT / "manuscript" / "manuscript_b_jce.md",
 }
 # Assigned by the publisher, registered only at publication: expected to 404.
 NOT_YET_REGISTERED = {"10.25259/jsstd_120_2026"}
@@ -62,10 +64,13 @@ def crossref_title(doi: str) -> tuple[int, str]:
 def main() -> int:
     problems = 0
     for name, path in PAPERS.items():
+        if not path.exists():
+            continue
         refs = references(path.read_text(encoding="utf-8"))
         print(f"\n{name}: {len(refs)} references")
         for ref in refs:
-            m = re.search(r"doi:\s*(10\.\S+?)(?:[.;,]?\s*$|[.;,]\s)", ref + " ")
+            # "doi:10.x" (Vancouver) or "https://doi.org/10.x" (Elsevier)
+            m = re.search(r"(?:doi:\s*|https?://doi\.org/)(10\.\S+?)(?:[.;,]?\s*$|[.;,]\s)", ref + " ")
             if not m:
                 print(f"  no DOI   {ref[:80]}")
                 continue

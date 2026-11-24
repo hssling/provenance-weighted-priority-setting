@@ -48,8 +48,11 @@ def main() -> int:
     # nothing else. Figures are images and carry no text to check.
     # Word's "~$" owner files appear while a document is open; they are not
     # documents, and reading one as a .docx crashed this check.
+    # Working documents kept beside a set (its journal's rules, a build report) are
+    # named in the layout and are not uploads.
     uploads = sorted(f for f in S.glob("paper_*/*")
-                     if f.suffix in (".md", ".docx") and not f.name.startswith("~$"))
+                     if f.suffix in (".md", ".docx") and not f.name.startswith("~$")
+                     and f.with_suffix(".md").name not in LAYOUT.get(f.parent.name, {}).get("working", []))
     if not uploads:
         print("FAILED: no upload files found; run manuscript/build_submission.py")
         return 1
@@ -64,9 +67,10 @@ def main() -> int:
         if f.stem in names and not re.search(
                 r"Word count:\s*\*?\*?\s*[\d,]+ words", t):
             errs.append(f"  {f.relative_to(S)}: no word count on the title section")
-    # Both journals set citations as superscript numerals; the build converts
-    # the source's "[n]". A bracketed citation left in an uploaded manuscript,
-    # outside its reference list, means the conversion missed one.
+    # IJTB, IJE and TMIH set citations as superscript numerals; the build converts
+    # the source's "[n]". A bracketed citation left in such an uploaded manuscript,
+    # outside its reference list, means the conversion missed one. The Journal of
+    # Clinical Epidemiology wants "[n]" in line, so there a superscript is the error.
     for key, lay in LAYOUT.items():
         for role in ("manuscript", "blinded", "captions"):
             if role not in lay:
@@ -79,6 +83,14 @@ def main() -> int:
             j = t.find("\n## ", i + 5)
             rest = t[:i] + (t[j:] if j != -1 else "")
             left = re.findall(r"\[\d+(?:\s*[,–-]\s*\d+)*\]", rest)
+            if lay.get("citations") == "brackets":
+                sup = re.findall(r"\^\d[\d,–-]*\^", rest)
+                if sup:
+                    errs.append(f"  {f.relative_to(S)}: superscript citations where the "
+                                f"journal wants [n]: {sup[:5]}")
+                if not left:
+                    errs.append(f"  {f.relative_to(S)}: no bracketed citation at all")
+                continue
             if left:
                 errs.append(f"  {f.relative_to(S)}: citations not superscripted: {left[:5]}")
             if not re.search(r"\^\d[\d,–-]*\^", t):

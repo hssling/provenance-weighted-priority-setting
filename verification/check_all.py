@@ -63,6 +63,10 @@ def main() -> int:
                        [sys.executable, str(ROOT / "verification" / "check_data_manifest.py")]))
     results.append(run("verification/check_manuscript_numbers.py",
                        [sys.executable, str(ROOT / "verification" / "check_manuscript_numbers.py")]))
+    # Paper B's Journal of Clinical Epidemiology set against the journal's limits and rules.
+    # Its sources are kept local; without them the check says so and passes.
+    results.append(run("verification/check_jce_profile.py",
+                       [sys.executable, "-I", str(ROOT / "verification" / "check_jce_profile.py")]))
     results.append(run("verification/check_self_similarity.py",
                        [sys.executable, str(ROOT / "verification" / "check_self_similarity.py")]))
     failed = results.count(False)

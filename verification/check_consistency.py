@@ -38,13 +38,18 @@ PAPERS = {
                     folder=S / "paper_a", intro="## 1. Introduction"),
     "paper B": dict(src=M / "manuscript_b_tmih.md", supp=M / "supplementary_paper_b_tmih.md",
                     folder=S / "paper_b_tmih", intro="## 1. Background"),
+    # The Journal of Clinical Epidemiology version: its sources are kept local, so it is
+    # checked where they exist and skipped where they do not.
+    "paper B (JCE)": dict(src=M / "manuscript_b_jce.md", supp=M / "supplementary_paper_b_jce.md",
+                          folder=S / "paper_b_jce", intro="## 1. Introduction",
+                          cover=("**What the paper reports.**", "**How it relates"), optional=True),
 }
 # v1.0.0 (paper A), v1.1.0 (paper B at IJE, adds the vintage analysis), v1.2.0 (paper B at
 # TMIH, adds demos/d3_strengthen.py), and the concept DOI.
 DEPOSIT_DOIS = {"10.5281/zenodo.24187367", "10.5281/zenodo.24214490",
                 "10.5281/zenodo.24286016", "10.5281/zenodo.24187366"}
 # The version a paper must cite: the first one containing all the code its numbers come from.
-REQUIRED_DOI = {"paper B": "10.5281/zenodo.24286016"}
+REQUIRED_DOI = {"paper B": "10.5281/zenodo.24286016", "paper B (JCE)": "10.5281/zenodo.24286016"}
 AUTHOR = {"name": "Siddalingaiah H S", "orcid": "0000-0002-4771-8285",
           "email": "hssling@yahoo.com"}
 
@@ -105,14 +110,19 @@ def check_stated_overlap() -> list[str]:
     import check_self_similarity as ss
     errs = []
     a_src, b_src = PAPERS["paper A"]["src"], PAPERS["paper B"]["src"]
+    jce_src = PAPERS["paper B (JCE)"]["src"]
     sh = {k: ss.shingles(ss.normalise(ss.body_only(ss.read_any(v))))
-          for k, v in (("A", a_src), ("B", b_src))}
+          for k, v in (("A", a_src), ("B", b_src), ("B (JCE)", jce_src))}
     measured = {"A": 100 * len(sh["A"] & sh["B"]) / len(sh["A"]),
                 "B": 100 * len(sh["B"] & sh["A"]) / len(sh["B"])}
+    if sh["B (JCE)"]:
+        measured["B (JCE)"] = 100 * len(sh["B (JCE)"] & sh["A"]) / len(sh["B (JCE)"])
     # Paper A's letter is frozen as submitted (13 Nov 2026); its figure was measured against
     # paper B as it stood then, and cannot follow later edits to paper B. Only letters still
     # to be sent are held to the current measurement.
-    for key, folder in (("B", S / "paper_b_tmih"),):
+    for key, folder in (("B", S / "paper_b_tmih"), ("B (JCE)", S / "paper_b_jce")):
+        if key not in measured:
+            continue
         m = re.search(r"overlap screen between them returns (\d+\.\d)%",
                       read(folder / LAYOUT[folder.name]["cover"]))
         if not m:
@@ -127,6 +137,8 @@ def main() -> int:
     errs: list[str] = []
     for name, p in PAPERS.items():
         src = read(p["src"])
+        if not src and p.get("optional"):
+            continue
         f = p["folder"]
         lay = LAYOUT[f.name]
         title_page, cover = read(f / lay["title_page"]), read(f / lay["cover"])
@@ -196,7 +208,9 @@ def main() -> int:
             "abstract": section(src, "## Abstract"),
             "key messages": section(src, "## Key messages"),
             "highlights": section(src, "## Highlights"),
-            "cover letter": section(cover, "**What the paper reports.**", "**Declarations.**"),
+            "What is new? box": section(src, "## What is new?"),
+            "cover letter": section(cover, *p.get("cover", ("**What the paper reports.**",
+                                                            "**Declarations.**"))),
         }
         for label, text in summaries.items():
             for val, places, written in numbers(text):

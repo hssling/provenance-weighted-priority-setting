@@ -24,7 +24,10 @@ ROOT = Path(__file__).resolve().parent.parent
 PAPERS = {
     "paper A": ROOT / "manuscript" / "manuscript_draft_v1.md",
     "paper B": ROOT / "manuscript" / "manuscript_b_tmih.md",
+    # The Journal of Clinical Epidemiology version, kept local; checked where it exists.
+    "paper B (JCE)": ROOT / "manuscript" / "manuscript_b_jce.md",
 }
+OPTIONAL = {"paper B (JCE)"}
 
 
 def body_of(text: str) -> str:
@@ -39,7 +42,7 @@ def body_of(text: str) -> str:
     # paper A's abstract satisfy the first-citation check, which passed for the
     # wrong reason until this was excluded.
     for start, stop in (("## Abstract", "\n## "), ("## Key messages", "\n## "),
-                        ("## Highlights", "\n## ")):
+                        ("## Highlights", "\n## "), ("## What is new?", "\n## ")):
         i = text.find(start)
         if i != -1:
             j = text.find(stop, i + len(start))
@@ -95,14 +98,15 @@ def main() -> int:
     errors: list[str] = []
     for name, path in PAPERS.items():
         if not path.exists():
-            errors.append(f"  {name}: {path.name} not found")
+            if name not in OPTIONAL:
+                errors.append(f"  {name}: {path.name} not found")
             continue
         errors += check(name, path)
     if errors:
         print(f"FAILED: {len(errors)} problem(s) with exhibit numbering or order")
         print("\n".join(errors))
         return 1
-    print("PASSED: tables and figures in both papers are numbered from 1, "
+    print("PASSED: tables and figures in every paper are numbered from 1, "
           "each cited in the text, and cited in ascending order")
     return 0
 

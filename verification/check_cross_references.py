@@ -30,7 +30,16 @@ from submission_layout import LAYOUT  # noqa: E402
 PAPERS = {
     "paper A": (M / "manuscript_draft_v1.md", M / "supplementary_paper_a.md"),
     "paper B": (M / "manuscript_b_tmih.md", M / "supplementary_paper_b_tmih.md"),
+    # The Journal of Clinical Epidemiology version, kept local; checked where it exists.
+    "paper B (JCE)": (M / "manuscript_b_jce.md", M / "supplementary_paper_b_jce.md"),
 }
+RECORD_KEY = {"paper A": "paper_a", "paper B": "paper_b_tmih", "paper B (JCE)": "paper_b_jce"}
+# Elsevier asks for numbered cross-references ("Section 2.3"); the other papers use "§2.3".
+# Both forms must resolve, and so must the second member of "Sections 2.2 and 2.3" or
+# "Sections 3.1-3.3". "Section" is read only before the reference list, where a cited
+# report's own "Section 4.1" is not a pointer into this paper.
+SECTION_REF = re.compile(r"(?:§\s?|\bSections? )(\d+(?:\.\d+)*)"
+                         r"(?:(?: and |, |–|-)(\d+(?:\.\d+)*))?")
 
 PLACEHOLDERS = [
     r"to be inserted", r"at acceptance\]", r"\bTODO\b", r"\bTBD\b", r"\bXXX\b",
@@ -104,16 +113,19 @@ def supplementary_refs(text: str) -> list[str]:
 def main() -> int:
     errors: list[str] = []
     for name, (paper, supp) in PAPERS.items():
+        if name == "paper B (JCE)" and not paper.exists():
+            continue
         text = strip_notes(paper.read_text(encoding="utf-8"))
         have = section_numbers(text)
         sup_text = supp.read_text(encoding="utf-8") if supp.exists() else ""
         sup_have = supplement_sections(sup_text)
 
-        for m in re.finditer(r"§\s?(\d+(?:\.\d+)*)", text):
-            ref = m.group(1)
-            if ref not in have:
-                ctx = text[max(0, m.start() - 50):m.start() + 15].replace("\n", " ")
-                errors.append(f"  {name}: §{ref} does not exist  ...{ctx}...")
+        running = text.split("## References")[0]
+        for m in SECTION_REF.finditer(running):
+            for ref in filter(None, m.groups()):
+                if ref not in have:
+                    ctx = running[max(0, m.start() - 50):m.start() + 15].replace("\n", " ")
+                    errors.append(f"  {name}: section {ref} does not exist  ...{ctx}...")
 
         for ref in supplementary_refs(text):
             if not supp.exists():
@@ -173,16 +185,17 @@ def main() -> int:
         # The RECORD checklist tells a reviewer where to find each item. Paper
         # B's pointed at section 3.5 after that section had been renumbered
         # 3.4, so every pointer in it must resolve in its own paper.
-        key = {"paper A": "paper_a", "paper B": "paper_b_tmih"}[name]
+        key = RECORD_KEY[name]
         record = paper.parent / "submission" / key / LAYOUT[key]["record"]
         if record.exists():
             rec = record.read_text(encoding="utf-8")
             tables = set(re.findall(r"(?m)^\*\*Table (\d+)\.", text))
             figures = set(re.findall(r"(?m)^\*\*Figure (\d+)\.", text))
-            for m in re.finditer(r"§\s?(\d+(?:\.\d+)*)", rec):
-                if m.group(1) not in have:
-                    errors.append(f"  {name}: RECORD checklist points to §{m.group(1)}, "
-                                  f"which does not exist")
+            for m in SECTION_REF.finditer(rec):
+                for ref in filter(None, m.groups()):
+                    if ref not in have:
+                        errors.append(f"  {name}: RECORD checklist points to section {ref}, "
+                                      f"which does not exist")
             for kind, pool in (("Table", tables), ("Figure", figures)):
                 for m in re.finditer(rf"{kind}s? (\d+)(?:\s*[–-]\s*(\d+))?", rec):
                     for n in range(int(m.group(1)), int(m.group(2) or m.group(1)) + 1):
@@ -199,7 +212,7 @@ def main() -> int:
         print("\n".join(errors))
         return 1
     print("PASSED: every section and supplementary cross-reference resolves, in "
-          "both papers and their RECORD checklists, and no placeholder remains")
+          "every paper and its RECORD checklist, and no placeholder remains")
     return 0
 
 
