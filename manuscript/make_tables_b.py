@@ -1,12 +1,21 @@
 """Write paper B's vintage-analysis tables from the code, never by hand.
 
-Tables 1-4 of paper B are rendered here from demos/d3_vintages.py and written
-to manuscript/tables_paper_b.md. The manuscript carries the same blocks, and
+Paper B's tables are rendered here from demos/d3_vintages.py and
+demos/d3_strengthen.py. The manuscript carries the same blocks, and
 verification/check_manuscript_numbers.py fails if any block in the manuscript
-differs from a fresh rendering. Table 6 (the 443-variable screen) is checked
-against demos/d2_who_data_screen.py as before.
+differs from a fresh rendering. The 443-variable screen is checked against
+demos/d2_who_data_screen.py.
 
-Usage: python -I manuscript/make_tables_b.py
+Two numbering profiles share the same content:
+  tmih  Tables 1-5 in the main text and Supplementary Tables S1-S2,
+        written to manuscript/tables_paper_b_tmih.md;
+  jce   the Journal of Clinical Epidemiology version, which allows five
+        tables and shows the yearly care estimate in Figure 2 only: Tables
+        1-3 as before, the input-age table as Table 4, and the yearly care
+        estimate on each report and the high-burden countries as
+        Supplementary Tables S1-S3, written to manuscript/tables_paper_b_jce.md.
+
+Usage: python -I manuscript/make_tables_b.py [tmih|jce]
 """
 from __future__ import annotations
 
@@ -17,7 +26,8 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "demos"))
 import d3_vintages as d3                                       # noqa: E402
 
-OUT = ROOT / "manuscript" / "tables_paper_b_tmih.md"   # TMIH version
+OUT = {"tmih": ROOT / "manuscript" / "tables_paper_b_tmih.md",
+       "jce": ROOT / "manuscript" / "tables_paper_b_jce.md"}
 RELEASE_NAME = {"2024": "Jul 2024", "2025": "Jul 2025", "2026": "Aug 2026"}
 LABEL = {
     "hcfvisit_dstb": "Outpatient visits per patient, drug-susceptible TB",
@@ -151,14 +161,14 @@ def table4(R: dict, release: str = "2026", label: str = "Table 4") -> str:
     return "\n".join(rows)
 
 
-def table5() -> str:
+def table5(label: str = "Table 5") -> str:
     """Age of the inputs behind the care estimate, and the estimate adjusted for re-measurement
     (docs/paper_b_strengthening_plan.md, S1-S3), 2026 report, 2024 and 2025."""
     import d3_strengthen as ds
     S = {y: ds.summary(y) for y in (2024, 2025)}
     bn = lambda x: f"{x / 1e9:.2f}"
     sh = lambda s, k: f"{100 * s['age_share'].get(k, 0.0) / s['care']:.1f}%"
-    rows = ["**Table 5. Age of the inputs behind WHO's care estimate, and the estimate adjusted for "
+    rows = [f"**{label}. Age of the inputs behind WHO's care estimate, and the estimate adjusted for "
             "re-measurement, 2026 report.** Age is the number of years since an input's value last changed in "
             "the country's reported series; a cost component takes the age of its oldest input.", "",
             "| | 2024 | 2025 |", "|---|---:|---:|",
@@ -181,12 +191,12 @@ def table5() -> str:
     return "\n".join(rows)
 
 
-def table_s2() -> str:
+def table_s2(label: str = "Supplementary Table S2") -> str:
     """Per high-burden country, 2025 (plan S3)."""
     import d3_strengthen as ds
     s = ds.summary(2025)
     names = {r["iso3"]: r["country"] for r in d3.rows("proc2026")}
-    rows = ["**Supplementary Table S2. WHO's 2025 care estimate in the countries WHO flags as high TB burden, "
+    rows = [f"**{label}. WHO's 2025 care estimate in the countries WHO flags as high TB burden, "
             "by the provenance of its inputs.**", "",
             "| Country | Care estimate, US$ million | Share on inputs reported for 2025 | "
             "Adjusted at the median rate | Adjusted at the 25th and 75th percentile rates |",
@@ -202,20 +212,27 @@ def table_s2() -> str:
     return "\n".join(rows)
 
 
-def render() -> dict[str, str]:
+def render(profile: str = "tmih") -> dict[str, str]:
     R = d3.results()
+    if profile == "jce":
+        return {"Table 1": table1(R), "Table 2": table2(R), "Table 3": table3(R),
+                "Table 4": table5("Table 4"),
+                "Table S1": table4(R, "2026", "Supplementary Table S1"),
+                "Table S2": table4(R, "2025", "Supplementary Table S2"),
+                "Table S3": table_s2("Supplementary Table S3")}
+    assert profile == "tmih", f"unknown profile {profile!r}"
     return {"Table 1": table1(R), "Table 2": table2(R), "Table 3": table3(R), "Table 4": table4(R),
             "Table 5": table5(),
             "Table S1": table4(R, "2025", "Supplementary Table S1"), "Table S2": table_s2()}
 
 
-def main() -> int:
-    blocks = render()
-    OUT.write_text("\n\n".join(blocks.values()) + "\n", encoding="utf-8")
-    print(f"wrote {OUT.relative_to(ROOT)}: {', '.join(blocks)}")
+def main(profile: str = "tmih") -> int:
+    blocks = render(profile)
+    OUT[profile].write_text("\n\n".join(blocks.values()) + "\n", encoding="utf-8")
+    print(f"wrote {OUT[profile].relative_to(ROOT)}: {', '.join(blocks)}")
     return 0
 
 
 if __name__ == "__main__":
     sys.stdout.reconfigure(encoding="utf-8")
-    sys.exit(main())
+    sys.exit(main(*sys.argv[1:2]))

@@ -8,8 +8,9 @@ files and the same code paths as the tables, never from retyped numbers.
 
 Output: PNG at DPI below, at least 3600 pixels wide, as the International
 Journal of Epidemiology requires (minimum 300 dpi at a minimum width of 300 mm);
-paper A's figures are also written as 600 dpi LZW-compressed TIFF for the
-Indian Journal of Tuberculosis.
+both papers' figures are also written as 600 dpi LZW-compressed TIFF, the
+print masters Elsevier journals take (paper A at the Indian Journal of
+Tuberculosis, paper B at the Journal of Clinical Epidemiology).
 
 Usage: python figures/make_figures.py
 """
@@ -37,7 +38,7 @@ DPI = 400
 WIDTH_IN = 12.0
 PRINT_WIDTH_IN = 170 / 25.4            # full-page width in print
 PRINT_MIN_PT = 7.0
-TIFF_DPI = 600                         # paper A's IJTB print masters
+TIFF_DPI = 600                         # Elsevier print masters (papers A and B)
 
 # One restrained palette, colour-blind safe, used by both figures.
 INK = "#1a1a1a"
@@ -78,16 +79,17 @@ def save(fig, name: str) -> None:
             assert not (w_ > 2 and h_ > 2), (
                 f"{name}: text {ta.get_text()[:30]!r} overlaps {tb.get_text()[:30]!r}")
     fig.savefig(path, dpi=DPI, bbox_inches="tight", facecolor="white")
-    # Paper A goes to the Indian Journal of Tuberculosis, whose production
-    # takes TIFF print masters; the author's accepted IJTB papers supplied them
-    # at 600 dpi, above Elsevier's 500 dpi minimum for line-and-tone artwork.
-    # Rendered from the same figure object, so the TIFF cannot drift from the PNG.
-    if name.startswith("figure_a"):
+    # Both papers go to Elsevier journals, whose production takes TIFF print
+    # masters; the author's accepted IJTB papers supplied them at 600 dpi, above
+    # Elsevier's 500 dpi minimum for line-and-tone artwork. Rendered from the
+    # same figure object, so the TIFF cannot drift from the PNG.
+    tiff = name.startswith(("figure_a", "figure_b"))
+    if tiff:
         fig.savefig(path.with_suffix(".tif"), dpi=TIFF_DPI, bbox_inches="tight",
                     facecolor="white", pil_kwargs={"compression": "tiff_lzw"})
     plt.close(fig)
     from PIL import Image
-    if name.startswith("figure_a"):
+    if tiff:
         with Image.open(path.with_suffix(".tif")) as tif:
             dpi = tif.info.get("dpi", (0, 0))
             assert round(dpi[0]) >= TIFF_DPI, f"{name}: TIFF saved at {dpi} dpi"

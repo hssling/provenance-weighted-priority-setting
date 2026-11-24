@@ -32,6 +32,7 @@ PAPERS = {
     "paper_a": ("manuscript_draft_v1.md", "## 1. Introduction"),
     "paper_b": ("manuscript_b_draft_v1.md", "## 1. Background"),          # IJE, frozen
     "paper_b_tmih": ("manuscript_b_tmih.md", "## 1. Background"),
+    "paper_b_jce": ("manuscript_b_jce.md", "## 1. Introduction"),   # local source; see build_jce
 }
 # Submitted upload sets are never rebuilt. Name the papers to build:
 #   python -I manuscript/build_submission.py paper_b_tmih
@@ -79,7 +80,9 @@ def blind(text: str, identifying: list[str] = IDENTIFYING) -> tuple[str, int]:
     # "(Siddalingaiah 2026a)" and "Siddalingaiah (2026a, under review)". Both
     # journals reviewing these papers are double-anonymized, so the surname
     # must go in every form it takes.
-    text = re.sub(r"Siddalingaiah(?: HS?)?\.?", "[Author]", text)
+    # "Siddalingaiah H S", the spaced form a CRediT statement uses, goes whole rather
+    # than leaving "[Author] S".
+    text = re.sub(r"Siddalingaiah(?: H ?S| HS?)?\.?", "[Author]", text)
     # The deposit identifiers de-anonymise the submission: the repository URL
     # carries the author's username, and resolving the DOI shows the author
     # record. A journal reviewing blind expects these to be withheld and given
@@ -89,7 +92,7 @@ def blind(text: str, identifying: list[str] = IDENTIFYING) -> tuple[str, int]:
     # URL blanked that reference in the blinded copy.
     text = re.sub(r"https://github\.com/hssling/[A-Za-z0-9_.-]+",
                   "[repository URL withheld for blind review]", text)
-    text = re.sub(r"doi:10\.5281/zenodo\.[0-9]+",
+    text = re.sub(r"(?:doi:|https://doi\.org/)10\.5281/zenodo\.[0-9]+",
                   "[archive DOI withheld for blind review]", text)
     # tidy what those substitutions leave behind
     text = text.replace("[repository URL withheld for blind review] and archived at Zenodo, "
@@ -104,13 +107,17 @@ def blind(text: str, identifying: list[str] = IDENTIFYING) -> tuple[str, int]:
 def main() -> int:
     OUT.mkdir(exist_ok=True)
     print(f"{'paper':<9}{'abstract':>10}{'body':>8}{'refs':>6}{'tables':>8}  journal")
-    chosen = [k for k in sys.argv[1:] if k in PAPERS] or [k for k in PAPERS if k not in FROZEN]
+    chosen = [k for k in sys.argv[1:] if k in PAPERS] or [
+        k for k in PAPERS if k not in FROZEN and (HERE / PAPERS[k][0]).exists()]
     frozen = [k for k in chosen if k in FROZEN]
     if frozen:
         raise SystemExit(f"{frozen}: submitted upload sets are frozen and are not rebuilt")
     for key in chosen:
         fname, intro = PAPERS[key]
         lay = LAYOUT[key]
+        if lay.get("profile") == "jce":
+            build_jce(key, lay)
+            continue
         src = (HERE / fname).read_text(encoding="utf-8")
         abstract = count_words(section(src, "## Abstract", "**Keywords")
                                if "**Keywords" in src else
@@ -189,6 +196,120 @@ def main() -> int:
     return 0
 
 
+def between(text: str, start: str, end: str) -> str:
+    """Text after `start` up to the first `end` that follows it, or to the end of the text."""
+    i = text.index(start) + len(start)
+    j = text.find(end, i)
+    return text[i:j if j != -1 else len(text)]
+
+
+def jce_counts(src: str, lay: dict) -> dict[str, int]:
+    """The counts the Journal of Clinical Epidemiology limits apply to, from the source.
+
+    The main text runs from the Introduction to the Conclusions. Tables are lifted out
+    whole, caption, rows and the note beneath them, because the journal counts them
+    separately; the generic counter above keeps table notes in, which over-counts."""
+    body = section(src, lay["body_start"], lay["body_end"])
+    to_refs = section(src, lay["body_start"], "## References")
+    reflist = between(src, "## References", "\n## ")
+    keywords = re.search(r"(?m)^\*\*Keywords:\*\*(.+)$", src)
+    box = section(src, "## What is new?", lay["body_start"])
+    return {
+        "abstract": count_words(section(src, "## Abstract", "**Keywords")),
+        "body": count_words(split_tables(body)[0]),
+        "with_declarations": count_words(split_tables(to_refs)[0]),
+        "what_is_new_words": count_words(box),
+        "what_is_new_points": len(re.findall(r"(?m)^- ", box)),
+        "references": len(re.findall(r"(?m)^\d+\. ", reflist)),
+        "tables": len(re.findall(r"(?m)^\*\*Table \d+\.", src)),
+        "figures": len(re.findall(r"(?m)^\*\*Figure \d+\.", src)),
+        "keywords": len([k for k in keywords.group(1).split(";") if k.strip()]) if keywords else 0,
+    }
+
+
+def highlights_of(src: str) -> list[str]:
+    hi = between(src, "## Highlights", "\n## ")
+    return [ln[2:].strip() for ln in hi.splitlines() if ln.startswith("- ")]
+
+
+def bracket_reference_numbers(text: str) -> str:
+    """Write each reference number as a literal "[n]", one paragraph per reference.
+
+    The journal numbers references in square brackets, in the text and in the list.
+    Literal numbers, as for paper A, cannot be renumbered by Word. The brackets are
+    escaped so that pandoc keeps them as text."""
+    i = text.find("## References")
+    if i == -1:
+        return text
+    j = text.find("\n## ", i + 5)
+    j = j if j != -1 else len(text)
+    out = []
+    for ln in text[i:j].split("\n"):
+        m = re.match(r"^(\d+)\. (.*)$", ln)
+        if m:
+            out += [f"\\[{m.group(1)}\\] {m.group(2)}", ""]
+        elif ln.strip():
+            out += [ln, ""]
+    return text[:i] + "\n".join(out).rstrip() + "\n" + text[j:]
+
+
+def stamp(page: Path, rows: list[tuple[str, int]]) -> None:
+    """Write derived counts into a hand-written page; each pattern must match once."""
+    if not page.exists():
+        return
+    s = page.read_text(encoding="utf-8")
+    for pat, value in rows:
+        s, n = re.subn(pat, lambda m: f"{m.group(1)}{value:,}{m.group(2)}", s)
+        if n != 1:
+            raise SystemExit(f"{page.name}: expected one match for {pat!r}, found {n}")
+    page.write_text(s, encoding="utf-8")
+
+
+def build_jce(key: str, lay: dict) -> None:
+    """Journal of Clinical Epidemiology upload set: title page, cover letter, manuscript
+    with author details (single anonymised review), highlights as their own file, the
+    supplement, the RECORD checklist, TIFF figures with PNG previews and a blinded copy.
+    Citations stay as "[n]" in line, tables stay beside the text that cites them, and
+    the derived counts are written into the title page and the cover letter."""
+    src = (HERE / lay["source"]).read_text(encoding="utf-8")
+    c = jce_counts(src, lay)
+    d = OUT / key
+    d.mkdir(exist_ok=True)
+    basis = lay["word_count_basis"]
+    counted = add_word_count(src, c["body"], basis, lay["word_count_anchor"])
+
+    unblinded = for_submission(counted)
+    blinded, _ = blind(counted, lay["identifying"])
+    for leak in ("Siddalingaiah", "hssling", "ORCID", "Shridevi", "0000-0002",
+                 "zenodo.", "8941087719"):
+        assert leak not in blinded, f"{key}: blinded copy still contains {leak!r}"
+    for name, text in ((lay["manuscript"], unblinded), (lay["blinded"], blinded)):
+        text = bracket_reference_numbers(drop_section(text, "## Highlights"))
+        (d / name).write_text(re.sub(r"\n{3,}", "\n\n", text), encoding="utf-8")
+
+    bullets = highlights_of(src)
+    (d / lay["highlights"]).write_text(
+        "# Highlights\n\n" + "\n".join(f"- {b}" for b in bullets) + "\n", encoding="utf-8")
+    supp = HERE / lay["supplement_source"]
+    if supp.exists():
+        (d / lay["supplement"]).write_text(supp.read_text(encoding="utf-8"), encoding="utf-8")
+
+    stamp_counts(d / lay["title_page"], c["abstract"], c["body"], c["tables"],
+                 c["references"], c["figures"])
+    stamp(d / lay["title_page"],
+          [(r"(\| Main text with the declarations[^|]*\| )[\d,]+( words \|)", c["with_declarations"])])
+    stamp(d / lay["cover"],
+          [(r"(The main text has )[\d,]+( words)", c["body"]),
+           (r"(\()[\d,]+( words with the declarations)", c["with_declarations"]),
+           (r"(with )\d+( tables, )", c["tables"]),
+           (r"( tables, )\d+( figures and )", c["figures"]),
+           (r"( figures and )\d+( references)", c["references"])])
+    copy_figures(key, d, lay, c["figures"])
+    print(f"{key:<9}{c['abstract']:>10}{c['body']:>8}{c['references']:>6}{c['tables']:>8}  "
+          f"{lay['journal']} (with declarations {c['with_declarations']:,}; "
+          f"What is new? {c['what_is_new_points']} points; {len(bullets)} highlights)")
+
+
 def copy_figures(key: str, d: Path, lay: dict, figures: int) -> None:
     """Each folder is the complete upload for its journal, named by the
     figure number the text cites. Paper A takes the 600 dpi TIFF masters,
@@ -204,7 +325,7 @@ def copy_figures(key: str, d: Path, lay: dict, figures: int) -> None:
         old.unlink()
     for fig in figs:
         k = int(re.match(rf"figure_{letter}(\d+)_", fig.name).group(1))
-        shutil.copyfile(fig, d / lay["figure"].format(n=10 + k, k=k))
+        shutil.copyfile(fig, d / lay["figure"].format(n=lay.get("figure_offset", 10) + k, k=k))
         if "preview" in lay:
             shutil.copyfile(fig.with_suffix(".png"),
                             d / lay["preview"].format(n=91 + k, k=k))
@@ -412,7 +533,8 @@ def to_docx(folders: list[str]) -> str:
                 "Markdown, so convert before uploading.")
     made, failed = [], []
     for md in sorted(p for f in folders for p in (OUT / f).glob("*.md")):
-        if md.name == "README.md" or md.name == "SUBMISSION_STEPS.md":
+        if (md.name in ("README.md", "SUBMISSION_STEPS.md")
+                or md.name in LAYOUT.get(md.parent.name, {}).get("working", [])):
             continue                      # working documents, not uploads
         docx = md.with_suffix(".docx")
         proc = subprocess.run(

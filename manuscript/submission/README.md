@@ -13,6 +13,18 @@ File names by role for each paper are in `manuscript/submission_layout.py`; the 
 them from there. Current counts are on each title page, written by `manuscript/build_submission.py` on every
 run, and are deliberately not repeated here. How to upload: `SUBMISSION_STEPS.md`.
 
+## Paper B for the Journal of Clinical Epidemiology
+
+The `jce` profile builds Paper B's Journal of Clinical Epidemiology set (Original Research):
+`python -I manuscript/build_submission.py paper_b_jce`, after `python -I manuscript/make_tables_b.py jce` and
+`python -I manuscript/make_supplementary_b.py jce`. Its sources (`manuscript_b_jce.md`, the tables file, the
+supplement and its template) and the upload folder `paper_b_jce/` are kept local and are not in the repository.
+The set keeps "[n]" citations in line, tables beside the text, highlights as their own file and the figures as
+600 dpi TIFF with PNG previews. `verification/check_jce_profile.py` checks the journal's limits, the "What is
+new?" box, the highlights, the order of first citation of references, tables, figures and supplementary items,
+the counts written into the title page and cover letter, and the absence of causal wording; the other checks
+include the set wherever its sources exist, and skip it cleanly where they do not.
+
 ## What is generated and what is hand-written
 
 Generated on every build (never edit by hand): both manuscripts, the blinded copies, Paper A's highlights,

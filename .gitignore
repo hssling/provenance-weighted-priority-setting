@@ -29,3 +29,15 @@ manuscript/submission/**/*_signed.*
 manuscript/private/
 manuscript/submission/paper_b_tmih/03_manuscript.*
 manuscript/submission/paper_b_tmih/91_manuscript_blinded.*
+
+# Journal of Clinical Epidemiology version of paper B: the manuscript sources and the upload set
+# stay local. Only the tooling that builds and checks them is committed.
+manuscript/manuscript_b_jce.md
+manuscript/tables_paper_b_jce.md
+manuscript/supplementary_paper_b_jce.md
+manuscript/supplementary_paper_b_jce_template.md
+manuscript/submission/paper_b_jce/
+
+# Publishers' guides (copyright), kept beside the manuscripts for reference only.
+manuscript/*.pdf
+manuscript/*_guide_*.txt

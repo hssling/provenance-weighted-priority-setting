@@ -8,10 +8,13 @@ that are facts about files or code are generated here, so they cannot drift:
   {{NOTE2_FACTS}}  WHO's fill rule, the countries whose care estimate WHO sets
                    to zero, and the number of hand-coded substitutions, read
                    from WHO's own R code
-  {{TABLE_S1}}     Table 4 repeated on the 2025 report, from make_tables_b.py
-  {{TABLE_S2}}     the high-burden countries' care estimates by input provenance (make_tables_b.py)
+  {{TABLE_S1}}...  the supplementary tables, rendered by make_tables_b.py for
+                   the chosen profile (tmih: S1-S2; jce: S1-S3)
 
-Usage: python -I manuscript/make_supplementary_b.py
+Profiles: tmih (default) and jce, the Journal of Clinical Epidemiology
+version, whose template and output are kept local with its manuscript.
+
+Usage: python -I manuscript/make_supplementary_b.py [tmih|jce]
 """
 from __future__ import annotations
 
@@ -22,8 +25,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 HERE = ROOT / "manuscript"
-TEMPLATE = HERE / "supplementary_paper_b_tmih_template.md"
-OUT = HERE / "supplementary_paper_b_tmih.md"   # TMIH version; the IJE supplement is frozen
+PROFILES = {"tmih": ("supplementary_paper_b_tmih_template.md", "supplementary_paper_b_tmih.md"),
+            "jce": ("supplementary_paper_b_jce_template.md", "supplementary_paper_b_jce.md")}
 MANIFEST = ROOT / "data" / "vintages" / "vintage_manifest.csv"
 RAW = ROOT / "data" / "vintages" / "raw"
 
@@ -75,22 +78,23 @@ def note2() -> str:
     ])
 
 
-def main() -> int:
+def main(profile: str = "tmih") -> int:
     sys.path.insert(0, str(HERE))
     import make_tables_b as mt
-    text = TEMPLATE.read_text(encoding="utf-8")
-    parts = {"{{NOTE1_TABLE}}": note1(), "{{NOTE2_FACTS}}": note2(),
-             "{{TABLE_S1}}": mt.render()["Table S1"],
-             "{{TABLE_S2}}": mt.render()["Table S2"]}
+    template, out = (HERE / f for f in PROFILES[profile])
+    text = template.read_text(encoding="utf-8")
+    blocks = mt.render(profile)
+    parts = {"{{NOTE1_TABLE}}": note1(), "{{NOTE2_FACTS}}": note2()}
+    parts.update({"{{TABLE_%s}}" % k[6:]: v for k, v in blocks.items() if k.startswith("Table S")})
     for k, v in parts.items():
         assert k in text, k
         text = text.replace(k, v)
     assert "{{" not in text
-    OUT.write_text(text, encoding="utf-8")
-    print(f"wrote {OUT.relative_to(ROOT)}")
+    out.write_text(text, encoding="utf-8")
+    print(f"wrote {out.relative_to(ROOT)}")
     return 0
 
 
 if __name__ == "__main__":
     sys.stdout.reconfigure(encoding="utf-8")
-    sys.exit(main())
+    sys.exit(main(*sys.argv[1:2]))

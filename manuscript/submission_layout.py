@@ -1,5 +1,9 @@
 """Where each paper's upload files live, by role, for the build and every check.
 
+Paper B's Journal of Clinical Epidemiology set ("paper_b_jce") is built by the
+"jce" profile in build_submission.py; its sources are kept local, so every
+check that reads it skips it cleanly where they are absent.
+
 The two papers go to journals with different house conventions. Paper B
 follows the generic set this project started with; paper A follows the
 Indian Journal of Tuberculosis house set the author used for IJTB-S-26-01305
@@ -75,6 +79,39 @@ LAYOUT: dict[str, dict] = {
         "reviewers": "private/suggested_reviewers_paper_b_tmih.md",
         # Front matter in the paragraph layout TMIH's metadata extraction expects.
         "identifying": [r"^Siddalingaiah H S, MD, Professor$", r"^Department of Community Medicine.*$",
+                        r"^\*\*Corresponding author:\*\*.*$", r"^\*\*Target journal:\*\*.*$"],
+    },
+    # Paper B for the Journal of Clinical Epidemiology (Elsevier, hybrid; Original Research).
+    # Sources and uploads are kept local; this entry and the build profile are the tooling.
+    "paper_b_jce": {
+        "journal": "Journal of Clinical Epidemiology",
+        "profile": "jce",
+        "source": "manuscript_b_jce.md",
+        "supplement_source": "supplementary_paper_b_jce.md",
+        "figure_letter": "b",
+        "title_page": "01_title_page.md",
+        "cover": "02_cover_letter.md",
+        "manuscript": "03_manuscript.md",          # single anonymised review: author details kept
+        "highlights": "04_highlights.md",          # Elsevier: "highlights" in the file name
+        "supplement": "05_supplementary.md",
+        "record": "06_RECORD_checklist.md",
+        "blinded": "91_manuscript_blinded.md",     # kept in case the portal asks for one
+        "figure": "{n:02d}_Figure_{k}.tif",        # n = 6 + k: 07_Figure_1.tif, 08_Figure_2.tif
+        "figure_offset": 6,
+        "preview": "{n}_Figure_{k}_preview.png",   # n = 91 + k
+        "figure_glob": "0[7-9]_Figure_*.tif",
+        "tables_in_manuscript": True,             # JCE: tables beside the text that cites them
+        "citations": "brackets",                  # JCE: "[3,6]" in line, "[1]" in the list
+        "body_start": "## 1. Introduction",
+        "body_end": "## CRediT authorship contribution statement",
+        "word_count_basis": ("words of main text (Introduction to Conclusions), excluding the abstract, "
+                             "the What is new? box, tables, figure captions, declarations and references"),
+        "word_count_anchor": r"(?m)^\*\*Corresponding author:\*\*.*$",
+        # Working documents kept beside the uploads, never uploaded or converted.
+        "working": ["journal_rules.md", "REPORT.md"],
+        "limits": {"words": 3000, "abstract": 350, "references": 100, "figures": 5, "tables": 5,
+                   "keywords": (1, 7), "highlights": (3, 5), "highlight_chars": 85, "what_is_new": (3, 5)},
+        "identifying": [r"^Siddalingaiah H S\^a\^$", r"^\^a\^ Department of Community Medicine.*$",
                         r"^\*\*Corresponding author:\*\*.*$", r"^\*\*Target journal:\*\*.*$"],
     },
 }
