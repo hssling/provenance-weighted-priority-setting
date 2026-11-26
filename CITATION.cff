@@ -22,7 +22,7 @@ authors:
 license: MIT
 repository-code: "https://github.com/hssling/provenance-weighted-priority-setting"
 doi: "10.5281/zenodo.24187366"
-version: "v1.2.0"
+version: "v1.2.1"
 keywords:
   - data quality
   - data provenance
