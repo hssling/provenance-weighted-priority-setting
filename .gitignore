@@ -41,3 +41,10 @@ manuscript/submission/paper_b_jce/
 # Publishers' guides (copyright), kept beside the manuscripts for reference only.
 manuscript/*.pdf
 manuscript/*_guide_*.txt
+
+# Manuscript texts stay local from 26 Nov 2026: only the code, data, analysis plan and checks
+# are public. The checks read these files from the author's copy.
+manuscript/submission/
+manuscript/manuscript_*.md
+manuscript/supplementary_paper_*.md
+manuscript/tables_paper_*.md
