@@ -62,8 +62,12 @@ def main() -> int:
             for m in re.finditer(pat, t, re.I):
                 ctx = t[max(0, m.start() - 30):m.end() + 40].replace("\n", " ")
                 errs.append(f"  {f.relative_to(S)}: author-only content  ...{ctx}...")
-        lay = LAYOUT[f.parent.name]
-        names = {Path(lay[k]).stem for k in ("manuscript", "blinded")}
+        # A set built by its own script (paper A for Health Empirics, by
+        # manuscript/build_paper_a_he.py) has no entry in the layout: its
+        # manuscript is the document whose name says so.
+        lay = LAYOUT.get(f.parent.name)
+        names = ({Path(lay[k]).stem for k in ("manuscript", "blinded")} if lay
+                 else {f.stem} if "manuscript" in f.stem.lower() else set())
         if f.stem in names and not re.search(
                 r"Word count:\s*\*?\*?\s*[\d,]+ words", t):
             errs.append(f"  {f.relative_to(S)}: no word count on the title section")

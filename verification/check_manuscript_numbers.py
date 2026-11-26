@@ -29,6 +29,9 @@ SUPP_B = ROOT / "manuscript" / "supplementary_paper_b_tmih.md"
 # tables use the "jce" numbering of make_tables_b.py, and the screen is Supplementary Table S4.
 PAPER_B_JCE = ROOT / "manuscript" / "manuscript_b_jce.md"
 SUPP_B_JCE = ROOT / "manuscript" / "supplementary_paper_b_jce.md"
+# Paper A for Health Empirics (kept local) and its cover letter; checked where they exist.
+PAPER_A_HE = [ROOT / "manuscript" / "manuscript_a_he.md",
+              ROOT / "manuscript" / "manuscript_a_he_cover_letter.md"]
 
 # The screen's internal keys, and the row labels paper B uses for them.
 LABELS = {
@@ -266,6 +269,7 @@ def check_activity_counts() -> list[str]:
     errs = []
     files = [ROOT / "manuscript" / "manuscript_draft_v1.md",
              ROOT / "manuscript" / "submission" / "paper_a" / "01_Cover_Letter.md"]
+    files += [f for f in PAPER_A_HE if f.exists()]
     num = r"(\d+|" + "|".join(WORDS) + r")"
     for f in files:
         text = f.read_text(encoding="utf-8")
@@ -297,9 +301,10 @@ def check_dictionary_count() -> list[str]:
     errs, seen = [], 0
     num = r"(\d+|" + "|".join(WORDS) + r")"
     pat = re.compile(rf"(?is)dictionary[^.]{{0,90}}?\b{num} (?:interventions )?(?:would )?"
-                     rf"have no (?:budget )?line")
+                     rf"ha(?:ve|d) no (?:budget )?line")
     for f in (ROOT / "manuscript" / "manuscript_draft_v1.md",
-              ROOT / "manuscript" / "submission" / "paper_a" / "01_Cover_Letter.md"):
+              ROOT / "manuscript" / "submission" / "paper_a" / "01_Cover_Letter.md",
+              *[f for f in PAPER_A_HE if f.exists()]):
         text = f.read_text(encoding="utf-8")
         i = text.find("## Notes for the author")
         text = text[:i] if i != -1 else text
