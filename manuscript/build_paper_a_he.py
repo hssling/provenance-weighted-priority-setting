@@ -41,7 +41,7 @@ SRC = HERE / "manuscript_a_he.md"
 LETTER = HERE / "manuscript_a_he_cover_letter.md"
 EMAIL = HERE / "manuscript_a_he_email.md"
 OUT = HERE / "submission" / "paper_a_he"
-FROZEN = {"paper_a", "paper_b", "paper_b_tmih", "paper_b_jce"}
+FROZEN = {"paper_a", "paper_b", "paper_b_tmih", "paper_b_jce", "paper_a_he"}
 FIGURES = [ROOT / "figures" / "figure_a1_two_accounts_of_the_same_shortfall",
            ROOT / "figures" / "figure_a2_interventions_to_budget_lines"]
 DOCX_NAME = "HE_manuscript_fiscal_invisibility.docx"
